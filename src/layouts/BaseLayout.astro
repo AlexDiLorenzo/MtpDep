@@ -1,0 +1,111 @@
+---
+import '../styles/global.css';
+import { site } from '../config/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+  canonical?: string;
+}
+
+const {
+  title = `${site.name} — Remorquage et dépannage 24/7 · Hérault · A9`,
+  description = "Remorquage et dépannage 24h/24, 7j/7 à Montpellier et dans l'Hérault. Plateaux VL et PL, autoroute A9, transport international. Certifié NF Service depuis 1956.",
+  canonical = site.url,
+} = Astro.props;
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'AutomotiveBusiness',
+  name: site.name,
+  image: `${site.url}/og-default.jpg`,
+  url: site.url,
+  telephone: site.phone.display,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: site.address.street,
+    postalCode: site.address.postalCode,
+    addressLocality: site.address.city,
+    addressRegion: site.address.region,
+    addressCountry: site.address.country,
+  },
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      opens: '00:00',
+      closes: '23:59',
+    },
+  ],
+  priceRange: '€€',
+  areaServed: [
+    { '@type': 'City', name: 'Montpellier' },
+    { '@type': 'AdministrativeArea', name: 'Hérault' },
+    { '@type': 'Country', name: 'France' },
+    { '@type': 'Country', name: 'Belgique' },
+    { '@type': 'Country', name: 'Italie' },
+    { '@type': 'Country', name: 'Espagne' },
+  ],
+  foundingDate: String(site.foundedYear),
+  slogan: site.tagline,
+};
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    {/* Open Graph */}
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={`${site.url}/og-default.jpg`} />
+
+    {/* Twitter */}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={`${site.url}/og-default.jpg`} />
+
+    {/* Theme */}
+    <meta name="theme-color" content="#2C6126" />
+
+    {/* Fonts preconnect */}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    {/* LocalBusiness schema.org */}
+    <script type="application/ld+json" set:html={JSON.stringify(localBusinessSchema)} />
+  </head>
+  <body>
+    <a href="#main" class="skip-link">Aller au contenu principal</a>
+    <slot />
+
+    <style is:global>
+      .skip-link {
+        position: absolute;
+        top: -40px;
+        left: 0;
+        background: var(--color-primary);
+        color: #fff;
+        padding: 8px 16px;
+        z-index: 100;
+        text-decoration: none;
+        border-radius: 0 0 var(--radius-md) 0;
+        font-size: 13px;
+        font-weight: 700;
+      }
+      .skip-link:focus { top: 0; }
+    </style>
+  </body>
+</html>

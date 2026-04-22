@@ -1,0 +1,148 @@
+---
+import LogoMark from './LogoMark.astro';
+import { site } from '../config/site';
+
+const year = new Date().getFullYear();
+
+const columns = [
+  { title: 'Services', links: ['Remorquage VL', 'Remorquage PL', 'Autoroute A9', 'Transport international', 'Rapatriement', 'Mécanique · GPL · Clim'] },
+  { title: 'Entreprise', links: ['À propos', 'Certifications NF', 'Équipe', 'Flotte', 'Partenaires', 'Actualités'] },
+  { title: 'Informations', links: ['Demande de devis', 'Paiement en ligne', "Zone d'intervention", 'Tarifs', 'CGV', 'Mentions légales'] },
+];
+---
+
+<footer class="footer" id="contact">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-brand-head">
+          <LogoMark size={44} />
+          <div>
+            <div class="footer-wordmark">{site.name}</div>
+            <div class="footer-tag">Remorquage · 24/7</div>
+          </div>
+        </div>
+        <address class="footer-address">
+          {site.address.street}<br />
+          {site.address.postalCode} {site.address.city}<br />
+          <a href={site.phone.href} class="footer-phone mono">{site.phone.display}</a><br />
+          <a href={site.email.href} class="footer-email">{site.email.display}</a>
+        </address>
+      </div>
+
+      {columns.map((c) => (
+        <div class="footer-col">
+          <div class="footer-col-title">{c.title}</div>
+          <ul>
+            {c.links.map((l) => (
+              <li><a href="#">{l}</a></li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+
+    <div class="footer-meta">
+      <span>© {year} {site.name} · Agréé autoroutes · Certifié NF Service</span>
+      <span class="mono">24 / 7 — Intervention garantie</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background: var(--md-brand-black);
+    color: var(--md-stone-50);
+    padding: 60px var(--pad-x-desktop) 24px;
+    font-family: var(--font-sans);
+  }
+  .footer-inner { max-width: var(--container-max); margin: 0 auto; }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 40px;
+  }
+
+  .footer-brand-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .footer-wordmark {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: var(--tr-display);
+  }
+  .footer-tag {
+    font-size: 10px;
+    color: var(--md-stone-300);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-top: 2px;
+  }
+  .footer-address {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--md-stone-300);
+    font-style: normal;
+  }
+  .footer-phone {
+    color: var(--md-brand-yellow);
+    text-decoration: none;
+    font-weight: 700;
+  }
+  .footer-phone:hover { text-decoration: underline; }
+  .footer-email {
+    color: var(--md-stone-50);
+    text-decoration: none;
+  }
+  .footer-email:hover { text-decoration: underline; }
+
+  .footer-col-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--md-stone-400);
+    margin-bottom: 14px;
+  }
+  .footer-col ul {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .footer-col a {
+    color: var(--md-stone-200);
+    font-size: 13px;
+    text-decoration: none;
+    transition: color var(--dur-fast) var(--ease-standard);
+  }
+  .footer-col a:hover { color: var(--md-brand-yellow); }
+
+  .footer-meta {
+    border-top: 1px solid var(--md-stone-600);
+    padding-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    font-size: 12px;
+    color: var(--md-stone-400);
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 1023px) {
+    .footer { padding: 56px var(--pad-x-tablet) 24px; }
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+  }
+
+  @media (max-width: 639px) {
+    .footer { padding: 48px var(--pad-x-mobile) 24px; }
+    .footer-grid { grid-template-columns: 1fr; gap: 28px; }
+  }
+</style>

@@ -1,0 +1,176 @@
+---
+const zones = [
+  'Montpellier',
+  'Lattes',
+  'Castelnau',
+  'Juvignac',
+  'Villeneuve-lès-Maguelone',
+  'Pérols',
+  'Mauguio',
+  'A9 sortie 30-31',
+];
+
+const pins: Array<[number, number, string]> = [
+  [400, 300, 'MTP'],
+  [320, 240, 'VLT'],
+  [500, 220, ''],
+  [310, 370, ''],
+  [480, 360, ''],
+];
+---
+
+<section class="coverage" id="zones">
+  <div class="coverage-grid">
+    <div class="coverage-copy">
+      <div class="coverage-overline">Zone d'intervention</div>
+      <h2 class="coverage-title">
+        Montpellier et grand Hérault,<br />en moins de 30 minutes.
+      </h2>
+      <p class="coverage-lead">
+        Nos équipes sont basées à Montpellier (MTP) et Villeneuve-lès-Maguelone (VLT).
+        Interventions sur toute l'agglomération, l'A9 et la sortie d'autoroute.
+      </p>
+      <ul class="coverage-list">
+        {zones.map((z) => (
+          <li>
+            <span class="coverage-dot" aria-hidden="true"></span>
+            {z}
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="coverage-map" aria-hidden="true">
+      <svg width="100%" height="100%" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice" class="coverage-map-svg">
+        <defs>
+          <pattern id="gridL" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#E4E13C" stroke-width="0.5" opacity="0.4" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#gridL)" />
+        <circle cx="400" cy="300" r="80" fill="none" stroke="#E4E13C" stroke-width="1.2" opacity="0.8" />
+        <circle cx="400" cy="300" r="160" fill="none" stroke="#E4E13C" stroke-width="1" opacity="0.55" />
+        <circle cx="400" cy="300" r="240" fill="none" stroke="#E4E13C" stroke-width="0.8" opacity="0.35" />
+        <circle cx="400" cy="300" r="320" fill="none" stroke="#E4E13C" stroke-width="0.6" opacity="0.2" />
+        {pins.map(([x, y, lbl]) => (
+          <g>
+            <circle cx={x} cy={y} r={lbl ? 12 : 5} fill="#E4E13C" />
+            {lbl && (
+              <text
+                x={x}
+                y={y + 4}
+                font-family="'Space Grotesk', sans-serif"
+                font-size="10"
+                font-weight="700"
+                fill="#1A190F"
+                text-anchor="middle"
+              >{lbl}</text>
+            )}
+          </g>
+        ))}
+      </svg>
+      <div class="coverage-badge mono">⚡ 2 SITES · 16 DÉPANNEURS</div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .coverage {
+    background: var(--color-bg-subtle);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .coverage-grid {
+    max-width: var(--container-wide);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .coverage-copy {
+    padding: 72px 48px 72px var(--pad-x-desktop);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .coverage-overline {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    margin-bottom: 10px;
+  }
+  .coverage-title {
+    font-family: var(--font-display);
+    font-size: 36px;
+    margin: 0 0 18px;
+    color: var(--color-text);
+    letter-spacing: var(--tr-display);
+    line-height: 1.1;
+    font-weight: 700;
+  }
+  .coverage-lead {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--color-text-muted);
+    margin: 0 0 28px;
+    max-width: 480px;
+  }
+  .coverage-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .coverage-list li {
+    font-size: 13px;
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .coverage-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    flex-shrink: 0;
+  }
+
+  .coverage-map {
+    min-height: 480px;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--md-forest-800) 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .coverage-map-svg {
+    position: absolute;
+    inset: 0;
+    opacity: 0.3;
+  }
+  .coverage-badge {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    padding: 6px 12px;
+    background: rgba(26,25,15,0.7);
+    border-radius: var(--radius-pill);
+    color: var(--md-brand-yellow);
+    font-size: 10px;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+
+  @media (max-width: 1023px) {
+    .coverage-grid { grid-template-columns: 1fr; }
+    .coverage-copy { padding: 56px var(--pad-x-tablet); }
+    .coverage-map { min-height: 320px; }
+    .coverage-title { font-size: 32px; }
+  }
+  @media (max-width: 639px) {
+    .coverage-copy { padding: 48px var(--pad-x-mobile); }
+    .coverage-title { font-size: 28px; }
+    .coverage-list { grid-template-columns: 1fr; }
+  }
+</style>
