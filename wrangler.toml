@@ -1,0 +1,33 @@
+# Configuration Cloudflare Pages
+# Le projet est servi par Cloudflare Pages (statique Astro + Functions dans /functions).
+# Le binding D1 est consommé par les Pages Functions (functions/api/*).
+#
+# Variables d'environnement à configurer dans le dashboard Cloudflare
+# (Pages → Settings → Environment variables) :
+#
+#   RESEND_API_KEY       → clé API Resend
+#   RESEND_FROM          → "Montpellier Dépannage <devis@<ton-domaine>>" (ou onboarding@resend.dev en test)
+#   EMAIL_TO             → alexandre.dlrz@gmail.com
+#   DEVIS_SECRET         → secret HMAC pour signer les URLs "marquer traité" (32+ chars random)
+#   ADMIN_TOKEN          → bearer token pour accéder à /admin (32+ chars random)
+#   CRON_SECRET          → bearer token pour /api/cron/check-overdue (32+ chars random)
+#   EVOLUTION_API_URL    → https://evolution.<ton-vps>
+#   EVOLUTION_API_KEY    → apikey Evolution
+#   EVOLUTION_INSTANCE   → nom de l'instance Evolution
+#   ALERT_PHONE          → numéro WhatsApp du patron, format 33XXXXXXXXX (sans + ni espaces)
+#   SITE_URL             → URL publique du site, ex https://mtp-dep.pages.dev
+#
+# Aucune de ces valeurs ne doit jamais être committée dans le repo.
+
+name = "mtp-dep"
+compatibility_date = "2025-01-15"
+pages_build_output_dir = "dist"
+
+# Binding D1 — la base est créée une fois via :
+#   wrangler d1 create mtp-dep-db
+#   wrangler d1 execute mtp-dep-db --file=schema.sql --remote
+# puis on remplace database_id ci-dessous par celui retourné par la commande.
+[[d1_databases]]
+binding = "DB"
+database_name = "mtp-dep-db"
+database_id = "REPLACE_AFTER_D1_CREATE"

@@ -57,14 +57,66 @@ La carte recto reproduit le **Certificat d'Assurance** français (vert sauge, wa
 Le verso met en évidence le numéro d'assistance (jaune signal).
 Si on touche au design de la carte, garder la cohérence avec le visuel officiel français — référence : `public/img/carte-verte-ref.jpg`.
 
+## Backend — Pages Functions + D1
+
+Le site est statique mais utilise **Cloudflare Pages Functions** (dossier `functions/`) pour le formulaire de devis, le dashboard admin, et le cron.
+
+Endpoints :
+- `POST /api/devis` — création d'une demande (insert D1 + email Resend avec lien signé)
+- `GET  /api/devis/:id/traiter?t=<token>` — marque comme traitée (HMAC sur l'id)
+- `GET  /api/cron/check-overdue` — relance WhatsApp via Evolution API pour les devis ouverts >2h. Header `Authorization: Bearer ${CRON_SECRET}` requis. À appeler via cron-job.org ou GitHub Actions toutes les ~10 min.
+- `GET  /admin` — dashboard KPIs. Auth via `?token=<ADMIN_TOKEN>` puis cookie httpOnly.
+
+Storage : **D1** (SQLite Cloudflare). Schéma dans `schema.sql`. Une seule table `devis`.
+
+Type-check des Functions : `npx tsc -p functions/tsconfig.json --noEmit` (les Functions ne passent PAS par le build Astro — Cloudflare les compile séparément lors du deploy).
+
 ## Déploiement
 
 - Repo GitHub : `AlexDiLorenzo/MtpDep`
 - Hébergement : **Cloudflare Pages** (auto-deploy sur push `main`)
 - Build : `npm run build` → `dist/`
-- Variable d'env nécessaire côté Cloudflare : `NODE_VERSION=20`
+- Variable d'env Cloudflare : `NODE_VERSION=20`
 
-Avant un push, vérifier que `npm run build` passe en local.
+### Setup initial Cloudflare (une seule fois)
+
+1. **Créer la base D1** :
+   ```bash
+   npx wrangler d1 create mtp-dep-db
+   ```
+   Récupérer le `database_id` retourné, le coller dans `wrangler.toml` à la place de `REPLACE_AFTER_D1_CREATE`.
+
+2. **Appliquer le schéma** :
+   ```bash
+   npx wrangler d1 execute mtp-dep-db --file=schema.sql --remote
+   ```
+
+3. **Lier la D1 au projet Pages** : dashboard Cloudflare → Pages → projet → Settings → Functions → D1 database bindings → ajouter `DB` → `mtp-dep-db`.
+
+4. **Configurer les secrets** dans Pages → Settings → Environment variables (production) :
+
+   | Variable | Source / format |
+   |---|---|
+   | `RESEND_API_KEY` | Console Resend → API Keys |
+   | `RESEND_FROM` | `Montpellier Dépannage <devis@<domaine-vérifié>>` ou `onboarding@resend.dev` en test |
+   | `EMAIL_TO` | `alexandre.dlrz@gmail.com` (à changer plus tard) |
+   | `DEVIS_SECRET` | random 32+ chars (`openssl rand -base64 32`) |
+   | `ADMIN_TOKEN` | random 32+ chars |
+   | `CRON_SECRET` | random 32+ chars |
+   | `EVOLUTION_API_URL` | `https://evolution.<vps>` |
+   | `EVOLUTION_API_KEY` | apikey de l'instance Evolution |
+   | `EVOLUTION_INSTANCE` | nom de l'instance Evolution |
+   | `ALERT_PHONE` | `33XXXXXXXXX` (sans + ni espaces) |
+   | `SITE_URL` | URL publique, ex `https://mtp-dep.pages.dev` |
+
+5. **Cron externe** pour la relance 2h. Plus simple : créer un job sur **cron-job.org** :
+   - URL : `https://<site>/api/cron/check-overdue`
+   - Méthode : GET
+   - Header : `Authorization: Bearer <CRON_SECRET>`
+   - Fréquence : toutes les 10 min
+   - Failure notification : activé (te notifie si l'endpoint répond mal)
+
+Avant un push, vérifier que `npm run build` ET `npx tsc -p functions/tsconfig.json --noEmit` passent.
 
 ## À éviter
 

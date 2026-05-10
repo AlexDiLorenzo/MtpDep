@@ -116,15 +116,100 @@ const journey = [
       </ol>
     </div>
 
-    <!-- Fallback : numéro MDP en cas de besoin -->
+    <!-- Fallback : appel direct + CTA devis -->
     <div class="assist-fallback">
       <div class="assist-fallback-copy">
         <div class="assist-fallback-overline">Pas d’assistance ou besoin direct&nbsp;?</div>
-        <div class="assist-fallback-title">Notre standard répond 24h/24, 7j/7.</div>
+        <div class="assist-fallback-title">Appelez le standard 24/7 ou faites une demande de devis.</div>
       </div>
-      <a href={site.phone.href} class="assist-fallback-phone mono">
-        <span aria-hidden="true">☎</span> {site.phone.display}
-      </a>
+      <div class="assist-fallback-actions">
+        <a href={site.phone.href} class="assist-fallback-phone mono">
+          <span aria-hidden="true">☎</span> {site.phone.display}
+        </a>
+        <a href="#devis" class="assist-fallback-quote">Demande de devis →</a>
+      </div>
+    </div>
+
+    <!-- Formulaire devis -->
+    <div class="devis-panel" id="devis">
+      <div class="devis-head">
+        <div class="devis-overline">Demande de devis</div>
+        <h3 class="devis-title">Décrivez votre besoin en quelques champs.</h3>
+        <p class="devis-lead">
+          Nous vous rappelons sous 2&nbsp;heures aux horaires ouvrés.
+          Demande sans engagement, traitée par un dépanneur.
+        </p>
+      </div>
+
+      <form class="devis-form" id="devis-form" novalidate>
+        <div class="devis-grid">
+          <label class="devis-field">
+            <span class="devis-label">Nom &amp; prénom</span>
+            <input type="text" name="name" autocomplete="name" maxlength="120" />
+          </label>
+
+          <label class="devis-field">
+            <span class="devis-label">Téléphone <em class="req">*</em></span>
+            <input
+              type="tel"
+              name="phone"
+              autocomplete="tel"
+              required
+              maxlength="30"
+              placeholder="06 12 34 56 78"
+            />
+          </label>
+
+          <label class="devis-field">
+            <span class="devis-label">Email</span>
+            <input type="email" name="email" autocomplete="email" maxlength="160" />
+          </label>
+
+          <fieldset class="devis-field devis-field-radio">
+            <legend class="devis-label">Type de véhicule</legend>
+            <div class="devis-radios">
+              <label><input type="radio" name="vehicle_type" value="VL" /> <span>VL</span></label>
+              <label><input type="radio" name="vehicle_type" value="UTILITAIRE" /> <span>Utilitaire</span></label>
+              <label><input type="radio" name="vehicle_type" value="PL" /> <span>Poids lourd</span></label>
+            </div>
+          </fieldset>
+
+          <label class="devis-field devis-field-full">
+            <span class="devis-label">Lieu de la panne</span>
+            <input type="text" name="location" maxlength="200" placeholder="Adresse, sortie A9, lieu-dit…" />
+          </label>
+
+          <label class="devis-field devis-field-full">
+            <span class="devis-label">Détails</span>
+            <textarea name="details" rows="3" maxlength="2000" placeholder="Marque/modèle, nature du problème, accès…"></textarea>
+          </label>
+        </div>
+
+        <!-- honeypot anti-bot -->
+        <div class="devis-honeypot" aria-hidden="true">
+          <label>Site web (laisser vide)
+            <input type="text" name="website" tabindex="-1" autocomplete="off" />
+          </label>
+        </div>
+
+        <label class="devis-consent">
+          <input type="checkbox" name="consent_rgpd" required />
+          <span>
+            J’accepte que mes informations soient utilisées pour traiter ma demande de devis.
+            Données conservées le temps du suivi commercial, jamais transmises à un tiers.
+          </span>
+        </label>
+
+        <div class="devis-submit-row">
+          <button type="submit" class="devis-submit">
+            <span class="devis-submit-label">Envoyer la demande</span>
+            <span class="devis-submit-spinner" aria-hidden="true"></span>
+          </button>
+          <span class="devis-submit-note">Réponse sous 2&nbsp;h aux heures ouvrées</span>
+        </div>
+
+        <div class="devis-result" role="status" aria-live="polite"></div>
+      </form>
     </div>
   </div>
 </section>
@@ -139,6 +224,67 @@ const journey = [
       card.classList.toggle('is-flipped', !flipped);
     });
   });
+
+  // Soumission du formulaire de devis
+  const form = document.getElementById('devis-form') as HTMLFormElement | null;
+  if (form) {
+    const result = form.querySelector<HTMLDivElement>('.devis-result')!;
+    const submit = form.querySelector<HTMLButtonElement>('.devis-submit')!;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      result.textContent = '';
+      result.className = 'devis-result';
+
+      const data = new FormData(form);
+      const payload = {
+        name: String(data.get('name') || ''),
+        phone: String(data.get('phone') || ''),
+        email: String(data.get('email') || ''),
+        vehicle_type: String(data.get('vehicle_type') || ''),
+        location: String(data.get('location') || ''),
+        details: String(data.get('details') || ''),
+        consent_rgpd: data.get('consent_rgpd') === 'on',
+        website: String(data.get('website') || ''),
+      };
+
+      if (!payload.phone.trim()) {
+        result.textContent = 'Merci d’indiquer un numéro de téléphone.';
+        result.classList.add('devis-result-err');
+        return;
+      }
+      if (!payload.consent_rgpd) {
+        result.textContent = 'Merci d’accepter le traitement de vos données.';
+        result.classList.add('devis-result-err');
+        return;
+      }
+
+      submit.disabled = true;
+      submit.classList.add('is-loading');
+
+      try {
+        const res = await fetch('/api/devis', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const json = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+        if (!res.ok || !json.ok) {
+          throw new Error(json.error || `HTTP ${res.status}`);
+        }
+        result.textContent = 'Demande envoyée. Nous vous rappelons sous 2 heures.';
+        result.classList.add('devis-result-ok');
+        form.reset();
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'erreur';
+        result.textContent = `Échec de l’envoi (${msg}). Vous pouvez aussi appeler directement.`;
+        result.classList.add('devis-result-err');
+      } finally {
+        submit.disabled = false;
+        submit.classList.remove('is-loading');
+      }
+    });
+  }
 </script>
 
 <style>
@@ -597,6 +743,7 @@ const journey = [
     border-radius: var(--radius-xl);
     color: #fff;
     flex-wrap: wrap;
+    margin-bottom: 32px;
   }
   .assist-fallback-overline {
     font-size: 10px;
@@ -611,6 +758,11 @@ const journey = [
     font-size: 18px;
     font-weight: 700;
     color: #fff;
+  }
+  .assist-fallback-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
   }
   .assist-fallback-phone {
     display: inline-flex;
@@ -632,6 +784,240 @@ const journey = [
     background: var(--color-accent-hover);
     transform: translateY(-1px);
   }
+  .assist-fallback-quote {
+    display: inline-flex;
+    align-items: center;
+    padding: 14px 20px;
+    background: transparent;
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(255,255,255,0.3);
+    transition: background-color var(--dur-base) var(--ease-standard),
+                border-color var(--dur-base) var(--ease-standard);
+  }
+  .assist-fallback-quote:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.6);
+  }
+
+  /* ---------- Panneau devis ---------- */
+  .devis-panel {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-2xl);
+    padding: 36px 36px 32px;
+    box-shadow: var(--shadow-sm);
+    scroll-margin-top: 20px;
+  }
+  .devis-head {
+    margin-bottom: 24px;
+  }
+  .devis-overline {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    background: var(--color-primary-bg);
+    padding: 5px 12px;
+    border-radius: var(--radius-pill);
+    margin-bottom: 12px;
+  }
+  .devis-title {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 8px;
+    color: var(--color-text);
+    line-height: 1.2;
+  }
+  .devis-lead {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  .devis-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .devis-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 16px;
+  }
+  .devis-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  .devis-field-full { grid-column: 1 / -1; }
+  .devis-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-text);
+    letter-spacing: 0.02em;
+  }
+  .devis-label .req { color: var(--md-danger); font-style: normal; }
+  .devis-field input[type='text'],
+  .devis-field input[type='tel'],
+  .devis-field input[type='email'],
+  .devis-field textarea {
+    width: 100%;
+    padding: 11px 13px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--color-text);
+    background: var(--color-bg);
+    transition: border-color var(--dur-base) var(--ease-standard),
+                box-shadow var(--dur-base) var(--ease-standard);
+  }
+  .devis-field input:focus,
+  .devis-field textarea:focus {
+    outline: 0;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(44,97,38,0.12);
+  }
+  .devis-field textarea {
+    resize: vertical;
+    min-height: 80px;
+    font-family: var(--font-sans);
+  }
+
+  .devis-radios {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .devis-radios label {
+    flex: 1;
+    min-width: 100px;
+    cursor: pointer;
+  }
+  .devis-radios input[type='radio'] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .devis-radios span {
+    display: block;
+    text-align: center;
+    padding: 11px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-text);
+    background: var(--color-bg);
+    transition: border-color var(--dur-base) var(--ease-standard),
+                background-color var(--dur-base) var(--ease-standard),
+                color var(--dur-base) var(--ease-standard);
+  }
+  .devis-radios input[type='radio']:checked + span {
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
+  }
+  .devis-radios input[type='radio']:focus-visible + span {
+    box-shadow: 0 0 0 3px rgba(44,97,38,0.25);
+  }
+
+  .devis-honeypot {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .devis-consent {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    font-size: 12px;
+    line-height: 1.55;
+    color: var(--color-text-muted);
+    cursor: pointer;
+  }
+  .devis-consent input {
+    margin-top: 3px;
+    width: 16px;
+    height: 16px;
+    accent-color: var(--color-primary);
+    flex-shrink: 0;
+  }
+
+  .devis-submit-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .devis-submit {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 28px;
+    background: var(--color-primary);
+    color: #fff;
+    border: 0;
+    border-radius: var(--radius-lg);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color var(--dur-base) var(--ease-standard),
+                transform var(--dur-base) var(--ease-standard);
+  }
+  .devis-submit:hover { background: var(--color-primary-hover); }
+  .devis-submit:active { transform: translateY(1px); }
+  .devis-submit:disabled { opacity: 0.6; cursor: wait; }
+  .devis-submit-spinner {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: #fff;
+    display: none;
+    animation: devis-spin 0.7s linear infinite;
+  }
+  .devis-submit.is-loading .devis-submit-spinner { display: inline-block; }
+  @keyframes devis-spin { to { transform: rotate(360deg); } }
+  .devis-submit-note {
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+
+  .devis-result {
+    font-size: 13px;
+    line-height: 1.5;
+    padding: 0;
+  }
+  .devis-result-ok {
+    padding: 12px 14px;
+    background: var(--color-primary-bg);
+    color: var(--color-primary);
+    border-radius: var(--radius-md);
+    font-weight: 700;
+  }
+  .devis-result-err {
+    padding: 12px 14px;
+    background: var(--md-danger-bg);
+    color: var(--md-danger);
+    border-radius: var(--radius-md);
+    font-weight: 700;
+  }
 
   /* ---------- Responsive ---------- */
   @media (max-width: 1023px) {
@@ -640,6 +1026,7 @@ const journey = [
     .assist-grid { grid-template-columns: 1fr; gap: 48px; }
     .assist-card-wrap { order: 2; }
     .assist-steps { order: 1; }
+    .devis-panel { padding: 28px 24px; }
   }
   @media (max-width: 639px) {
     .assist { padding: 64px var(--pad-x-mobile); }
@@ -648,7 +1035,13 @@ const journey = [
     .assist-card { max-width: 340px; }
     .assist-card-back-phone-num { font-size: 18px; }
     .assist-fallback { flex-direction: column; align-items: stretch; padding: 20px; text-align: center; }
-    .assist-fallback-phone { justify-content: center; }
+    .assist-fallback-phone, .assist-fallback-quote { justify-content: center; text-align: center; }
+    .devis-panel { padding: 24px 20px; }
+    .devis-grid { grid-template-columns: 1fr; }
+    .devis-title { font-size: 20px; }
+    .devis-submit-row { flex-direction: column; align-items: stretch; }
+    .devis-submit { justify-content: center; }
+    .devis-submit-note { text-align: center; }
   }
 
   @media (prefers-reduced-motion: reduce) {
