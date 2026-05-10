@@ -31,23 +31,17 @@ export const site = {
 
 export const nav = [
   { label: 'Services', href: '#services' },
-  { label: 'Flotte', href: '#flotte' },
+  { label: 'Capacité', href: '#capacite' },
   { label: 'Zones', href: '#zones' },
-  { label: 'Actualités', href: '#news' },
   { label: 'Contact', href: '#contact' },
 ] as const;
 
-// Photos hotlinkées depuis l'ancien WordPress en attendant
-// une batch locale fournie par le client.
+// Photos locales fournies par le client (dossier public/img/).
 export const photos = {
-  heroA9: 'https://montpellierdepannage.com/wp-content/uploads/2021/04/a9-avril21-4-1.jpg',
-  accidentPL: 'https://montpellierdepannage.com/wp-content/uploads/2022/02/accident2.jpg',
-  plateauVL: 'https://montpellierdepannage.com/wp-content/uploads/2020/04/Resized_21-1.jpg',
-  bornesEV: 'https://montpellierdepannage.com/wp-content/uploads/2021/08/evbox-montpellier-1.jpg',
+  heroA9: '/img/intervention-a9.jpg',
+  flotteDepot: '/img/flotte-depot.jpg',
+  porschePlateau: '/img/porsche-plateau.jpg',
+  plRecuperation: '/img/pl-recuperation.jpg',
+  plRenversement: '/img/pl-renversement.jpg',
 } as const;
 
-export const certifications = {
-  nfService: 'https://montpellierdepannage.com/wp-content/uploads/2024/05/NFS_Depannage-vehicules-legers-et-poids-lourds.webp',
-  envol: 'https://montpellierdepannage.com/wp-content/uploads/2024/05/signature-titulaires-envol.webp',
-  oleo100: 'https://montpellierdepannage.com/wp-content/uploads/elementor/thumbs/Visuel-RS-Oleo100-2023-MONTPELLIER-DEPANNAGE-800-qol3tq547eb1wu82do3kdqa9hmbloo01u3hvtw8qrg.png',
-} as const;

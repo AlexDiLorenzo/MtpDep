@@ -6,8 +6,8 @@ const year = new Date().getFullYear();
 
 const columns = [
   { title: 'Services', links: ['Remorquage VL', 'Remorquage PL', 'Autoroute A9', 'Transport international', 'Rapatriement', 'Mécanique · GPL · Clim'] },
-  { title: 'Entreprise', links: ['À propos', 'Certifications NF', 'Équipe', 'Flotte', 'Partenaires', 'Actualités'] },
-  { title: 'Informations', links: ['Demande de devis', 'Paiement en ligne', "Zone d'intervention", 'Tarifs', 'CGV', 'Mentions légales'] },
+  { title: 'Entreprise', links: ['À propos', 'Certifications NF', 'Équipe', 'Flotte', 'Partenaires'] },
+  { title: 'Informations', links: ['Vous êtes en panne ?', 'Paiement en ligne', "Zone d'intervention", 'Tarifs', 'CGV', 'Mentions légales'] },
 ];
 ---
 
@@ -16,11 +16,7 @@ const columns = [
     <div class="footer-grid">
       <div class="footer-brand">
         <div class="footer-brand-head">
-          <LogoMark size={44} />
-          <div>
-            <div class="footer-wordmark">{site.name}</div>
-            <div class="footer-tag">Remorquage · 24/7</div>
-          </div>
+          <LogoMark size={42} class="footer-logo" />
         </div>
         <address class="footer-address">
           {site.address.street}<br />
@@ -68,22 +64,12 @@ const columns = [
   .footer-brand-head {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
+    margin-bottom: 18px;
   }
-  .footer-wordmark {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 16px;
-    letter-spacing: var(--tr-display);
-  }
-  .footer-tag {
-    font-size: 10px;
-    color: var(--md-stone-300);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    font-weight: 700;
-    margin-top: 2px;
+  .footer-brand :global(.footer-logo) {
+    background: var(--md-stone-50);
+    border-radius: 12px;
+    padding: 6px 10px;
   }
   .footer-address {
     font-size: 13px;

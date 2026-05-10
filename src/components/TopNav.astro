@@ -6,11 +6,7 @@ import { site, nav } from '../config/site';
 <nav class="topnav">
   <div class="topnav-inner">
     <a href="/" class="topnav-brand" aria-label={`${site.name} — accueil`}>
-      <LogoMark size={40} />
-      <div class="topnav-brand-text">
-        <span class="topnav-wordmark">{site.name}</span>
-        <span class="topnav-tag">{site.tagline}</span>
-      </div>
+      <LogoMark size={32} />
     </a>
 
     <ul class="topnav-links">
@@ -20,8 +16,10 @@ import { site, nav } from '../config/site';
     </ul>
 
     <div class="topnav-cta">
-      <a href={site.phone.href} class="topnav-phone">{site.phone.display}</a>
-      <a href="#devis" class="btn btn-primary topnav-quote">Demande de devis</a>
+      <a href="#assistance" class="topnav-assist">Vous êtes en panne&nbsp;?</a>
+      <a href={site.phone.href} class="btn btn-primary topnav-phone-cta mono">
+        <span aria-hidden="true">☎</span> {site.phone.display}
+      </a>
     </div>
 
     <button class="topnav-burger" aria-label="Menu" aria-controls="mobile-menu" aria-expanded="false" id="burger">
@@ -34,8 +32,8 @@ import { site, nav } from '../config/site';
       {nav.map((item) => (
         <li><a href={item.href}>{item.label}</a></li>
       ))}
-      <li><a href={site.phone.href} class="mobile-phone mono">{site.phone.display}</a></li>
-      <li><a href="#devis" class="btn btn-primary mobile-quote">Demande de devis</a></li>
+      <li><a href="#assistance" class="mobile-assist">Vous êtes en panne&nbsp;?</a></li>
+      <li><a href={site.phone.href} class="btn btn-primary mobile-phone-cta mono">☎ {site.phone.display}</a></li>
     </ul>
   </div>
 </nav>
@@ -66,30 +64,9 @@ import { site, nav } from '../config/site';
   .topnav-brand {
     display: flex;
     align-items: center;
-    gap: 14px;
     text-decoration: none;
     color: inherit;
     flex-shrink: 0;
-  }
-  .topnav-brand-text {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.15;
-  }
-  .topnav-wordmark {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 15px;
-    letter-spacing: var(--tr-display);
-    color: var(--color-text);
-  }
-  .topnav-tag {
-    font-size: 10px;
-    color: var(--color-text-muted);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    font-weight: 700;
-    margin-top: 2px;
   }
 
   .topnav-links {
@@ -109,23 +86,29 @@ import { site, nav } from '../config/site';
   .topnav-links a:hover { color: var(--color-primary); border-color: var(--color-primary); }
 
   .topnav-cta { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-  .topnav-phone {
+  .topnav-assist {
     padding: 10px 16px;
     border-radius: var(--radius-md);
     background: transparent;
-    color: var(--color-primary);
-    border: 1px solid var(--color-primary);
+    color: var(--color-text);
     font-size: 13px;
     font-weight: 700;
     text-decoration: none;
-    font-family: var(--font-mono);
-    transition: background-color var(--dur-base) var(--ease-standard), color var(--dur-base) var(--ease-standard);
+    border: 1px solid var(--color-border);
+    transition: background-color var(--dur-base) var(--ease-standard), border-color var(--dur-base) var(--ease-standard), color var(--dur-base) var(--ease-standard);
   }
-  .topnav-phone:hover { background: var(--color-primary-bg); }
-  .topnav-quote {
+  .topnav-assist:hover {
+    background: var(--color-primary-bg);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+  .topnav-phone-cta {
     padding: 10px 16px;
     font-size: 13px;
     border-radius: var(--radius-md);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
   }
 
   /* Burger (mobile) */
@@ -165,12 +148,11 @@ import { site, nav } from '../config/site';
     color: var(--color-text);
     text-decoration: none;
   }
-  .mobile-phone { color: var(--color-primary) !important; }
-  .mobile-quote { justify-content: center; margin-top: 6px; }
+  .mobile-assist { color: var(--color-text) !important; }
+  .mobile-phone-cta { justify-content: center; margin-top: 6px; display: flex; align-items: center; gap: 8px; }
 
   @media (max-width: 1023px) {
     .topnav-inner { padding: 12px var(--pad-x-tablet); gap: 16px; }
-    .topnav-wordmark { font-size: 14px; }
     .topnav-links { gap: 18px; }
   }
 
@@ -182,7 +164,6 @@ import { site, nav } from '../config/site';
     .topnav-inner { padding: 12px var(--pad-x-mobile); }
     .topnav-cta { display: none; }
     .topnav-burger { display: flex; }
-    .topnav-tag { display: none; }
     .topnav-mobile { display: block; }
     .topnav-mobile[hidden] { display: none; }
   }

@@ -1,0 +1,658 @@
+---
+import { site } from '../../config/site';
+
+const journey = [
+  {
+    n: '1',
+    title: 'Avez-vous une assurance ou une carte grise récente ?',
+    desc: 'Presque tous les contrats incluent une assistance dépannage 24/7 — souvent gratuite, sans franchise sur les premiers kilomètres.',
+  },
+  {
+    n: '2',
+    title: 'Appelez d’abord votre assistance.',
+    desc: 'Le numéro est au dos de votre carte verte (assurance) ou sur votre contrat. Vous êtes probablement déjà pris en charge.',
+  },
+  {
+    n: '3',
+    title: 'Pas d’assistance ou besoin direct ?',
+    desc: 'Composez notre standard. Intervention immédiate, devis transparent, prise en charge sur l’A9 et le grand Hérault.',
+  },
+];
+---
+
+<section class="assist" id="assistance" aria-labelledby="assist-title">
+  <div class="assist-inner">
+    <header class="assist-head">
+      <div class="assist-overline">Vous êtes en panne&nbsp;?</div>
+      <h2 class="assist-title" id="assist-title">
+        Avant tout, pensez à appeler<br />
+        <span class="assist-title-accent">votre assistance.</span>
+      </h2>
+      <p class="assist-lead">
+        9&nbsp;automobilistes sur 10 sont déjà couverts sans le savoir. Le numéro
+        est au dos de votre carte verte&nbsp;— vérifiez avant tout&nbsp;:
+        l’appel est gratuit, le remorquage souvent inclus.
+      </p>
+    </header>
+
+    <div class="assist-grid">
+      <!-- Carte qui se retourne -->
+      <div class="assist-card-wrap">
+        <button
+          type="button"
+          class="assist-card"
+          aria-label="Retourner la carte d'assistance pour voir le numéro"
+          data-flip
+        >
+          <div class="assist-card-inner">
+            <!-- Recto : Certificat d'Assurance (carte verte FR) -->
+            <div class="assist-card-face assist-card-front">
+              <div class="assist-card-watermark" aria-hidden="true">
+                <span>CA</span>
+              </div>
+              <div class="assist-card-border" aria-hidden="true"></div>
+
+              <h3 class="assist-card-cert-title">CERTIFICAT D'ASSURANCE</h3>
+
+              <div class="assist-card-field assist-card-field-period">
+                <div class="assist-card-field-row">
+                  <span class="assist-card-field-label">du</span>
+                  <span class="assist-card-field-value mono">01.01.2026</span>
+                  <span class="assist-card-field-label">au</span>
+                  <span class="assist-card-field-value mono">31.12.2026</span>
+                </div>
+              </div>
+
+              <div class="assist-card-field assist-card-field-id">
+                <span class="assist-card-field-mini-label">Identification</span>
+                <span class="assist-card-field-id-value mono">AB-123-CD</span>
+              </div>
+
+              <div class="assist-card-num">
+                <span class="assist-card-num-label">N°</span>
+                <span class="assist-card-num-value mono">2026 04 67 421 431</span>
+              </div>
+
+              <div class="assist-card-flip-hint" aria-hidden="true">
+                <span class="assist-card-flip-icon">↻</span>
+                Cliquez pour retourner
+              </div>
+            </div>
+
+            <!-- Verso : numéro d'assistance mis en évidence -->
+            <div class="assist-card-face assist-card-back">
+              <div class="assist-card-back-strip" aria-hidden="true"></div>
+              <div class="assist-card-back-overline">Assistance 24/7 — au dos de votre carte</div>
+              <div class="assist-card-back-phone">
+                <span class="assist-card-back-phone-icon" aria-hidden="true">☎</span>
+                <span class="assist-card-back-phone-num mono">0&nbsp;800&nbsp;XX&nbsp;XX&nbsp;XX</span>
+              </div>
+              <div class="assist-card-back-note">
+                C’est ce numéro qu’il faut composer en premier. <br />
+                Appel gratuit, remorquage souvent inclus dans votre contrat.
+              </div>
+              <div class="assist-card-back-arrow" aria-hidden="true">↻</div>
+            </div>
+          </div>
+        </button>
+
+        <div class="assist-card-caption">
+          Carte d’illustration — votre numéro d’assistance se trouve
+          au dos de la vraie carte verte ou sur votre contrat d’assurance.
+        </div>
+      </div>
+
+      <!-- Parcours -->
+      <ol class="assist-steps">
+        {journey.map((s) => (
+          <li class="assist-step">
+            <div class="assist-step-num">{s.n}</div>
+            <div class="assist-step-body">
+              <div class="assist-step-title">{s.title}</div>
+              <div class="assist-step-desc">{s.desc}</div>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+
+    <!-- Fallback : numéro MDP en cas de besoin -->
+    <div class="assist-fallback">
+      <div class="assist-fallback-copy">
+        <div class="assist-fallback-overline">Pas d’assistance ou besoin direct&nbsp;?</div>
+        <div class="assist-fallback-title">Notre standard répond 24h/24, 7j/7.</div>
+      </div>
+      <a href={site.phone.href} class="assist-fallback-phone mono">
+        <span aria-hidden="true">☎</span> {site.phone.display}
+      </a>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Flip au clic + au focus clavier (Enter/Espace géré nativement par <button>)
+  const cards = document.querySelectorAll<HTMLButtonElement>('[data-flip]');
+  cards.forEach((card) => {
+    card.addEventListener('click', () => {
+      const flipped = card.getAttribute('aria-pressed') === 'true';
+      card.setAttribute('aria-pressed', String(!flipped));
+      card.classList.toggle('is-flipped', !flipped);
+    });
+  });
+</script>
+
+<style>
+  .assist {
+    padding: 96px var(--pad-x-desktop);
+    background: var(--color-bg);
+    position: relative;
+    overflow: hidden;
+  }
+  .assist::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 12% 10%, rgba(44,97,38,0.05) 0%, transparent 55%),
+      radial-gradient(ellipse at 88% 90%, rgba(228,225,60,0.08) 0%, transparent 55%);
+    pointer-events: none;
+  }
+  .assist-inner {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    position: relative;
+  }
+
+  /* ---------- Head ---------- */
+  .assist-head {
+    max-width: 720px;
+    margin-bottom: 56px;
+  }
+  .assist-overline {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    background: var(--color-primary-bg);
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    margin-bottom: 18px;
+  }
+  .assist-title {
+    font-family: var(--font-display);
+    font-size: 44px;
+    line-height: 1.08;
+    letter-spacing: var(--tr-display);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 18px;
+  }
+  .assist-title-accent { color: var(--color-primary); }
+  .assist-lead {
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  /* ---------- Grid carte + steps ---------- */
+  .assist-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    gap: 64px;
+    align-items: center;
+    margin-bottom: 56px;
+  }
+
+  /* ---------- Carte 3D flip ---------- */
+  .assist-card-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+  }
+  .assist-card {
+    width: 100%;
+    max-width: 360px;
+    aspect-ratio: 1 / 0.86;
+    perspective: 1400px;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .assist-card:focus-visible {
+    outline: 3px solid var(--md-signal-300);
+    outline-offset: 6px;
+    border-radius: var(--radius-xl);
+  }
+  .assist-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 900ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    will-change: transform;
+  }
+  .assist-card.is-flipped .assist-card-inner {
+    transform: rotateY(180deg);
+  }
+  /* Léger flottement au survol pour signaler l'interactivité */
+  @media (hover: hover) {
+    .assist-card:hover .assist-card-inner {
+      transform: translateY(-4px) rotateY(0);
+    }
+    .assist-card.is-flipped:hover .assist-card-inner {
+      transform: translateY(-4px) rotateY(180deg);
+    }
+  }
+
+  .assist-card-face {
+    position: absolute;
+    inset: 0;
+    border-radius: 6px;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    box-shadow:
+      0 24px 60px -20px rgba(26,25,15,0.45),
+      0 8px 18px -6px rgba(26,25,15,0.25);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+  }
+
+  /* ----- Front : Certificat d'Assurance officiel ----- */
+  .assist-card-front {
+    /* Vert sauge clair, ton officiel de la carte verte FR */
+    background:
+      linear-gradient(180deg, #B5D6B2 0%, #A6CDA4 50%, #98C399 100%);
+    color: #1a1a1a;
+    padding: 0;
+    font-family: 'Times New Roman', 'Liberation Serif', Georgia, serif;
+  }
+
+  /* Filigrane "CA" répété en mosaïque */
+  .assist-card-front::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80' opacity='0.55'><text x='4' y='22' font-family='serif' font-size='18' font-weight='700' fill='%2381AE85'>CA</text><text x='44' y='42' font-family='serif' font-size='18' font-weight='700' fill='%2381AE85'>CA</text><text x='4' y='62' font-family='serif' font-size='18' font-weight='700' fill='%2381AE85'>CA</text><text x='44' y='82' font-family='serif' font-size='18' font-weight='700' fill='%2381AE85'>CA</text></svg>");
+    background-size: 80px 80px;
+    background-repeat: repeat;
+    opacity: 0.55;
+    pointer-events: none;
+  }
+
+  /* Grand "CA" stylisé au centre */
+  .assist-card-watermark {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .assist-card-watermark span {
+    font-family: 'Times New Roman', 'Liberation Serif', Georgia, serif;
+    font-size: 220px;
+    font-weight: 700;
+    color: rgba(110, 155, 113, 0.45);
+    letter-spacing: -0.04em;
+    line-height: 0.8;
+    -webkit-text-stroke: 1px rgba(80, 130, 85, 0.55);
+    text-stroke: 1px rgba(80, 130, 85, 0.55);
+    transform: translateY(8px);
+  }
+
+  /* Bordure intérieure imitant le cadre officiel */
+  .assist-card-border {
+    position: absolute;
+    inset: 8px;
+    border: 1.5px solid rgba(60, 110, 65, 0.35);
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .assist-card-border::after {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border: 1px dashed rgba(60, 110, 65, 0.25);
+    border-radius: 1px;
+  }
+
+  .assist-card-cert-title {
+    position: relative;
+    z-index: 3;
+    font-family: 'Times New Roman', 'Liberation Serif', Georgia, serif;
+    font-size: 16px;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 0.04em;
+    color: #111;
+    margin: 22px 24px 16px;
+    text-transform: uppercase;
+  }
+
+  /* Champs noirs (cadres officiels) */
+  .assist-card-field {
+    position: relative;
+    z-index: 3;
+    margin: 0 24px 12px;
+    background: transparent;
+    border: 1.4px solid #111;
+    padding: 8px 10px;
+    min-height: 30px;
+    display: flex;
+    align-items: center;
+  }
+  .assist-card-field-period .assist-card-field-row {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    flex: 1;
+    flex-wrap: nowrap;
+    font-size: 12px;
+  }
+  .assist-card-field-label {
+    font-family: 'Times New Roman', serif;
+    font-size: 13px;
+    font-weight: 400;
+    color: #111;
+    font-style: italic;
+  }
+  .assist-card-field-value {
+    flex: 1;
+    border-bottom: 1px solid #111;
+    padding: 0 4px 1px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: #111;
+    text-align: center;
+  }
+  .assist-card-field-id {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 4px 10px 8px;
+  }
+  .assist-card-field-mini-label {
+    font-family: 'Times New Roman', serif;
+    font-size: 10.5px;
+    font-style: italic;
+    text-align: center;
+    color: #111;
+    margin-bottom: 2px;
+  }
+  .assist-card-field-id-value {
+    align-self: center;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: #111;
+    border-bottom: 1px solid #111;
+    padding: 0 24px 1px;
+    min-width: 60%;
+    text-align: center;
+  }
+
+  .assist-card-num {
+    position: relative;
+    z-index: 3;
+    margin: auto 24px 16px;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-family: 'Times New Roman', serif;
+    font-size: 12px;
+  }
+  .assist-card-num-label { font-weight: 400; color: #111; }
+  .assist-card-num-value {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: #1a1a1a;
+  }
+
+  /* Hint flip discret en bas à droite */
+  .assist-card-flip-hint {
+    position: absolute;
+    bottom: 14px;
+    right: 18px;
+    z-index: 4;
+    font-family: var(--font-sans);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #2C6126;
+    background: rgba(255,255,255,0.85);
+    padding: 5px 9px;
+    border-radius: var(--radius-pill);
+    border: 1px solid rgba(44,97,38,0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  }
+  .assist-card-flip-icon {
+    display: inline-block;
+    font-size: 11px;
+    animation: assist-flip-hint 2.4s ease-in-out infinite;
+  }
+  @keyframes assist-flip-hint {
+    0%, 60%, 100% { transform: rotate(0); }
+    70% { transform: rotate(-90deg); }
+    85% { transform: rotate(-180deg); }
+  }
+
+  /* ----- Back : numéro d'assistance ----- */
+  .assist-card-back {
+    background:
+      linear-gradient(160deg, #FFFFFF 0%, #F6F5EB 60%, #EDEBD3 100%);
+    color: var(--color-text);
+    transform: rotateY(180deg);
+    padding: 26px 28px;
+    justify-content: space-between;
+  }
+  .assist-card-back::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 90% 90%, rgba(228,225,60,0.25) 0%, transparent 45%);
+    pointer-events: none;
+  }
+  .assist-card-back-strip {
+    position: absolute;
+    top: 18px;
+    left: 0;
+    right: 0;
+    height: 36px;
+    background: var(--md-stone-900);
+  }
+  .assist-card-back-overline {
+    margin-top: 70px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    position: relative;
+  }
+  .assist-card-back-phone {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--md-signal-300);
+    color: var(--md-brand-black);
+    padding: 14px 16px;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 6px 18px rgba(228,225,60,0.45);
+    position: relative;
+    border: 2px solid var(--md-brand-black);
+  }
+  .assist-card-back-phone-icon {
+    font-size: 22px;
+    line-height: 1;
+  }
+  .assist-card-back-phone-num {
+    font-family: var(--font-mono);
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .assist-card-back-note {
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+    position: relative;
+  }
+  .assist-card-back-arrow {
+    position: absolute;
+    bottom: 14px;
+    right: 16px;
+    font-size: 14px;
+    color: var(--color-text-muted);
+    opacity: 0.6;
+  }
+
+  .assist-card-caption {
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+    text-align: center;
+    max-width: 360px;
+  }
+
+  /* ---------- Steps ---------- */
+  .assist-steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .assist-step {
+    display: flex;
+    gap: 18px;
+    padding: 20px 22px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xs);
+    transition: border-color var(--dur-base) var(--ease-standard),
+                box-shadow var(--dur-base) var(--ease-standard),
+                transform var(--dur-base) var(--ease-standard);
+  }
+  .assist-step:hover {
+    border-color: var(--md-forest-200);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+  .assist-step-num {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: #fff;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .assist-step-body { flex: 1; }
+  .assist-step-title {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+  .assist-step-desc {
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--color-text-muted);
+  }
+
+  /* ---------- Fallback bandeau ---------- */
+  .assist-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 24px 28px;
+    background: var(--md-stone-900);
+    border-radius: var(--radius-xl);
+    color: #fff;
+    flex-wrap: wrap;
+  }
+  .assist-fallback-overline {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--md-signal-300);
+    margin-bottom: 4px;
+  }
+  .assist-fallback-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .assist-fallback-phone {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 22px;
+    background: var(--md-signal-300);
+    color: var(--md-brand-black);
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-accent);
+    transition: background-color var(--dur-base) var(--ease-standard),
+                transform var(--dur-base) var(--ease-standard);
+  }
+  .assist-fallback-phone:hover {
+    background: var(--color-accent-hover);
+    transform: translateY(-1px);
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1023px) {
+    .assist { padding: 80px var(--pad-x-tablet); }
+    .assist-title { font-size: 36px; }
+    .assist-grid { grid-template-columns: 1fr; gap: 48px; }
+    .assist-card-wrap { order: 2; }
+    .assist-steps { order: 1; }
+  }
+  @media (max-width: 639px) {
+    .assist { padding: 64px var(--pad-x-mobile); }
+    .assist-title { font-size: 28px; }
+    .assist-lead { font-size: 15px; }
+    .assist-card { max-width: 340px; }
+    .assist-card-back-phone-num { font-size: 18px; }
+    .assist-fallback { flex-direction: column; align-items: stretch; padding: 20px; text-align: center; }
+    .assist-fallback-phone { justify-content: center; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .assist-card-inner { transition: none; }
+    .assist-card-flip-icon { animation: none; }
+  }
+</style>

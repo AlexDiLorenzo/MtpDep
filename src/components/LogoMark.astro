@@ -2,45 +2,24 @@
 interface Props {
   size?: number;
   class?: string;
+  alt?: string;
 }
-const { size = 40, class: className } = Astro.props;
-const mdSize = Math.round(size * 0.3);
-const subSize = Math.max(8, Math.round(size * 0.11));
+const { size = 32, class: className, alt = 'Montpellier Dépannage' } = Astro.props;
 ---
 
-<div class:list={['logo-mark', className]} style={`--logo-size: ${size}px; --logo-md-size: ${mdSize}px; --logo-sub-size: ${subSize}px;`}>
-  <span class="logo-md">MD</span>
-  <span class="logo-sub">DÉPANNAGE</span>
-</div>
+<img
+  src="/img/logo-mdp.png"
+  alt={alt}
+  class:list={['logo-mark', className]}
+  loading="eager"
+  decoding="async"
+  style={`height:${size}px;width:auto;`}
+/>
 
 <style>
   .logo-mark {
-    width: var(--logo-size);
-    height: var(--logo-size);
-    border-radius: 50%;
-    background: var(--md-brand-green);
-    border: 1.5px solid var(--md-brand-black);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: var(--md-brand-yellow);
-    font-family: var(--font-display);
-    font-weight: 700;
     flex-shrink: 0;
-    line-height: 1;
-  }
-  .logo-md {
-    font-size: var(--logo-md-size);
-    letter-spacing: var(--tr-display);
-    line-height: 1;
-  }
-  .logo-sub {
-    font-family: var(--font-sans);
-    font-weight: 700;
-    font-size: var(--logo-sub-size);
-    letter-spacing: 0.1em;
-    margin-top: 2px;
-    opacity: 0.9;
+    display: block;
+    object-fit: contain;
   }
 </style>

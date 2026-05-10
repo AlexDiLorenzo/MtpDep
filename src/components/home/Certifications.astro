@@ -1,0 +1,217 @@
+---
+const certs = [
+  {
+    type: 'image',
+    src: '/img/cert-nf-afnor.jpg',
+    alt: 'NF Service — certifié AFNOR',
+    title: 'NF Service',
+    body: 'Dépannage VL & PL certifié par AFNOR Certification. Engagement qualité audité chaque année.',
+  },
+  {
+    type: 'image',
+    src: '/img/cert-envol.png',
+    alt: 'Envol — engagement environnemental',
+    title: 'Envol',
+    body: "Engagement volontaire de l'entreprise pour l'environnement. Démarche RSE reconnue.",
+  },
+  {
+    type: 'badge',
+    title: 'Toutes assurances',
+    body: 'Agréés toutes compagnies — vous êtes pris en charge directement, sans avance de frais.',
+  },
+];
+---
+
+<section class="certs" aria-labelledby="certs-title">
+  <div class="certs-inner">
+    <header class="certs-head">
+      <div class="certs-overline">Certifications &amp; agréments</div>
+      <h2 class="certs-title" id="certs-title">
+        Certifiés, agréés, <span class="certs-title-accent">engagés.</span>
+      </h2>
+      <p class="certs-lead">
+        Trois garanties concrètes pour vous : une qualité de service auditée, un engagement
+        environnemental reconnu, et un agrément valable auprès de toutes les assurances.
+      </p>
+    </header>
+
+    <ul class="certs-grid">
+      {certs.map((c) => (
+        <li class="certs-card">
+          <div class="certs-card-logo">
+            {c.type === 'image' ? (
+              <img src={c.src} alt={c.alt} loading="lazy" decoding="async" />
+            ) : (
+              <div class="certs-badge" aria-hidden="true">
+                <svg viewBox="0 0 64 64" width="56" height="56">
+                  <circle cx="32" cy="32" r="30" fill="none" stroke="#2C6126" stroke-width="2.4" />
+                  <path
+                    d="M19 33 L28 42 L46 22"
+                    fill="none"
+                    stroke="#2C6126"
+                    stroke-width="4"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <text
+                    x="32"
+                    y="56"
+                    text-anchor="middle"
+                    font-family="'Space Grotesk', sans-serif"
+                    font-size="6.5"
+                    font-weight="700"
+                    fill="#2C6126"
+                    letter-spacing="0.12em"
+                  >ASSURANCES</text>
+                </svg>
+              </div>
+            )}
+          </div>
+          <div class="certs-card-body">
+            <h3 class="certs-card-title">{c.title}</h3>
+            <p class="certs-card-text">{c.body}</p>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .certs {
+    padding: 72px var(--pad-x-desktop);
+    background: var(--color-bg);
+    position: relative;
+  }
+  .certs-inner {
+    max-width: var(--container-max);
+    margin: 0 auto;
+  }
+
+  .certs-head {
+    max-width: 720px;
+    margin: 0 auto 40px;
+    text-align: center;
+  }
+  .certs-overline {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    background: var(--color-primary-bg);
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    margin-bottom: 16px;
+  }
+  .certs-title {
+    font-family: var(--font-display);
+    font-size: 36px;
+    line-height: 1.1;
+    letter-spacing: var(--tr-display);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 14px;
+  }
+  .certs-title-accent { color: var(--color-primary); }
+  .certs-lead {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  .certs-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .certs-card {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-2xl);
+    padding: 28px 26px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+    box-shadow: var(--shadow-xs);
+    position: relative;
+    overflow: hidden;
+    transition: transform var(--dur-base) var(--ease-standard),
+                box-shadow var(--dur-base) var(--ease-standard),
+                border-color var(--dur-base) var(--ease-standard);
+  }
+  .certs-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--color-primary), var(--md-signal-300));
+    opacity: 0;
+    transition: opacity var(--dur-base) var(--ease-standard);
+  }
+  .certs-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--md-forest-200);
+  }
+  .certs-card:hover::after { opacity: 1; }
+
+  .certs-card-logo {
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  .certs-card-logo img {
+    height: 100%;
+    width: auto;
+    max-width: 160px;
+    object-fit: contain;
+    display: block;
+  }
+
+  .certs-badge {
+    width: 72px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-primary-bg);
+    border-radius: 50%;
+    border: 1.5px solid var(--md-forest-200);
+  }
+  .certs-badge svg { display: block; }
+
+  .certs-card-body { flex: 1; }
+  .certs-card-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 6px;
+  }
+  .certs-card-text {
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  @media (max-width: 1023px) {
+    .certs { padding: 64px var(--pad-x-tablet); }
+    .certs-title { font-size: 30px; }
+    .certs-grid { grid-template-columns: 1fr; gap: 14px; }
+  }
+  @media (max-width: 639px) {
+    .certs { padding: 48px var(--pad-x-mobile); }
+    .certs-title { font-size: 26px; }
+    .certs-card { padding: 22px 20px; }
+  }
+</style>
