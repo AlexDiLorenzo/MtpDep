@@ -33,6 +33,15 @@ function clean(s: unknown, max: number): string | null {
 export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   const { request, env } = ctx;
 
+  // Vérifie d'abord la conf : on préfère échouer fort qu'enregistrer une demande qui n'enverra jamais d'email
+  const missing = ['EMAIL_TO', 'RESEND_API_KEY', 'RESEND_FROM', 'DEVIS_SECRET', 'SITE_URL'].filter(
+    (k) => !(env as unknown as Record<string, string>)[k]
+  );
+  if (missing.length) {
+    console.error('Missing env vars:', missing.join(', '));
+    return jsonResponse({ ok: false, error: `config_missing: ${missing.join(', ')}` }, 500);
+  }
+
   let body: FormPayload;
   try {
     body = await request.json();
@@ -97,14 +106,15 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
       },
       body: JSON.stringify({
         from: env.RESEND_FROM,
-        to: [env.EMAIL_TO],
+        to: env.EMAIL_TO, // string, pas tableau — Resend accepte les deux mais string évite les pièges null
         subject,
         html,
         reply_to: email || undefined,
       }),
     });
     if (!res.ok) {
-      console.error('Resend failed', res.status, await res.text());
+      const errBody = await res.text();
+      console.error(`Resend failed ${res.status}:`, errBody);
     }
   } catch (e) {
     console.error('Resend exception', e);
