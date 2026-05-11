@@ -12,20 +12,24 @@ type Site = {
   ly: number;
   anchor: 'start' | 'middle' | 'end';
   main?: boolean;
+  /** trait de rappel pin → label (pour labels éloignés) */
+  leader?: { x: number; y: number };
 };
 
 // Coordonnées projetées (lon, lat → x, y) — voir scripts/build-coverage-map.mjs
 const sites: Site[] = [
-  { name: 'Montpellier',            x: 556.3, y: 395.4, lx: 556, ly: 432, anchor: 'middle', main: true },
-  { name: 'Clermont l’Hérault',     x: 419.1, y: 388.2, lx: 419, ly: 378, anchor: 'middle' },
-  { name: 'St-Georges d’Orques',    x: 527.0, y: 393.5, lx: 522, ly: 381, anchor: 'end' },
-  { name: 'St-Jean de Védas',       x: 540.5, y: 410.1, lx: 510, ly: 449, anchor: 'end' },
-  { name: 'Pérols',                 x: 578.3, y: 419.7, lx: 590, ly: 423, anchor: 'start' },
-  { name: 'La Grande Motte',        x: 618.5, y: 415.6, lx: 628, ly: 433, anchor: 'start' },
+  { name: 'Montpellier',            x: 556.3, y: 395.4, lx: 556, ly: 446, anchor: 'middle', main: true },
+  { name: 'Clermont l’Hérault',     x: 419.1, y: 388.2, lx: 395, ly: 386, anchor: 'end'    },
+  { name: 'St-Georges d’Orques',    x: 527.0, y: 393.5, lx: 522, ly: 397, anchor: 'end'    },
+  { name: 'St-Jean de Védas',       x: 540.5, y: 410.1, lx: 470, ly: 426, anchor: 'end',
+    leader: { x: 478, y: 420 } },
+  { name: 'Pérols',                 x: 578.3, y: 419.7, lx: 608, ly: 444, anchor: 'start',
+    leader: { x: 603, y: 440 } },
+  { name: 'La Grande Motte',        x: 618.5, y: 415.6, lx: 635, ly: 405, anchor: 'start'  },
   { name: 'Laroque',                x: 509.7, y: 259.9, lx: 510, ly: 249, anchor: 'middle' },
-  { name: 'Villetelle',             x: 636.1, y: 357.4, lx: 626, ly: 348, anchor: 'end' },
-  { name: 'Lunel',                  x: 635.6, y: 367.1, lx: 618, ly: 383, anchor: 'end' },
-  { name: 'Gallargues-le-Montueux', x: 647.7, y: 347.0, lx: 670, ly: 335, anchor: 'start' },
+  { name: 'Villetelle',             x: 636.1, y: 357.4, lx: 622, ly: 351, anchor: 'end'    },
+  { name: 'Lunel',                  x: 635.6, y: 367.1, lx: 622, ly: 379, anchor: 'end'    },
+  { name: 'Gallargues-le-Montueux', x: 647.7, y: 347.0, lx: 670, ly: 333, anchor: 'start'  },
   { name: 'Fournès',                x: 782.1, y: 263.2, lx: 782, ly: 252, anchor: 'middle' },
 ];
 
@@ -93,6 +97,18 @@ const gardPath = 'M402.5,158.4L408.0,159.2L415.1,165.5L420.0,168.0L420.8,173.8L4
         <!-- Pins -->
         {sites.map((s, i) => (
           <g class={`cov-pin${s.main ? ' is-main' : ''}`} style={`--i:${i};`}>
+            {s.leader && (
+              <line
+                x1={s.x}
+                y1={s.y}
+                x2={s.leader.x}
+                y2={s.leader.y}
+                stroke="#1A190F"
+                stroke-width="0.8"
+                stroke-linecap="round"
+                opacity="0.45"
+              />
+            )}
             {s.main && (
               <>
                 <circle cx={s.x} cy={s.y} r="22" fill="#2C6126" opacity="0.18" class="cov-pin-halo" />
