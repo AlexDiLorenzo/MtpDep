@@ -38,10 +38,16 @@ export const nav = [
 
 // Photos locales fournies par le client (dossier public/img/).
 export const photos = {
-  heroA9: '/img/intervention-a9.jpg',
-  flotteDepot: '/img/flotte-depot.jpg',
-  porschePlateau: '/img/porsche-plateau.jpg',
-  plRecuperation: '/img/pl-recuperation.jpg',
-  plRenversement: '/img/pl-renversement.jpg',
+  // Iconiques Montpellier
+  heroComedie: '/img/hero-comedie.jpg',           // Aston Martin Place de la Comédie
+  flotteCamions: '/img/flotte-camions.jpg',       // Flotte alignée vue de face
+  peyrou: '/img/peyrou-vertical.jpg',             // Camion devant l'Arc du Peyrou (vertical)
+  astonAntigone: '/img/aston-antigone.png',       // Aston Martin quartier Antigone
+  porscheCayman: '/img/porsche-cayman.jpg',       // Porsche Cayman + plateau MDP
+
+  // Interventions terrain
+  interventionA9: '/img/intervention-a9.jpg',     // Autoroute A9
+  plRecuperation: '/img/pl-recuperation.jpg',     // Poids lourd dans le fossé
+  plRenversement: '/img/pl-renversement.jpg',     // PL renversé
 } as const;
 
