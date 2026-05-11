@@ -85,20 +85,24 @@ async function sendWhatsApp(env: Env, row: DevisRow): Promise<void> {
 
   const url = `${env.EVOLUTION_API_URL.replace(/\/$/, '')}/message/sendText/${encodeURIComponent(env.EVOLUTION_INSTANCE)}`;
 
+  // Evolution API attend généralement le JID complet (33XXX@s.whatsapp.net pour un perso,
+  // @g.us pour un groupe). On ajoute le suffixe si l'utilisateur a mis juste le numéro.
+  const number = env.ALERT_PHONE.includes('@')
+    ? env.ALERT_PHONE
+    : `${env.ALERT_PHONE.replace(/\D/g, '')}@s.whatsapp.net`;
+
   const res = await fetch(url, {
     method: 'POST',
     headers: {
       'apikey': env.EVOLUTION_API_KEY,
       'content-type': 'application/json',
     },
-    body: JSON.stringify({
-      number: env.ALERT_PHONE,
-      text,
-    }),
+    body: JSON.stringify({ number, text }),
   });
 
+  const respBody = await res.text().catch(() => '');
   if (!res.ok) {
-    const body = await res.text().catch(() => '');
-    throw new Error(`Evolution ${res.status}: ${body.slice(0, 200)}`);
+    throw new Error(`Evolution ${res.status}: ${respBody.slice(0, 300)}`);
   }
+  console.log(`Evolution OK → ${number} (${respBody.slice(0, 80)})`);
 }
