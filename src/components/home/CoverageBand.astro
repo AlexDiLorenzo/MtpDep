@@ -1,6 +1,9 @@
 ---
-// 11 sites du réseau Montpellier Dépannage, Hérault + Gard.
-// Montpellier est le site principal (marker mis en évidence).
+// Carte des 11 sites Montpellier Dépannage sur les contours réels
+// des départements Hérault (34) et Gard (30). Paths SVG générés depuis
+// les GeoJSON officiels via scripts/build-coverage-map.mjs (RDP simplifié).
+// ViewBox 1000×600 — territoire utile ~ x[140-855] y[35-565].
+
 type Site = {
   name: string;
   x: number;
@@ -11,19 +14,24 @@ type Site = {
   main?: boolean;
 };
 
+// Coordonnées projetées (lon, lat → x, y) — voir scripts/build-coverage-map.mjs
 const sites: Site[] = [
-  { name: 'Clermont l’Hérault',    x: 200, y: 280, lx: 200, ly: 254, anchor: 'middle' },
-  { name: 'Laroque',                x: 400, y: 205, lx: 400, ly: 180, anchor: 'middle' },
-  { name: 'St-Georges d’Orques',    x: 348, y: 348, lx: 318, ly: 332, anchor: 'end' },
-  { name: 'Montpellier',            x: 418, y: 358, lx: 418, ly: 397, anchor: 'middle', main: true },
-  { name: 'St-Jean de Védas',       x: 398, y: 425, lx: 380, ly: 452, anchor: 'middle' },
-  { name: 'Pérols',                 x: 475, y: 372, lx: 495, ly: 376, anchor: 'start' },
-  { name: 'La Grande Motte',        x: 530, y: 442, lx: 545, ly: 466, anchor: 'middle' },
-  { name: 'Villetelle',             x: 590, y: 282, lx: 590, ly: 258, anchor: 'middle' },
-  { name: 'Lunel',                  x: 578, y: 360, lx: 578, ly: 386, anchor: 'middle' },
-  { name: 'Gallargues-le-Montueux', x: 680, y: 320, lx: 700, ly: 324, anchor: 'start' },
-  { name: 'Fournès',                x: 820, y: 215, lx: 820, ly: 192, anchor: 'middle' },
+  { name: 'Montpellier',            x: 556.3, y: 395.4, lx: 556, ly: 432, anchor: 'middle', main: true },
+  { name: 'Clermont l’Hérault',     x: 419.1, y: 388.2, lx: 419, ly: 378, anchor: 'middle' },
+  { name: 'St-Georges d’Orques',    x: 527.0, y: 393.5, lx: 522, ly: 381, anchor: 'end' },
+  { name: 'St-Jean de Védas',       x: 540.5, y: 410.1, lx: 510, ly: 449, anchor: 'end' },
+  { name: 'Pérols',                 x: 578.3, y: 419.7, lx: 590, ly: 423, anchor: 'start' },
+  { name: 'La Grande Motte',        x: 618.5, y: 415.6, lx: 628, ly: 433, anchor: 'start' },
+  { name: 'Laroque',                x: 509.7, y: 259.9, lx: 510, ly: 249, anchor: 'middle' },
+  { name: 'Villetelle',             x: 636.1, y: 357.4, lx: 626, ly: 348, anchor: 'end' },
+  { name: 'Lunel',                  x: 635.6, y: 367.1, lx: 618, ly: 383, anchor: 'end' },
+  { name: 'Gallargues-le-Montueux', x: 647.7, y: 347.0, lx: 670, ly: 335, anchor: 'start' },
+  { name: 'Fournès',                x: 782.1, y: 263.2, lx: 782, ly: 252, anchor: 'middle' },
 ];
+
+const heraultPath = 'M397.9,267.2L400.8,267.0L408.4,268.4L410.9,266.7L418.1,268.1L422.9,274.4L421.5,275.7L420.3,282.5L417.9,284.5L421.3,288.7L429.7,284.9L434.8,278.0L440.0,277.1L445.2,274.6L448.2,279.0L448.4,288.0L450.5,291.8L457.5,293.5L459.7,291.6L464.9,296.8L471.5,292.2L466.7,290.5L464.2,287.6L468.9,279.9L472.0,278.1L471.8,275.9L478.9,265.8L483.6,266.2L481.7,273.2L485.8,272.6L486.0,266.8L492.7,268.6L493.8,268.1L497.0,257.2L496.8,253.2L504.3,247.0L507.5,247.2L510.5,243.8L515.6,244.8L518.9,243.6L528.9,244.7L529.4,251.8L531.5,255.0L539.0,255.1L541.0,257.9L540.4,264.9L537.7,270.1L532.6,276.9L534.6,282.4L539.6,283.7L542.2,287.2L544.4,285.4L548.7,284.8L551.9,282.8L562.4,282.5L568.6,279.1L569.2,287.3L570.0,290.7L575.7,292.8L581.0,292.3L581.3,296.9L587.5,297.2L584.4,305.4L582.1,308.3L582.0,312.9L586.0,314.7L594.5,310.5L601.1,314.0L610.2,321.5L610.3,327.1L616.4,329.0L620.0,329.1L622.2,331.3L622.4,335.5L626.7,338.9L628.7,341.7L633.7,340.4L638.1,343.4L640.2,350.4L643.8,354.9L643.8,363.4L646.2,365.9L653.2,377.1L652.2,383.4L645.4,396.2L641.2,400.3L639.7,406.2L628.8,405.4L624.0,406.3L623.1,407.9L627.2,413.4L624.7,419.4L614.1,418.1L606.7,418.3L597.3,420.2L584.2,425.5L565.5,435.3L559.1,439.5L547.9,448.6L531.7,467.4L525.0,471.4L516.3,474.7L509.8,478.1L509.2,484.3L507.0,484.4L499.7,488.2L490.7,488.0L485.7,491.2L472.5,503.6L461.3,516.2L444.5,538.4L431.5,537.0L419.8,531.2L411.6,532.2L406.6,533.8L393.4,539.6L368.9,557.2L361.9,564.0L357.8,560.6L352.6,554.3L349.8,548.6L345.6,547.8L342.2,550.5L337.4,551.1L333.4,549.5L331.7,544.2L326.1,543.5L323.1,546.7L316.6,543.8L312.6,543.1L305.2,535.7L296.8,534.7L293.3,537.1L289.9,531.9L290.3,527.0L289.7,518.6L282.6,519.6L276.0,521.8L271.6,521.8L264.4,516.0L260.1,517.9L253.8,514.4L253.2,512.5L255.4,508.4L254.2,504.1L254.8,500.0L251.4,497.0L248.0,492.3L244.5,495.7L244.7,497.3L248.6,503.4L249.7,510.4L248.2,514.6L237.3,517.6L231.2,517.1L229.2,520.3L232.9,523.1L224.8,530.0L223.2,533.2L223.3,538.3L218.9,545.0L212.8,546.3L208.4,540.9L202.4,537.5L199.0,538.3L196.9,534.6L198.2,527.4L196.9,526.1L196.7,521.8L194.8,518.4L190.3,520.8L189.7,524.8L184.3,530.1L175.9,528.2L174.6,531.8L171.3,531.6L166.7,527.6L165.4,521.3L163.9,519.5L162.9,514.9L160.4,512.4L152.5,511.3L147.9,507.5L151.7,500.0L152.6,489.7L156.8,484.6L162.0,485.2L163.6,483.6L164.3,479.4L159.9,478.1L155.8,475.0L161.4,473.9L163.2,472.2L168.1,471.6L169.1,467.6L172.4,467.2L180.4,459.7L177.8,457.1L180.8,455.6L186.0,457.8L187.0,455.1L184.4,450.8L183.0,443.7L184.6,441.0L184.2,431.5L174.7,420.5L171.0,414.2L176.0,406.8L174.7,403.9L170.7,400.1L174.8,393.9L177.0,389.1L179.5,378.8L182.7,379.2L192.4,378.3L200.2,380.7L204.1,383.1L208.7,387.3L210.1,390.7L213.4,394.1L217.3,392.8L220.0,390.2L225.8,389.7L232.2,383.1L236.3,383.9L239.6,382.0L244.9,381.7L250.0,380.0L251.5,376.1L260.1,377.1L262.8,374.6L263.9,365.9L263.5,363.6L268.7,360.0L272.1,360.7L276.1,358.0L283.9,354.1L291.3,356.9L294.4,359.6L298.6,361.1L301.8,359.1L307.0,360.6L307.5,356.7L309.5,354.8L305.6,350.2L304.6,338.2L305.7,334.3L309.3,333.7L311.6,328.7L308.5,326.4L305.8,322.7L305.4,318.4L303.5,313.8L306.8,311.4L306.7,302.0L308.2,300.3L315.0,300.3L321.5,303.1L327.9,308.2L334.4,309.5L336.7,307.9L342.7,309.5L350.5,309.5L356.4,307.8L359.3,304.3L364.5,302.8L365.1,297.6L361.8,294.5L360.0,291.0L360.6,287.2L362.7,283.5L366.1,282.9L367.9,280.2L368.8,276.1L372.4,273.7L376.0,275.9L378.6,275.1L386.2,276.8L393.0,275.5L392.3,272.3L397.9,267.2Z';
+
+const gardPath = 'M402.5,158.4L408.0,159.2L415.1,165.5L420.0,168.0L420.8,173.8L422.7,176.0L427.2,177.0L432.4,176.8L435.4,178.2L442.9,177.2L448.2,179.7L453.6,180.5L455.3,182.5L462.0,178.8L470.2,180.2L473.9,181.6L481.9,178.7L482.6,171.3L487.8,169.1L480.2,165.0L483.2,156.4L486.8,154.1L489.3,157.3L495.7,153.3L499.9,158.2L503.0,160.0L510.0,161.1L512.9,164.2L518.2,166.9L521.2,167.4L523.0,170.7L525.3,170.6L528.1,174.3L531.8,176.7L536.6,176.1L539.6,173.0L542.4,172.5L551.7,175.6L556.4,174.4L561.7,168.1L566.6,166.9L567.0,162.9L571.6,162.4L571.8,158.0L570.0,154.3L572.3,153.7L579.4,158.4L586.0,161.0L586.7,158.7L582.9,155.6L581.6,149.7L574.6,147.9L576.4,144.6L578.6,136.0L577.4,129.0L579.0,125.8L585.3,124.1L586.1,120.5L580.6,115.6L577.2,117.7L574.2,114.4L575.5,110.7L574.4,106.4L570.3,101.5L575.6,97.1L579.3,91.6L578.3,88.9L574.6,87.8L571.9,85.1L568.4,78.6L566.7,73.8L561.0,69.1L559.0,66.4L563.4,64.5L565.7,60.2L571.9,59.1L576.8,61.5L578.9,60.4L578.2,56.0L582.0,55.4L585.2,50.2L585.4,46.4L587.8,42.1L593.3,36.0L598.4,38.2L600.9,42.0L605.3,42.0L608.0,47.5L604.7,52.8L611.0,55.2L614.7,59.2L611.3,64.1L606.8,63.6L607.2,67.9L610.0,70.3L610.8,75.9L610.1,86.3L607.6,89.7L605.1,90.6L609.6,96.3L615.7,92.1L625.6,89.3L628.2,91.2L632.5,87.7L636.7,91.9L637.5,98.0L641.1,98.3L648.1,96.1L650.9,103.8L659.9,108.4L667.5,116.3L672.9,118.6L678.3,114.6L682.2,106.5L681.9,97.5L686.8,97.2L692.1,93.5L696.5,86.9L705.9,86.9L711.9,83.9L714.2,84.5L717.0,89.3L713.2,102.4L714.0,106.4L715.7,108.3L722.7,109.0L728.4,110.4L731.5,104.8L731.1,101.6L731.5,89.9L733.6,86.0L739.3,86.4L741.7,87.7L747.6,86.6L752.0,91.0L756.5,94.1L760.1,94.9L764.5,102.6L769.2,103.3L773.1,105.9L779.2,107.7L782.6,112.7L785.9,110.4L788.7,110.9L789.9,114.7L792.1,116.2L793.6,123.0L799.9,129.7L801.0,133.5L799.3,138.9L802.6,140.7L808.2,139.2L810.6,143.1L808.8,147.0L814.4,151.3L812.6,160.4L813.4,169.5L812.0,172.3L809.8,182.6L809.9,186.8L813.6,194.0L816.8,197.2L824.4,193.3L826.2,194.1L825.3,198.0L834.5,203.1L834.9,208.6L840.6,213.9L843.1,217.1L844.6,223.7L849.7,224.4L851.4,226.5L852.1,232.1L851.0,236.4L847.9,236.9L843.1,235.4L841.3,240.4L842.8,244.4L840.6,247.6L837.3,249.0L831.8,257.0L828.6,258.7L822.9,259.4L819.6,262.8L819.9,264.7L814.8,270.5L808.8,273.3L809.9,274.9L804.7,279.8L797.1,283.6L794.4,283.7L789.9,286.8L791.8,293.7L795.0,292.8L797.3,296.4L792.4,298.8L790.0,302.1L793.1,308.2L793.8,312.7L792.7,322.9L785.9,332.4L784.0,339.4L781.3,345.1L781.1,351.7L785.5,361.7L778.9,363.6L775.0,363.0L771.6,359.3L762.7,357.2L758.7,354.6L754.0,356.8L747.7,356.8L742.6,358.0L739.1,364.3L739.1,370.0L733.1,371.5L730.5,374.9L727.7,381.3L724.3,391.3L728.1,395.5L732.7,395.2L736.4,393.6L739.0,396.5L734.5,404.6L729.2,407.2L723.8,406.3L717.4,410.9L720.7,411.7L718.9,416.5L712.1,416.8L710.1,420.1L705.4,422.4L701.8,422.3L695.9,427.4L690.5,423.6L688.4,424.1L692.4,429.5L691.7,431.6L687.0,433.6L684.8,435.9L676.7,439.0L672.8,439.2L666.6,443.4L664.4,452.2L664.2,459.3L653.0,456.9L644.4,454.3L635.9,450.0L631.4,444.9L629.4,438.7L633.5,432.8L636.1,431.3L636.3,428.9L631.0,422.5L624.7,419.4L627.2,413.4L623.1,407.9L624.0,406.3L628.8,405.4L639.7,406.2L641.2,400.3L645.4,396.2L652.2,383.4L653.2,377.1L646.2,365.9L643.8,363.4L643.8,354.9L640.2,350.4L638.1,343.4L633.7,340.4L628.7,341.7L626.7,338.9L622.4,335.5L622.2,331.3L620.0,329.1L616.4,329.0L610.3,327.1L610.2,321.5L601.1,314.0L594.5,310.5L586.0,314.7L582.0,312.9L582.1,308.3L584.4,305.4L587.5,297.2L581.3,296.9L581.0,292.3L575.7,292.8L570.0,290.7L569.2,287.3L568.6,279.1L562.4,282.5L551.9,282.8L548.7,284.8L544.4,285.4L542.2,287.2L539.6,283.7L534.6,282.4L532.6,276.9L537.7,270.1L540.4,264.9L541.0,257.9L539.0,255.1L531.5,255.0L529.4,251.8L528.9,244.7L518.9,243.6L515.6,244.8L510.5,243.8L507.5,247.2L504.3,247.0L496.8,253.2L497.0,257.2L493.8,268.1L492.7,268.6L486.0,266.8L485.8,272.6L481.7,273.2L483.6,266.2L478.9,265.8L471.8,275.9L472.0,278.1L468.9,279.9L464.2,287.6L466.7,290.5L471.5,292.2L464.9,296.8L459.7,291.6L457.5,293.5L450.5,291.8L448.4,288.0L448.2,279.0L445.2,274.6L440.0,277.1L434.8,278.0L429.7,284.9L421.3,288.7L417.9,284.5L420.3,282.5L421.5,275.7L422.9,274.4L418.1,268.1L410.9,266.7L408.4,268.4L400.8,267.0L397.9,267.2L396.0,260.5L395.8,256.9L397.1,253.5L403.1,249.3L403.6,244.7L410.2,244.4L412.3,243.3L416.3,233.4L422.5,231.5L424.6,228.8L426.1,221.9L417.1,214.4L410.8,212.4L407.6,208.0L404.1,207.9L400.9,206.2L395.9,209.4L391.3,204.4L388.9,197.2L385.7,197.2L382.6,200.9L379.7,201.6L377.2,200.3L368.7,190.9L377.9,186.1L382.5,186.2L386.5,184.3L387.5,181.9L386.2,173.1L389.3,170.5L391.1,163.5L402.5,158.4Z';
 ---
 
 <section class="coverage" id="zones" aria-labelledby="coverage-title">
@@ -36,136 +44,86 @@ const sites: Site[] = [
       </h2>
       <p class="coverage-lead">
         Un maillage de proximité avec Montpellier comme site principal,
-        des relais sur le grand Hérault et jusqu’en Gard.
+        des relais sur tout le grand Hérault et jusqu’en Gard.
         Délais d’intervention courts, présence permanente sur l’A9.
       </p>
     </header>
 
     <div class="coverage-map-wrap">
       <svg
-        viewBox="0 0 1000 560"
+        viewBox="120 20 770 565"
         preserveAspectRatio="xMidYMid meet"
         class="coverage-map-svg"
         role="img"
         aria-label="Carte des 11 sites Montpellier Dépannage dans l’Hérault et le Gard"
       >
         <defs>
-          <linearGradient id="cov-territory" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#EFEB55" />
-            <stop offset="55%" stop-color="#E4E13C" />
-            <stop offset="100%" stop-color="#C9C42B" />
+          <linearGradient id="cov-herault" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%"   stop-color="#FBF6D0" />
+            <stop offset="100%" stop-color="#F2E89E" />
           </linearGradient>
-          <pattern id="cov-grid" width="36" height="36" patternUnits="userSpaceOnUse">
-            <path d="M 36 0 L 0 0 0 36" fill="none" stroke="rgba(228,225,60,0.06)" stroke-width="1" />
-          </pattern>
-          <filter id="cov-territory-shadow" x="-10%" y="-10%" width="120%" height="130%">
-            <feGaussianBlur in="SourceAlpha" stdDeviation="10" />
-            <feOffset dx="0" dy="8" result="off" />
-            <feComponentTransfer><feFuncA type="linear" slope="0.45" /></feComponentTransfer>
+          <linearGradient id="cov-gard" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%"   stop-color="#F8F3C4" />
+            <stop offset="100%" stop-color="#EDDF8C" />
+          </linearGradient>
+          <filter id="cov-drop" x="-5%" y="-5%" width="110%" height="115%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="4" />
+            <feOffset dx="0" dy="4" result="off" />
+            <feComponentTransfer><feFuncA type="linear" slope="0.28" /></feComponentTransfer>
             <feMerge>
               <feMergeNode />
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
-          <radialGradient id="cov-pin-halo" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stop-color="#2C6126" stop-opacity="0.35" />
-            <stop offset="100%" stop-color="#2C6126" stop-opacity="0" />
-          </radialGradient>
         </defs>
 
-        <!-- fond grille subtil -->
-        <rect width="1000" height="560" fill="url(#cov-grid)" />
+        <!-- Légers grands labels en watermark -->
+        <text x="230" y="478" class="cov-region" font-family="'Space Grotesk', sans-serif" font-size="44" font-weight="700" letter-spacing="0.05em">HÉRAULT</text>
+        <text x="690" y="178" class="cov-region" font-family="'Space Grotesk', sans-serif" font-size="36" font-weight="700" letter-spacing="0.05em">GARD</text>
 
-        <!-- territoire Hérault + Gard (forme abstraite combinée) -->
-        <g filter="url(#cov-territory-shadow)">
-          <path
-            d="M 95 360
-               C 100 280, 150 215, 240 195
-               L 335 170
-               C 395 160, 445 175, 478 205
-               C 520 180, 600 158, 720 162
-               L 825 170
-               C 880 180, 915 220, 915 280
-               C 915 340, 880 385, 820 400
-               L 705 415
-               C 645 425, 585 415, 525 393
-               C 495 420, 455 445, 400 460
-               L 290 472
-               C 200 477, 130 452, 98 412 Z"
-            fill="url(#cov-territory)"
-          />
+        <!-- Départements -->
+        <g filter="url(#cov-drop)">
+          <path d={heraultPath} fill="url(#cov-herault)" stroke="#2C6126" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" />
+          <path d={gardPath}    fill="url(#cov-gard)"    stroke="#2C6126" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" />
         </g>
 
-        <!-- frontière interne Hérault / Gard -->
-        <path
-          d="M 510 195 C 502 250, 510 320, 528 395"
-          stroke="rgba(26,25,15,0.22)"
-          fill="none"
-          stroke-width="1.5"
-          stroke-dasharray="6,5"
-        />
+        <!-- Mer (subtil indicateur sud-est) -->
+        <text x="660" y="525" font-family="'DM Sans', sans-serif" font-size="11" font-style="italic" fill="rgba(44,97,38,0.5)" letter-spacing="0.2em">MER MÉDITERRANÉE</text>
 
-        <!-- labels régions -->
-        <text
-          x="225"
-          y="350"
-          class="coverage-region-label"
-          font-family="'Space Grotesk', sans-serif"
-          font-size="46"
-          font-weight="700"
-          fill="#1A190F"
-          letter-spacing="-0.02em"
-        >HÉRAULT</text>
-        <text
-          x="755"
-          y="265"
-          class="coverage-region-label"
-          font-family="'Space Grotesk', sans-serif"
-          font-size="38"
-          font-weight="700"
-          fill="#1A190F"
-          letter-spacing="-0.02em"
-        >GARD</text>
-
-        <!-- pins -->
+        <!-- Pins -->
         {sites.map((s, i) => (
           <g class={`cov-pin${s.main ? ' is-main' : ''}`} style={`--i:${i};`}>
             {s.main && (
-              <circle cx={s.x} cy={s.y} r="32" fill="url(#cov-pin-halo)" class="cov-pin-halo" />
+              <>
+                <circle cx={s.x} cy={s.y} r="22" fill="#2C6126" opacity="0.18" class="cov-pin-halo" />
+                <circle cx={s.x} cy={s.y} r="14" fill="#2C6126" opacity="0.35" class="cov-pin-halo cov-pin-halo--inner" />
+              </>
             )}
             <circle
               cx={s.x}
-              cy={s.y + 2}
-              r={s.main ? 15 : 9}
-              fill="rgba(0,0,0,0.2)"
+              cy={s.y + 1.5}
+              r={s.main ? 8.5 : 5.5}
+              fill="rgba(0,0,0,0.25)"
             />
             <circle
               cx={s.x}
               cy={s.y}
-              r={s.main ? 15 : 8}
+              r={s.main ? 8.5 : 5}
               fill={s.main ? '#2C6126' : '#1A190F'}
               stroke="#fff"
-              stroke-width={s.main ? 3 : 2}
+              stroke-width={s.main ? 2.4 : 1.8}
               class="cov-pin-dot"
             />
             {s.main && (
-              <text
-                x={s.x}
-                y={s.y + 5}
-                text-anchor="middle"
-                font-family="'Space Grotesk', sans-serif"
-                font-size="14"
-                font-weight="700"
-                fill="#E4E13C"
-              >★</text>
+              <circle cx={s.x} cy={s.y} r="2" fill="#E4E13C" />
             )}
             <text
               x={s.lx}
               y={s.ly}
               text-anchor={s.anchor}
               font-family="'Space Grotesk', sans-serif"
-              font-size={s.main ? 16 : 12.5}
-              font-weight="700"
+              font-size={s.main ? 14 : 11.5}
+              font-weight={s.main ? 700 : 600}
               fill="#1A190F"
               class="cov-pin-label"
             >{s.name}</text>
@@ -173,23 +131,24 @@ const sites: Site[] = [
         ))}
       </svg>
 
-      <!-- badge KPI sur la carte -->
+      <!-- Badge KPI flottant -->
       <div class="coverage-badge mono">
         <span class="coverage-badge-dot" aria-hidden="true"></span>
         11 SITES · 40 DÉPANNEURS
       </div>
-    </div>
 
-    <!-- liste a11y / repli mobile -->
-    <ul class="coverage-list" aria-label="Liste des sites">
-      {sites.map((s) => (
-        <li class={s.main ? 'coverage-list-item is-main' : 'coverage-list-item'}>
-          <span class="coverage-list-dot" aria-hidden="true"></span>
-          <span class="coverage-list-name">{s.name}</span>
-          {s.main && <span class="coverage-list-badge">Site principal</span>}
-        </li>
-      ))}
-    </ul>
+      <!-- Légende discrète -->
+      <div class="coverage-legend">
+        <span class="coverage-legend-item">
+          <span class="coverage-legend-pin coverage-legend-pin--main"></span>
+          Site principal
+        </span>
+        <span class="coverage-legend-item">
+          <span class="coverage-legend-pin"></span>
+          Site relais
+        </span>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -197,8 +156,8 @@ const sites: Site[] = [
   .coverage {
     padding: 96px var(--pad-x-desktop);
     background:
-      radial-gradient(ellipse at 50% 0%, rgba(44,97,38,0.08) 0%, transparent 60%),
-      var(--color-bg-subtle);
+      radial-gradient(ellipse at 50% 0%, rgba(44,97,38,0.06) 0%, transparent 60%),
+      var(--color-bg);
     border-top: 1px solid var(--color-border);
     border-bottom: 1px solid var(--color-border);
   }
@@ -246,14 +205,13 @@ const sites: Site[] = [
   .coverage-map-wrap {
     position: relative;
     background:
-      linear-gradient(160deg, #2C6126 0%, #1F4D1A 55%, #133611 100%);
+      radial-gradient(circle at 50% 0%, #F6F5EB 0%, #ECEAD8 100%);
+    border: 1px solid var(--color-border);
     border-radius: var(--radius-2xl);
     overflow: hidden;
-    box-shadow:
-      var(--shadow-lg, 0 24px 60px -20px rgba(26,25,15,0.45)),
-      inset 0 1px 0 rgba(255,255,255,0.06);
-    aspect-ratio: 1000 / 560;
-    max-height: 620px;
+    box-shadow: var(--shadow-sm);
+    aspect-ratio: 770 / 565;
+    max-height: 640px;
   }
   .coverage-map-svg {
     width: 100%;
@@ -261,16 +219,22 @@ const sites: Site[] = [
     display: block;
   }
 
-  /* pins : entrée animée échelonnée */
+  /* Grands labels watermark de département */
+  .cov-region {
+    fill: rgba(26,25,15,0.13);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  /* Pins : entrée animée échelonnée */
   .cov-pin {
     opacity: 0;
-    transform-origin: center;
-    animation: cov-pin-in 0.55s var(--ease-out) forwards;
-    animation-delay: calc(0.25s + var(--i) * 0.06s);
+    animation: cov-pin-in 0.5s var(--ease-out) forwards;
+    animation-delay: calc(0.2s + var(--i) * 0.05s);
   }
   @keyframes cov-pin-in {
-    from { opacity: 0; transform: translateY(-8px) scale(0.7); }
-    to   { opacity: 1; transform: translateY(0) scale(1); }
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
   .cov-pin-dot {
     transition: transform 0.2s var(--ease-standard);
@@ -278,45 +242,42 @@ const sites: Site[] = [
     transform-origin: center;
   }
   .cov-pin:hover .cov-pin-dot {
-    transform: scale(1.18);
+    transform: scale(1.2);
   }
   .cov-pin-label {
     paint-order: stroke fill;
-    stroke: rgba(228,225,60,0.55);
-    stroke-width: 4;
+    stroke: rgba(251,246,208,0.85);
+    stroke-width: 3.5;
     stroke-linejoin: round;
   }
 
-  /* Halo pulsé pour Montpellier */
   .cov-pin-halo {
     transform-origin: center;
     transform-box: fill-box;
     animation: cov-halo-pulse 2.6s ease-in-out infinite;
   }
+  .cov-pin-halo--inner { animation-delay: 0.3s; }
   @keyframes cov-halo-pulse {
-    0%, 100% { transform: scale(1);   opacity: 0.9; }
-    50%      { transform: scale(1.35); opacity: 0.45; }
+    0%, 100% { transform: scale(1);    opacity: 0.55; }
+    50%      { transform: scale(1.45); opacity: 0.15; }
   }
 
   /* Badge KPI flottant */
   .coverage-badge {
     position: absolute;
     top: 18px;
-    left: 20px;
+    left: 18px;
     display: inline-flex;
     align-items: center;
     gap: 8px;
     padding: 8px 14px;
-    background: rgba(26,25,15,0.78);
-    border: 1px solid rgba(228,225,60,0.25);
+    background: rgba(26,25,15,0.88);
     border-radius: var(--radius-pill);
     color: var(--md-brand-yellow);
     font-family: var(--font-mono);
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.08em;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
   }
   .coverage-badge-dot {
     width: 8px;
@@ -331,65 +292,55 @@ const sites: Site[] = [
     50%      { box-shadow: 0 0 0 6px rgba(228,225,60,0.08); }
   }
 
-  /* ---------- Liste sites (sous la carte) ---------- */
-  .coverage-list {
-    list-style: none;
-    margin: 36px 0 0;
-    padding: 0;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px 24px;
-  }
-  .coverage-list-item {
+  /* Légende */
+  .coverage-legend {
+    position: absolute;
+    bottom: 16px;
+    right: 18px;
     display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 14px;
-    background: var(--color-bg);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    font-size: 13px;
+    gap: 16px;
+    padding: 8px 14px;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(26,25,15,0.08);
+    border-radius: var(--radius-pill);
+    font-size: 11px;
+    font-weight: 600;
     color: var(--color-text);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   }
-  .coverage-list-item.is-main {
-    border-color: var(--color-primary);
-    background: var(--color-primary-bg);
-    font-weight: 700;
+  .coverage-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
   }
-  .coverage-list-dot {
-    width: 8px;
-    height: 8px;
+  .coverage-legend-pin {
+    width: 9px;
+    height: 9px;
     border-radius: 50%;
     background: var(--md-brand-black);
-    flex-shrink: 0;
+    border: 1.5px solid #fff;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
   }
-  .coverage-list-item.is-main .coverage-list-dot {
+  .coverage-legend-pin--main {
+    width: 12px;
+    height: 12px;
     background: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(44,97,38,0.18);
-  }
-  .coverage-list-name { flex: 1; }
-  .coverage-list-badge {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--color-primary);
-    background: rgba(255,255,255,0.7);
-    padding: 2px 8px;
-    border-radius: var(--radius-pill);
+    border-width: 2px;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.1), 0 0 0 4px rgba(44,97,38,0.15);
   }
 
   /* ---------- Responsive ---------- */
   @media (max-width: 1023px) {
     .coverage { padding: 80px var(--pad-x-tablet); }
     .coverage-title { font-size: 36px; }
-    .coverage-list { grid-template-columns: repeat(2, 1fr); gap: 8px 16px; }
   }
   @media (max-width: 639px) {
     .coverage { padding: 64px var(--pad-x-mobile); }
     .coverage-title { font-size: 28px; }
-    .coverage-list { grid-template-columns: 1fr; }
     .coverage-badge { font-size: 10px; padding: 6px 10px; top: 12px; left: 12px; }
+    .coverage-legend { bottom: 10px; right: 10px; gap: 10px; padding: 6px 10px; font-size: 10px; }
   }
 
   @media (prefers-reduced-motion: reduce) {
