@@ -1,0 +1,502 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TopNav from '../components/TopNav.astro';
+import Footer from '../components/Footer.astro';
+import { site, photos } from '../config/site';
+
+const postes = [
+  {
+    title: 'Dépanneur',
+    desc: 'Intervention sur véhicules en panne ou accidentés, dépannage mécanique de premier niveau, mise en sécurité.',
+    skills: ['Permis B', 'CACES R483 apprécié', 'Sens du service'],
+  },
+  {
+    title: 'Remorqueur',
+    desc: 'Conduite de plateaux VL et PL, chargement et arrimage, intervention 24/7 sur l’A9 et le grand Hérault.',
+    skills: ['Permis C ou EC selon poste', 'FIMO/FCO à jour', 'Disponibilité astreintes'],
+  },
+  {
+    title: 'Mécanicien',
+    desc: 'Diagnostic et réparation en atelier, entretien des véhicules clients, support à l’équipe dépannage.',
+    skills: ['CAP/BAC Pro mécanique', 'Diagnostic électronique', 'Autonomie'],
+  },
+];
+
+const candidatureMail = 'contact@montpellierdepannage.com';
+---
+
+<BaseLayout
+  title="Recrutement — Montpellier Dépannage"
+  description="Montpellier Dépannage recrute des dépanneurs, remorqueurs et mécaniciens. Envoyez votre candidature."
+>
+  <TopNav />
+  <main id="main">
+    <!-- Hero -->
+    <section class="rec-hero" style={`--rec-bg: url('${photos.flotteCamions}');`}>
+      <div class="rec-hero-inner">
+        <div class="rec-pill">
+          <span class="rec-pill-dot" aria-hidden="true"></span>
+          Nous recrutons en CDI
+        </div>
+        <h1 class="rec-title">
+          Rejoignez Montpellier&nbsp;Dépannage<br />
+          <span class="rec-title-accent">depuis 1956 sur la route.</span>
+        </h1>
+        <p class="rec-lead">
+          Nous étoffons notre équipe pour soutenir notre croissance sur Montpellier,
+          le grand Hérault et l’autoroute A9. Trois postes sont actuellement ouverts.
+        </p>
+        <a href={`#postes`} class="rec-hero-cta">
+          Voir les postes
+          <span aria-hidden="true">↓</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- Postes -->
+    <section class="rec-postes" id="postes">
+      <div class="rec-inner">
+        <header class="rec-section-head">
+          <div class="rec-overline">Postes ouverts</div>
+          <h2 class="rec-section-title">3 métiers, une même équipe.</h2>
+        </header>
+
+        <ul class="rec-grid">
+          {postes.map((p, i) => (
+            <li class="rec-card" style={`--i:${i}`}>
+              <div class="rec-card-num mono">0{i + 1}</div>
+              <h3 class="rec-card-title">{p.title}</h3>
+              <p class="rec-card-desc">{p.desc}</p>
+              <div class="rec-card-skills">
+                <div class="rec-card-skills-label">Profil recherché</div>
+                <ul>
+                  {p.skills.map((s) => <li><span class="rec-check" aria-hidden="true">✓</span> {s}</li>)}
+                </ul>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <!-- Pourquoi nous -->
+    <section class="rec-why">
+      <div class="rec-inner rec-why-grid">
+        <div class="rec-why-copy">
+          <div class="rec-overline">Pourquoi nous</div>
+          <h2 class="rec-section-title">Une entreprise familiale, des moyens pro.</h2>
+          <ul class="rec-why-list">
+            <li><span class="rec-check rec-check-lg" aria-hidden="true">✓</span> 68&nbsp;ans d’expérience, deux sites opérationnels Montpellier &amp; VLT</li>
+            <li><span class="rec-check rec-check-lg" aria-hidden="true">✓</span> Flotte récente&nbsp;: 10+ plateaux, 4×4 autoroutes, flotte électrique centre-ville</li>
+            <li><span class="rec-check rec-check-lg" aria-hidden="true">✓</span> Certifiés NF Service, signataires Envol pour l’environnement</li>
+            <li><span class="rec-check rec-check-lg" aria-hidden="true">✓</span> Partenaire officiel Vinci Autoroutes A9</li>
+            <li><span class="rec-check rec-check-lg" aria-hidden="true">✓</span> Formations internes payées (FIMO/FCO, autoroute, GPL)</li>
+          </ul>
+        </div>
+        <aside class="rec-why-photo" aria-hidden="true" style={`background-image: url('${photos.flotteCamions}');`}>
+          <div class="rec-why-photo-overlay">
+            <div class="rec-why-photo-num">40</div>
+            <div class="rec-why-photo-label">dépanneurs certifiés sur 2 sites</div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- CTA candidature -->
+    <section class="rec-apply">
+      <div class="rec-inner rec-apply-card">
+        <div class="rec-apply-overline">Postuler</div>
+        <h2 class="rec-apply-title">
+          Envoyez CV et lettre de motivation à&nbsp;:
+        </h2>
+        <a href={`mailto:${candidatureMail}?subject=${encodeURIComponent('Candidature — Montpellier Dépannage')}`} class="rec-apply-mail">
+          <span aria-hidden="true">✉</span>
+          <span class="rec-apply-mail-addr">{candidatureMail}</span>
+        </a>
+        <p class="rec-apply-note">
+          Précisez le poste qui vous intéresse en objet. Réponse sous 5&nbsp;jours ouvrés.<br />
+          Renseignements téléphone&nbsp;: <a href={site.phone.href} class="rec-apply-phone mono">{site.phone.display}</a>
+        </p>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style>
+  /* ---------- Hero ---------- */
+  .rec-hero {
+    position: relative;
+    min-height: 520px;
+    padding: 96px var(--pad-x-desktop) 80px;
+    color: #fff;
+    background-image:
+      linear-gradient(180deg, rgba(26,25,15,0.6) 0%, rgba(26,25,15,0.85) 100%),
+      var(--rec-bg);
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+  }
+  .rec-hero-inner {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    width: 100%;
+  }
+  .rec-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    background: rgba(228,225,60,0.95);
+    border-radius: var(--radius-pill);
+    color: var(--md-brand-black);
+    margin-bottom: 22px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .rec-pill-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--md-brand-green);
+    box-shadow: 0 0 0 3px rgba(44,97,38,0.25);
+    animation: recruit-pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes recruit-pulse {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(44,97,38,0.25); }
+    50%      { box-shadow: 0 0 0 6px rgba(44,97,38,0.08); }
+  }
+  .rec-title {
+    font-family: var(--font-display);
+    font-size: 60px;
+    line-height: 1.05;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin: 0 0 18px;
+    max-width: 900px;
+  }
+  .rec-title-accent { color: var(--md-brand-yellow); }
+  .rec-lead {
+    font-size: 18px;
+    line-height: 1.55;
+    max-width: 620px;
+    color: rgba(255,255,255,0.88);
+    margin: 0 0 32px;
+  }
+  .rec-hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 24px;
+    background: var(--md-brand-yellow);
+    color: var(--md-brand-black);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+    transition: transform var(--dur-base) var(--ease-standard),
+                background-color var(--dur-base) var(--ease-standard);
+  }
+  .rec-hero-cta:hover {
+    background: var(--color-accent-hover);
+    transform: translateY(-1px);
+  }
+
+  /* ---------- Sections génériques ---------- */
+  .rec-inner {
+    max-width: var(--container-max);
+    margin: 0 auto;
+  }
+  .rec-overline {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    background: var(--color-primary-bg);
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    margin-bottom: 14px;
+  }
+  .rec-section-head {
+    max-width: 720px;
+    margin-bottom: 40px;
+  }
+  .rec-section-title {
+    font-family: var(--font-display);
+    font-size: 36px;
+    line-height: 1.1;
+    letter-spacing: var(--tr-display);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .rec-check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-primary);
+    font-weight: 700;
+    font-size: 12px;
+  }
+  .rec-check-lg { font-size: 16px; margin-right: 8px; }
+
+  /* ---------- Postes ---------- */
+  .rec-postes {
+    padding: 96px var(--pad-x-desktop);
+    background: var(--color-bg);
+  }
+  .rec-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  .rec-card {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-2xl);
+    padding: 32px 30px;
+    position: relative;
+    overflow: hidden;
+    transition: transform var(--dur-base) var(--ease-standard),
+                box-shadow var(--dur-base) var(--ease-standard),
+                border-color var(--dur-base) var(--ease-standard);
+    opacity: 0;
+    transform: translateY(12px);
+    animation: rec-card-in 0.6s var(--ease-out) forwards;
+    animation-delay: calc(0.1s + var(--i) * 0.12s);
+  }
+  @keyframes rec-card-in {
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .rec-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--color-primary) 0%, var(--md-signal-300) 100%);
+    opacity: 0;
+    transition: opacity var(--dur-base) var(--ease-standard);
+  }
+  .rec-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--md-forest-200);
+  }
+  .rec-card:hover::before { opacity: 1; }
+  .rec-card-num {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--md-signal-500);
+    letter-spacing: 0.1em;
+    margin-bottom: 14px;
+  }
+  .rec-card-title {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 10px;
+  }
+  .rec-card-desc {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--color-text-muted);
+    margin: 0 0 22px;
+  }
+  .rec-card-skills-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-bottom: 10px;
+  }
+  .rec-card-skills ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .rec-card-skills li {
+    font-size: 13px;
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* ---------- Why us ---------- */
+  .rec-why {
+    padding: 96px var(--pad-x-desktop);
+    background: var(--color-bg-subtle);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .rec-why-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 56px;
+    align-items: center;
+  }
+  .rec-why-list {
+    list-style: none;
+    padding: 0;
+    margin: 24px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .rec-why-list li {
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--color-text);
+    display: flex;
+    align-items: flex-start;
+  }
+  .rec-why-photo {
+    position: relative;
+    min-height: 360px;
+    border-radius: var(--radius-2xl);
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+  }
+  .rec-why-photo-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(26,25,15,0) 50%, rgba(26,25,15,0.9) 100%);
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    color: #fff;
+  }
+  .rec-why-photo-num {
+    font-family: var(--font-display);
+    font-size: 56px;
+    font-weight: 700;
+    color: var(--md-signal-300);
+    line-height: 1;
+  }
+  .rec-why-photo-label {
+    font-size: 13px;
+    color: rgba(255,255,255,0.85);
+    margin-top: 6px;
+    letter-spacing: 0.04em;
+  }
+
+  /* ---------- Apply ---------- */
+  .rec-apply {
+    padding: 96px var(--pad-x-desktop);
+    background: var(--color-bg);
+  }
+  .rec-apply-card {
+    background: var(--md-stone-900);
+    color: #fff;
+    border-radius: var(--radius-2xl);
+    padding: 60px 56px;
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+  }
+  .rec-apply-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(228,225,60,0.18) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .rec-apply-overline {
+    position: relative;
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--md-signal-300);
+    margin-bottom: 16px;
+  }
+  .rec-apply-title {
+    position: relative;
+    font-family: var(--font-display);
+    font-size: 28px;
+    line-height: 1.2;
+    font-weight: 700;
+    margin: 0 0 28px;
+  }
+  .rec-apply-mail {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 32px;
+    background: var(--md-signal-300);
+    color: var(--md-brand-black);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 18px;
+    box-shadow: 0 8px 28px rgba(228,225,60,0.4);
+    transition: transform var(--dur-base) var(--ease-standard);
+  }
+  .rec-apply-mail:hover { transform: translateY(-2px); }
+  .rec-apply-mail-addr {
+    font-family: var(--font-mono);
+    font-size: 16px;
+  }
+  .rec-apply-note {
+    position: relative;
+    margin: 26px 0 0;
+    font-size: 13px;
+    color: rgba(255,255,255,0.78);
+    line-height: 1.6;
+  }
+  .rec-apply-phone {
+    color: var(--md-signal-300);
+    text-decoration: none;
+    font-weight: 700;
+    border-bottom: 1px dotted var(--md-signal-300);
+  }
+  .rec-apply-phone:hover { border-bottom-style: solid; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1023px) {
+    .rec-hero { padding: 80px var(--pad-x-tablet) 64px; min-height: 440px; }
+    .rec-title { font-size: 44px; }
+    .rec-postes, .rec-why, .rec-apply { padding: 72px var(--pad-x-tablet); }
+    .rec-grid { grid-template-columns: 1fr; }
+    .rec-why-grid { grid-template-columns: 1fr; gap: 32px; }
+    .rec-section-title { font-size: 30px; }
+    .rec-apply-card { padding: 48px 32px; }
+  }
+  @media (max-width: 639px) {
+    .rec-hero { padding: 56px var(--pad-x-mobile) 48px; min-height: 380px; }
+    .rec-title { font-size: 32px; }
+    .rec-lead { font-size: 15px; }
+    .rec-postes, .rec-why, .rec-apply { padding: 56px var(--pad-x-mobile); }
+    .rec-section-title { font-size: 24px; }
+    .rec-apply-title { font-size: 22px; }
+    .rec-apply-mail { flex-direction: column; padding: 16px 20px; font-size: 14px; }
+    .rec-apply-mail-addr { font-size: 14px; word-break: break-all; }
+    .rec-apply-card { padding: 36px 24px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rec-card, .rec-pill-dot { animation: none; opacity: 1; transform: none; }
+  }
+</style>

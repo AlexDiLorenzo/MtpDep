@@ -139,6 +139,9 @@ const journey = [
           Nous vous rappelons sous 2&nbsp;heures aux horaires ouvrés.
           Demande sans engagement, traitée par un dépanneur.
         </p>
+        <p class="devis-lead-mail">
+          Ou par email&nbsp;: <a href="mailto:pec@montpellierdepannage.com">pec@montpellierdepannage.com</a>
+        </p>
       </div>
 
       <form class="devis-form" id="devis-form" novalidate>
@@ -177,6 +180,11 @@ const journey = [
           <label class="devis-field devis-field-full">
             <span class="devis-label">Lieu de la panne</span>
             <input type="text" name="location" maxlength="200" placeholder="Adresse, sortie A9, lieu-dit…" />
+          </label>
+
+          <label class="devis-field devis-field-full">
+            <span class="devis-label">Destination souhaitée</span>
+            <input type="text" name="destination" maxlength="200" placeholder="Garage, domicile, adresse précise…" />
           </label>
 
           <label class="devis-field devis-field-full">
@@ -243,6 +251,7 @@ const journey = [
         email: String(data.get('email') || ''),
         vehicle_type: String(data.get('vehicle_type') || ''),
         location: String(data.get('location') || ''),
+        destination: String(data.get('destination') || ''),
         details: String(data.get('details') || ''),
         consent_rgpd: data.get('consent_rgpd') === 'on',
         website: String(data.get('website') || ''),
@@ -787,20 +796,21 @@ const journey = [
   .assist-fallback-quote {
     display: inline-flex;
     align-items: center;
-    padding: 14px 20px;
-    background: transparent;
+    padding: 14px 22px;
+    background: var(--md-forest-400);
     color: #fff;
     text-decoration: none;
     font-size: 14px;
     font-weight: 700;
     border-radius: var(--radius-lg);
-    border: 1px solid rgba(255,255,255,0.3);
+    border: 0;
+    box-shadow: 0 4px 14px rgba(100,161,66,0.4);
     transition: background-color var(--dur-base) var(--ease-standard),
-                border-color var(--dur-base) var(--ease-standard);
+                transform var(--dur-base) var(--ease-standard);
   }
   .assist-fallback-quote:hover {
-    background: rgba(255,255,255,0.1);
-    border-color: rgba(255,255,255,0.6);
+    background: var(--md-forest-500);
+    transform: translateY(-1px);
   }
 
   /* ---------- Panneau devis ---------- */
@@ -840,6 +850,20 @@ const journey = [
     line-height: 1.6;
     color: var(--color-text-muted);
     margin: 0;
+  }
+  .devis-lead-mail {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    margin: 8px 0 0;
+  }
+  .devis-lead-mail a {
+    color: var(--color-primary);
+    font-weight: 700;
+    text-decoration: none;
+    border-bottom: 1px dotted var(--color-primary);
+  }
+  .devis-lead-mail a:hover {
+    border-bottom-style: solid;
   }
 
   .devis-form {

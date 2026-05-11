@@ -9,7 +9,8 @@ CREATE TABLE IF NOT EXISTS devis (
   phone         TEXT NOT NULL,
   email         TEXT,
   vehicle_type  TEXT,                              -- VL | UTILITAIRE | PL
-  location      TEXT,
+  location      TEXT,                              -- lieu de la panne
+  destination   TEXT,                              -- destination souhaitée
   details       TEXT,
   consent_rgpd  INTEGER NOT NULL DEFAULT 0,        -- 0/1
   status        TEXT NOT NULL DEFAULT 'open',      -- open | treated
@@ -21,3 +22,7 @@ CREATE TABLE IF NOT EXISTS devis (
 
 CREATE INDEX IF NOT EXISTS idx_devis_status_created ON devis(status, created_at);
 CREATE INDEX IF NOT EXISTS idx_devis_created ON devis(created_at);
+
+-- Migration pour la table existante (ajoute la colonne destination si pas déjà là).
+-- À lancer une seule fois après mise à jour, ignore l'erreur "duplicate column" :
+--   wrangler d1 execute mtp-dep-db --command="ALTER TABLE devis ADD COLUMN destination TEXT" --remote

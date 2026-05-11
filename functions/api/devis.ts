@@ -9,7 +9,7 @@ import { signId, uuidv4 } from '../_lib/crypto';
 import { jsonResponse, escapeHtml } from '../_lib/html';
 
 const VEHICLE_TYPES = new Set(['VL', 'UTILITAIRE', 'PL']);
-const MAX_LEN = { name: 120, phone: 30, email: 160, location: 200, details: 2000 };
+const MAX_LEN = { name: 120, phone: 30, email: 160, location: 200, destination: 200, details: 2000 };
 
 interface FormPayload {
   name?: string;
@@ -17,6 +17,7 @@ interface FormPayload {
   email?: string;
   vehicle_type?: string;
   location?: string;
+  destination?: string;
   details?: string;
   consent_rgpd?: boolean;
   // anti-bot honeypot
@@ -77,6 +78,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   const email = clean(body.email, MAX_LEN.email);
   const vehicle_type = clean(body.vehicle_type, 20);
   const location = clean(body.location, MAX_LEN.location);
+  const destination = clean(body.destination, MAX_LEN.destination);
   const details = clean(body.details, MAX_LEN.details);
 
   const vt = vehicle_type && VEHICLE_TYPES.has(vehicle_type) ? vehicle_type : null;
@@ -90,10 +92,10 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   try {
     await env.DB.prepare(
       `INSERT INTO devis
-       (id, created_at, name, phone, email, vehicle_type, location, details, consent_rgpd, status, user_agent, ip_country)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, 'open', ?, ?)`
+       (id, created_at, name, phone, email, vehicle_type, location, destination, details, consent_rgpd, status, user_agent, ip_country)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 'open', ?, ?)`
     )
-      .bind(id, created_at, name, phone, email, vt, location, details, user_agent, ip_country)
+      .bind(id, created_at, name, phone, email, vt, location, destination, details, user_agent, ip_country)
       .run();
   } catch (e) {
     console.error('D1 insert error', e);
@@ -106,7 +108,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
 
   // Email Resend (n'attend pas la réponse pour ne pas bloquer si Resend rate-limit ; mais on log)
   const subject = `[Devis MDP] ${name ?? 'Sans nom'} — ${vt ?? 'véhicule non précisé'}`;
-  const html = renderEmail({ id, name, phone, email, vt, location, details, treatUrl, created_at });
+  const html = renderEmail({ id, name, phone, email, vt, location, destination, details, treatUrl, created_at });
 
   try {
     const res = await fetch('https://api.resend.com/emails', {
@@ -142,6 +144,7 @@ function renderEmail(d: {
   email: string | null;
   vt: string | null;
   location: string | null;
+  destination: string | null;
   details: string | null;
   treatUrl: string;
   created_at: number;
@@ -163,6 +166,7 @@ function renderEmail(d: {
         ${d.email ? `<tr><td style="padding:8px 0;color:#5F5E5A;">Email</td><td style="padding:8px 0;"><a style="color:#2C6126;" href="mailto:${escapeHtml(d.email)}">${escapeHtml(d.email)}</a></td></tr>` : ''}
         ${d.vt ? `<tr><td style="padding:8px 0;color:#5F5E5A;">Véhicule</td><td style="padding:8px 0;font-weight:700;">${escapeHtml(d.vt)}</td></tr>` : ''}
         ${d.location ? `<tr><td style="padding:8px 0;color:#5F5E5A;vertical-align:top;">Lieu</td><td style="padding:8px 0;">${escapeHtml(d.location)}</td></tr>` : ''}
+        ${d.destination ? `<tr><td style="padding:8px 0;color:#5F5E5A;vertical-align:top;">Destination</td><td style="padding:8px 0;">${escapeHtml(d.destination)}</td></tr>` : ''}
         ${d.details ? `<tr><td style="padding:8px 0;color:#5F5E5A;vertical-align:top;">Détails</td><td style="padding:8px 0;white-space:pre-wrap;">${escapeHtml(d.details)}</td></tr>` : ''}
       </table>
 

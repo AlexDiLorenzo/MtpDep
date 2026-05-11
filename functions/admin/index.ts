@@ -325,16 +325,17 @@ function renderDashboard(data: {
       data.list.length === 0
         ? '<p style="color:var(--muted);font-size:13px;">Aucune demande pour ce filtre.</p>'
         : `<div style="overflow-x:auto;"><table>
-      <thead><tr><th>Reçue</th><th>Nom</th><th>Téléphone</th><th>Véhicule</th><th>Lieu</th><th>Statut</th><th>Délai</th></tr></thead>
+      <thead><tr><th>Reçue</th><th>Nom</th><th>Téléphone</th><th>Véhicule</th><th>Départ → Destination</th><th>Statut</th><th>Délai</th></tr></thead>
       <tbody>${data.list
         .map((r) => {
           const elapsed = r.status === 'treated' && r.treated_at ? r.treated_at - r.created_at : Date.now() - r.created_at;
+          const trip = [r.location, r.destination].filter(Boolean).map((s) => (s as string).slice(0, 40)).join(' → ') || '—';
           return `<tr>
         <td>${escapeHtml(fmtDateTime(r.created_at))}</td>
         <td class="col-name">${escapeHtml(r.name ?? '—')}</td>
         <td class="col-phone">${escapeHtml(r.phone)}</td>
         <td>${escapeHtml(r.vehicle_type ?? '—')}</td>
-        <td>${escapeHtml((r.location ?? '').slice(0, 60))}</td>
+        <td>${escapeHtml(trip)}</td>
         <td>${
           r.status === 'treated'
             ? '<span class="badge badge-treated">Traitée</span>'

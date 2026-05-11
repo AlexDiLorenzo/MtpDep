@@ -44,6 +44,7 @@ export const photos = {
   peyrou: '/img/peyrou-vertical.jpg',             // Camion devant l'Arc du Peyrou (vertical)
   astonAntigone: '/img/aston-antigone.png',       // Aston Martin quartier Antigone
   porscheCayman: '/img/porsche-cayman.jpg',       // Porsche Cayman + plateau MDP
+  flotteElectrique: '/img/flotte-electrique.jpg', // Petite voiture + scooters électriques MDP
 
   // Interventions terrain
   interventionA9: '/img/intervention-a9.jpg',     // Autoroute A9

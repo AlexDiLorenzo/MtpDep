@@ -29,6 +29,7 @@ export interface DevisRow {
   email: string | null;
   vehicle_type: string | null;
   location: string | null;
+  destination: string | null;
   details: string | null;
   consent_rgpd: number;
   status: 'open' | 'treated';
