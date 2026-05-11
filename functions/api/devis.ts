@@ -34,12 +34,23 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   const { request, env } = ctx;
 
   // Vérifie d'abord la conf : on préfère échouer fort qu'enregistrer une demande qui n'enverra jamais d'email
+  const envBag = env as unknown as Record<string, unknown>;
   const missing = ['EMAIL_TO', 'RESEND_API_KEY', 'RESEND_FROM', 'DEVIS_SECRET', 'SITE_URL'].filter(
-    (k) => !(env as unknown as Record<string, string>)[k]
+    (k) => !envBag[k]
   );
   if (missing.length) {
+    // Log exhaustif pour diagnostiquer les pièges Cloudflare (Plaintext qui ne propage pas, etc.)
+    const visibleKeys = Object.keys(envBag).sort();
     console.error('Missing env vars:', missing.join(', '));
-    return jsonResponse({ ok: false, error: `config_missing: ${missing.join(', ')}` }, 500);
+    console.error('Env keys visible in runtime:', visibleKeys.join(', '));
+    return jsonResponse(
+      {
+        ok: false,
+        error: `config_missing: ${missing.join(', ')}`,
+        debug_keys_visible: visibleKeys,
+      },
+      500
+    );
   }
 
   let body: FormPayload;
