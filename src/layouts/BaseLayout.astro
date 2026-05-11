@@ -9,8 +9,8 @@ interface Props {
 }
 
 const {
-  title = `${site.name} — Remorquage et dépannage 24/7 · Hérault · A9`,
-  description = "Remorquage et dépannage 24h/24, 7j/7 à Montpellier et dans l'Hérault. Plateaux VL et PL, autoroute A9, transport international. Certifié NF Service depuis 1956.",
+  title = `${site.name} · Remorquage et dépannage 24/7 · Hérault · A9`,
+  description = "Remorquage et dépannage 24h/24, 7j/7 à Montpellier et dans l'Hérault. Plateaux VL et PL, autoroute A9, transport international. Certifié NF Service, plus de 30 ans d'expérience.",
   canonical = site.url,
 } = Astro.props;
 
@@ -46,7 +46,6 @@ const localBusinessSchema = {
     { '@type': 'Country', name: 'Italie' },
     { '@type': 'Country', name: 'Espagne' },
   ],
-  foundingDate: String(site.foundedYear),
   slogan: site.tagline,
 };
 ---

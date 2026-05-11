@@ -4,8 +4,7 @@
 export const site = {
   name: 'Montpellier Dépannage',
   shortName: 'MDP',
-  foundedYear: 1956,
-  tagline: 'Remorquage · 24/7 · Depuis 1956',
+  tagline: 'Remorquage · 24/7 · Plus de 30 ans d’expérience',
 
   phone: {
     display: '04 67 42 14 31',

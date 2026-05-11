@@ -1,176 +1,400 @@
 ---
-const zones = [
-  'Montpellier',
-  'Lattes',
-  'Castelnau',
-  'Juvignac',
-  'Villeneuve-lès-Maguelone',
-  'Pérols',
-  'Mauguio',
-  'A9 sortie 30-31',
-];
+// 11 sites du réseau Montpellier Dépannage, Hérault + Gard.
+// Montpellier est le site principal (marker mis en évidence).
+type Site = {
+  name: string;
+  x: number;
+  y: number;
+  lx: number;
+  ly: number;
+  anchor: 'start' | 'middle' | 'end';
+  main?: boolean;
+};
 
-const pins: Array<[number, number, string]> = [
-  [400, 300, 'MTP'],
-  [320, 240, 'VLT'],
-  [500, 220, ''],
-  [310, 370, ''],
-  [480, 360, ''],
+const sites: Site[] = [
+  { name: 'Clermont l’Hérault',    x: 200, y: 280, lx: 200, ly: 254, anchor: 'middle' },
+  { name: 'Laroque',                x: 400, y: 205, lx: 400, ly: 180, anchor: 'middle' },
+  { name: 'St-Georges d’Orques',    x: 348, y: 348, lx: 318, ly: 332, anchor: 'end' },
+  { name: 'Montpellier',            x: 418, y: 358, lx: 418, ly: 397, anchor: 'middle', main: true },
+  { name: 'St-Jean de Védas',       x: 398, y: 425, lx: 380, ly: 452, anchor: 'middle' },
+  { name: 'Pérols',                 x: 475, y: 372, lx: 495, ly: 376, anchor: 'start' },
+  { name: 'La Grande Motte',        x: 530, y: 442, lx: 545, ly: 466, anchor: 'middle' },
+  { name: 'Villetelle',             x: 590, y: 282, lx: 590, ly: 258, anchor: 'middle' },
+  { name: 'Lunel',                  x: 578, y: 360, lx: 578, ly: 386, anchor: 'middle' },
+  { name: 'Gallargues-le-Montueux', x: 680, y: 320, lx: 700, ly: 324, anchor: 'start' },
+  { name: 'Fournès',                x: 820, y: 215, lx: 820, ly: 192, anchor: 'middle' },
 ];
 ---
 
-<section class="coverage" id="zones">
-  <div class="coverage-grid">
-    <div class="coverage-copy">
-      <div class="coverage-overline">Zone d'intervention</div>
-      <h2 class="coverage-title">
-        Montpellier et grand Hérault,<br />en moins de 30 minutes.
+<section class="coverage" id="zones" aria-labelledby="coverage-title">
+  <div class="coverage-inner">
+    <header class="coverage-head">
+      <div class="coverage-overline">Zone d’intervention</div>
+      <h2 class="coverage-title" id="coverage-title">
+        11&nbsp;sites pour couvrir<br />
+        <span class="coverage-title-accent">l’Hérault et le Gard.</span>
       </h2>
       <p class="coverage-lead">
-        Nos équipes sont basées à Montpellier (MTP) et Villeneuve-lès-Maguelone (VLT).
-        Interventions sur toute l'agglomération, l'A9 et la sortie d'autoroute.
+        Un maillage de proximité avec Montpellier comme site principal,
+        des relais sur le grand Hérault et jusqu’en Gard.
+        Délais d’intervention courts, présence permanente sur l’A9.
       </p>
-      <ul class="coverage-list">
-        {zones.map((z) => (
-          <li>
-            <span class="coverage-dot" aria-hidden="true"></span>
-            {z}
-          </li>
-        ))}
-      </ul>
-    </div>
+    </header>
 
-    <div class="coverage-map" aria-hidden="true">
-      <svg width="100%" height="100%" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice" class="coverage-map-svg">
+    <div class="coverage-map-wrap">
+      <svg
+        viewBox="0 0 1000 560"
+        preserveAspectRatio="xMidYMid meet"
+        class="coverage-map-svg"
+        role="img"
+        aria-label="Carte des 11 sites Montpellier Dépannage dans l’Hérault et le Gard"
+      >
         <defs>
-          <pattern id="gridL" width="40" height="40" patternUnits="userSpaceOnUse">
-            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#E4E13C" stroke-width="0.5" opacity="0.4" />
+          <linearGradient id="cov-territory" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#EFEB55" />
+            <stop offset="55%" stop-color="#E4E13C" />
+            <stop offset="100%" stop-color="#C9C42B" />
+          </linearGradient>
+          <pattern id="cov-grid" width="36" height="36" patternUnits="userSpaceOnUse">
+            <path d="M 36 0 L 0 0 0 36" fill="none" stroke="rgba(228,225,60,0.06)" stroke-width="1" />
           </pattern>
+          <filter id="cov-territory-shadow" x="-10%" y="-10%" width="120%" height="130%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="10" />
+            <feOffset dx="0" dy="8" result="off" />
+            <feComponentTransfer><feFuncA type="linear" slope="0.45" /></feComponentTransfer>
+            <feMerge>
+              <feMergeNode />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          <radialGradient id="cov-pin-halo" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#2C6126" stop-opacity="0.35" />
+            <stop offset="100%" stop-color="#2C6126" stop-opacity="0" />
+          </radialGradient>
         </defs>
-        <rect width="100%" height="100%" fill="url(#gridL)" />
-        <circle cx="400" cy="300" r="80" fill="none" stroke="#E4E13C" stroke-width="1.2" opacity="0.8" />
-        <circle cx="400" cy="300" r="160" fill="none" stroke="#E4E13C" stroke-width="1" opacity="0.55" />
-        <circle cx="400" cy="300" r="240" fill="none" stroke="#E4E13C" stroke-width="0.8" opacity="0.35" />
-        <circle cx="400" cy="300" r="320" fill="none" stroke="#E4E13C" stroke-width="0.6" opacity="0.2" />
-        {pins.map(([x, y, lbl]) => (
-          <g>
-            <circle cx={x} cy={y} r={lbl ? 12 : 5} fill="#E4E13C" />
-            {lbl && (
-              <text
-                x={x}
-                y={y + 4}
-                font-family="'Space Grotesk', sans-serif"
-                font-size="10"
-                font-weight="700"
-                fill="#1A190F"
-                text-anchor="middle"
-              >{lbl}</text>
+
+        <!-- fond grille subtil -->
+        <rect width="1000" height="560" fill="url(#cov-grid)" />
+
+        <!-- territoire Hérault + Gard (forme abstraite combinée) -->
+        <g filter="url(#cov-territory-shadow)">
+          <path
+            d="M 95 360
+               C 100 280, 150 215, 240 195
+               L 335 170
+               C 395 160, 445 175, 478 205
+               C 520 180, 600 158, 720 162
+               L 825 170
+               C 880 180, 915 220, 915 280
+               C 915 340, 880 385, 820 400
+               L 705 415
+               C 645 425, 585 415, 525 393
+               C 495 420, 455 445, 400 460
+               L 290 472
+               C 200 477, 130 452, 98 412 Z"
+            fill="url(#cov-territory)"
+          />
+        </g>
+
+        <!-- frontière interne Hérault / Gard -->
+        <path
+          d="M 510 195 C 502 250, 510 320, 528 395"
+          stroke="rgba(26,25,15,0.22)"
+          fill="none"
+          stroke-width="1.5"
+          stroke-dasharray="6,5"
+        />
+
+        <!-- labels régions -->
+        <text
+          x="225"
+          y="350"
+          class="coverage-region-label"
+          font-family="'Space Grotesk', sans-serif"
+          font-size="46"
+          font-weight="700"
+          fill="#1A190F"
+          letter-spacing="-0.02em"
+        >HÉRAULT</text>
+        <text
+          x="755"
+          y="265"
+          class="coverage-region-label"
+          font-family="'Space Grotesk', sans-serif"
+          font-size="38"
+          font-weight="700"
+          fill="#1A190F"
+          letter-spacing="-0.02em"
+        >GARD</text>
+
+        <!-- pins -->
+        {sites.map((s, i) => (
+          <g class={`cov-pin${s.main ? ' is-main' : ''}`} style={`--i:${i};`}>
+            {s.main && (
+              <circle cx={s.x} cy={s.y} r="32" fill="url(#cov-pin-halo)" class="cov-pin-halo" />
             )}
+            <circle
+              cx={s.x}
+              cy={s.y + 2}
+              r={s.main ? 15 : 9}
+              fill="rgba(0,0,0,0.2)"
+            />
+            <circle
+              cx={s.x}
+              cy={s.y}
+              r={s.main ? 15 : 8}
+              fill={s.main ? '#2C6126' : '#1A190F'}
+              stroke="#fff"
+              stroke-width={s.main ? 3 : 2}
+              class="cov-pin-dot"
+            />
+            {s.main && (
+              <text
+                x={s.x}
+                y={s.y + 5}
+                text-anchor="middle"
+                font-family="'Space Grotesk', sans-serif"
+                font-size="14"
+                font-weight="700"
+                fill="#E4E13C"
+              >★</text>
+            )}
+            <text
+              x={s.lx}
+              y={s.ly}
+              text-anchor={s.anchor}
+              font-family="'Space Grotesk', sans-serif"
+              font-size={s.main ? 16 : 12.5}
+              font-weight="700"
+              fill="#1A190F"
+              class="cov-pin-label"
+            >{s.name}</text>
           </g>
         ))}
       </svg>
-      <div class="coverage-badge mono">⚡ 2 SITES · 16 DÉPANNEURS</div>
+
+      <!-- badge KPI sur la carte -->
+      <div class="coverage-badge mono">
+        <span class="coverage-badge-dot" aria-hidden="true"></span>
+        11 SITES · 40 DÉPANNEURS
+      </div>
     </div>
+
+    <!-- liste a11y / repli mobile -->
+    <ul class="coverage-list" aria-label="Liste des sites">
+      {sites.map((s) => (
+        <li class={s.main ? 'coverage-list-item is-main' : 'coverage-list-item'}>
+          <span class="coverage-list-dot" aria-hidden="true"></span>
+          <span class="coverage-list-name">{s.name}</span>
+          {s.main && <span class="coverage-list-badge">Site principal</span>}
+        </li>
+      ))}
+    </ul>
   </div>
 </section>
 
 <style>
   .coverage {
-    background: var(--color-bg-subtle);
+    padding: 96px var(--pad-x-desktop);
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(44,97,38,0.08) 0%, transparent 60%),
+      var(--color-bg-subtle);
     border-top: 1px solid var(--color-border);
     border-bottom: 1px solid var(--color-border);
   }
-  .coverage-grid {
-    max-width: var(--container-wide);
+  .coverage-inner {
+    max-width: var(--container-max);
     margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
   }
 
-  .coverage-copy {
-    padding: 72px 48px 72px var(--pad-x-desktop);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+  /* ---------- Header ---------- */
+  .coverage-head {
+    max-width: 760px;
+    margin: 0 auto 48px;
+    text-align: center;
   }
   .coverage-overline {
+    display: inline-block;
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--color-primary);
-    margin-bottom: 10px;
+    background: var(--color-primary-bg);
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    margin-bottom: 16px;
   }
   .coverage-title {
     font-family: var(--font-display);
-    font-size: 36px;
-    margin: 0 0 18px;
-    color: var(--color-text);
+    font-size: 44px;
+    line-height: 1.08;
     letter-spacing: var(--tr-display);
-    line-height: 1.1;
     font-weight: 700;
-  }
-  .coverage-lead {
-    font-size: 15px;
-    line-height: 1.65;
-    color: var(--color-text-muted);
-    margin: 0 0 28px;
-    max-width: 480px;
-  }
-  .coverage-list {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
-  .coverage-list li {
-    font-size: 13px;
     color: var(--color-text);
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    margin: 0 0 16px;
   }
-  .coverage-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--color-primary);
-    flex-shrink: 0;
+  .coverage-title-accent { color: var(--color-primary); }
+  .coverage-lead {
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    margin: 0;
   }
 
-  .coverage-map {
-    min-height: 480px;
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--md-forest-800) 100%);
+  /* ---------- Map ---------- */
+  .coverage-map-wrap {
     position: relative;
+    background:
+      linear-gradient(160deg, #2C6126 0%, #1F4D1A 55%, #133611 100%);
+    border-radius: var(--radius-2xl);
     overflow: hidden;
+    box-shadow:
+      var(--shadow-lg, 0 24px 60px -20px rgba(26,25,15,0.45)),
+      inset 0 1px 0 rgba(255,255,255,0.06);
+    aspect-ratio: 1000 / 560;
+    max-height: 620px;
   }
   .coverage-map-svg {
-    position: absolute;
-    inset: 0;
-    opacity: 0.3;
-  }
-  .coverage-badge {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    padding: 6px 12px;
-    background: rgba(26,25,15,0.7);
-    border-radius: var(--radius-pill);
-    color: var(--md-brand-yellow);
-    font-size: 10px;
-    font-family: var(--font-mono);
-    font-weight: 700;
-    letter-spacing: 0.08em;
+    width: 100%;
+    height: 100%;
+    display: block;
   }
 
+  /* pins : entrée animée échelonnée */
+  .cov-pin {
+    opacity: 0;
+    transform-origin: center;
+    animation: cov-pin-in 0.55s var(--ease-out) forwards;
+    animation-delay: calc(0.25s + var(--i) * 0.06s);
+  }
+  @keyframes cov-pin-in {
+    from { opacity: 0; transform: translateY(-8px) scale(0.7); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .cov-pin-dot {
+    transition: transform 0.2s var(--ease-standard);
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .cov-pin:hover .cov-pin-dot {
+    transform: scale(1.18);
+  }
+  .cov-pin-label {
+    paint-order: stroke fill;
+    stroke: rgba(228,225,60,0.55);
+    stroke-width: 4;
+    stroke-linejoin: round;
+  }
+
+  /* Halo pulsé pour Montpellier */
+  .cov-pin-halo {
+    transform-origin: center;
+    transform-box: fill-box;
+    animation: cov-halo-pulse 2.6s ease-in-out infinite;
+  }
+  @keyframes cov-halo-pulse {
+    0%, 100% { transform: scale(1);   opacity: 0.9; }
+    50%      { transform: scale(1.35); opacity: 0.45; }
+  }
+
+  /* Badge KPI flottant */
+  .coverage-badge {
+    position: absolute;
+    top: 18px;
+    left: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: rgba(26,25,15,0.78);
+    border: 1px solid rgba(228,225,60,0.25);
+    border-radius: var(--radius-pill);
+    color: var(--md-brand-yellow);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .coverage-badge-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--md-brand-yellow);
+    box-shadow: 0 0 0 3px rgba(228,225,60,0.25);
+    animation: cov-badge-pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes cov-badge-pulse {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(228,225,60,0.25); }
+    50%      { box-shadow: 0 0 0 6px rgba(228,225,60,0.08); }
+  }
+
+  /* ---------- Liste sites (sous la carte) ---------- */
+  .coverage-list {
+    list-style: none;
+    margin: 36px 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px 24px;
+  }
+  .coverage-list-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    color: var(--color-text);
+  }
+  .coverage-list-item.is-main {
+    border-color: var(--color-primary);
+    background: var(--color-primary-bg);
+    font-weight: 700;
+  }
+  .coverage-list-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--md-brand-black);
+    flex-shrink: 0;
+  }
+  .coverage-list-item.is-main .coverage-list-dot {
+    background: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(44,97,38,0.18);
+  }
+  .coverage-list-name { flex: 1; }
+  .coverage-list-badge {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    background: rgba(255,255,255,0.7);
+    padding: 2px 8px;
+    border-radius: var(--radius-pill);
+  }
+
+  /* ---------- Responsive ---------- */
   @media (max-width: 1023px) {
-    .coverage-grid { grid-template-columns: 1fr; }
-    .coverage-copy { padding: 56px var(--pad-x-tablet); }
-    .coverage-map { min-height: 320px; }
-    .coverage-title { font-size: 32px; }
+    .coverage { padding: 80px var(--pad-x-tablet); }
+    .coverage-title { font-size: 36px; }
+    .coverage-list { grid-template-columns: repeat(2, 1fr); gap: 8px 16px; }
   }
   @media (max-width: 639px) {
-    .coverage-copy { padding: 48px var(--pad-x-mobile); }
+    .coverage { padding: 64px var(--pad-x-mobile); }
     .coverage-title { font-size: 28px; }
     .coverage-list { grid-template-columns: 1fr; }
+    .coverage-badge { font-size: 10px; padding: 6px 10px; top: 12px; left: 12px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cov-pin { animation: none; opacity: 1; transform: none; }
+    .cov-pin-halo { animation: none; }
+    .coverage-badge-dot { animation: none; }
   }
 </style>
