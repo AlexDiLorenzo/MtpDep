@@ -98,8 +98,12 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
       .bind(id, created_at, name, phone, email, vt, location, destination, details, user_agent, ip_country)
       .run();
   } catch (e) {
-    console.error('D1 insert error', e);
-    return jsonResponse({ ok: false, error: 'db_error' }, 500);
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error('D1 insert error', msg);
+    // Expose le message D1 dans la réponse pour diagnostiquer en prod :
+    // "no such column" → migration manquante ; "no such table" → schéma non appliqué ;
+    // "Cannot read properties of undefined (reading 'prepare')" → binding DB non configuré.
+    return jsonResponse({ ok: false, error: 'db_error', debug: msg.slice(0, 300) }, 500);
   }
 
   // Lien signé pour marquer la demande comme traitée
