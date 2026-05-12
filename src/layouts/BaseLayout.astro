@@ -91,6 +91,14 @@ const localBusinessSchema = {
     <a href="#main" class="skip-link">Aller au contenu principal</a>
     <slot />
 
+    {/* Cloudflare Web Analytics */}
+    <script
+      defer
+      src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon='{"token": "7df7e12428a84425812377fa7b679025"}'
+    ></script>
+    {/* End Cloudflare Web Analytics */}
+
     <style is:global>
       .skip-link {
         position: absolute;
