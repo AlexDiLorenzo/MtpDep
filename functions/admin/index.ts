@@ -3,7 +3,7 @@
 // Auth basique : token en query string ou cookie httpOnly (set au premier passage avec ?token=).
 
 import type { Env, DevisRow } from '../_lib/env';
-import { htmlResponse, escapeHtml } from '../_lib/html';
+import { htmlResponse, escapeHtml, jsonResponse } from '../_lib/html';
 
 const COOKIE_NAME = 'mdp_admin';
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 jours
@@ -115,6 +115,32 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   const url = new URL(ctx.request.url);
   url.searchParams.set('token', token);
   return new Response(null, { status: 302, headers: { location: url.pathname + url.search } });
+};
+
+// DELETE /admin?id=<uuid> — supprime un devis (utile pour purger les tests)
+export const onRequestDelete: PagesFunction<Env> = async (ctx) => {
+  const { request, env } = ctx;
+  const url = new URL(request.url);
+  const queryToken = url.searchParams.get('token');
+  const cookieToken = parseCookie(request.headers.get('cookie'))[COOKIE_NAME];
+  const expected = env.ADMIN_TOKEN;
+  const provided = queryToken || cookieToken;
+  if (!expected || !provided || !timingSafeEqual(provided, expected)) {
+    return jsonResponse({ ok: false, error: 'unauthorized' }, 401);
+  }
+
+  const id = url.searchParams.get('id');
+  if (!id || !/^[0-9a-f-]{36}$/i.test(id)) {
+    return jsonResponse({ ok: false, error: 'bad_id' }, 400);
+  }
+
+  try {
+    const res = await env.DB.prepare('DELETE FROM devis WHERE id = ?').bind(id).run();
+    return jsonResponse({ ok: true, deleted: res.meta?.changes ?? 0 });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return jsonResponse({ ok: false, error: 'db_error', debug: msg.slice(0, 300) }, 500);
+  }
 };
 
 // ---------- helpers ----------
@@ -264,6 +290,9 @@ function renderDashboard(data: {
   .badge-open { background: #FCEBEB; color: #A32D2D; }
   .badge-treated { background: var(--green-bg); color: var(--green); }
   .badge-alert { background: #FFF3CD; color: #856404; margin-left: 6px; }
+  .btn-del { padding: 4px 9px; background: transparent; border: 1px solid var(--line); border-radius: 6px; color: var(--muted); font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.12s ease; }
+  .btn-del:hover { background: #FCEBEB; border-color: #A32D2D; color: #A32D2D; }
+  .btn-del:disabled { opacity: 0.4; cursor: wait; }
   svg .area { fill: rgba(44,97,38,0.18); }
   svg .line { fill: none; stroke: var(--green); stroke-width: 2; }
   svg text { font-family: ui-monospace, monospace; font-size: 9px; fill: var(--muted); }
@@ -325,12 +354,12 @@ function renderDashboard(data: {
       data.list.length === 0
         ? '<p style="color:var(--muted);font-size:13px;">Aucune demande pour ce filtre.</p>'
         : `<div style="overflow-x:auto;"><table>
-      <thead><tr><th>Reçue</th><th>Nom</th><th>Téléphone</th><th>Véhicule</th><th>Départ → Destination</th><th>Statut</th><th>Délai</th></tr></thead>
+      <thead><tr><th>Reçue</th><th>Nom</th><th>Téléphone</th><th>Véhicule</th><th>Départ → Destination</th><th>Statut</th><th>Délai</th><th></th></tr></thead>
       <tbody>${data.list
         .map((r) => {
           const elapsed = r.status === 'treated' && r.treated_at ? r.treated_at - r.created_at : Date.now() - r.created_at;
           const trip = [r.location, r.destination].filter(Boolean).map((s) => (s as string).slice(0, 40)).join(' → ') || '—';
-          return `<tr>
+          return `<tr data-id="${escapeHtml(r.id)}">
         <td>${escapeHtml(fmtDateTime(r.created_at))}</td>
         <td class="col-name">${escapeHtml(r.name ?? '—')}</td>
         <td class="col-phone">${escapeHtml(r.phone)}</td>
@@ -342,11 +371,42 @@ function renderDashboard(data: {
             : `<span class="badge badge-open">Ouverte</span>${r.alert_sent_at ? '<span class="badge badge-alert">Alerte envoyée</span>' : ''}`
         }</td>
         <td>${escapeHtml(fmtDuration(elapsed))}</td>
+        <td><button type="button" class="btn-del" data-del="${escapeHtml(r.id)}" title="Supprimer ce devis">Supprimer</button></td>
       </tr>`;
         })
         .join('')}</tbody></table></div>`
     }
   </section>
 </main>
+<script>
+  document.addEventListener('click', async (e) => {
+    const target = e.target;
+    if (!(target instanceof HTMLElement)) return;
+    const btn = target.closest('[data-del]');
+    if (!btn) return;
+    const id = btn.getAttribute('data-del');
+    if (!id) return;
+    const row = btn.closest('tr');
+    const label = row ? (row.querySelector('.col-name')?.textContent || '').trim() : id;
+    if (!confirm('Supprimer définitivement le devis : ' + (label || id) + ' ?')) return;
+    btn.setAttribute('disabled', 'true');
+    btn.textContent = '...';
+    try {
+      const res = await fetch('/admin?id=' + encodeURIComponent(id), { method: 'DELETE' });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || !json.ok) {
+        alert('Échec de la suppression : ' + (json.debug || json.error || res.status));
+        btn.removeAttribute('disabled');
+        btn.textContent = 'Supprimer';
+        return;
+      }
+      if (row) row.remove();
+    } catch (err) {
+      alert('Erreur réseau : ' + (err && err.message ? err.message : err));
+      btn.removeAttribute('disabled');
+      btn.textContent = 'Supprimer';
+    }
+  });
+</script>
 </body></html>`;
 }
