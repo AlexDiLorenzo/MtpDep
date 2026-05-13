@@ -182,18 +182,18 @@ function startOfDayParis(ts: number): number {
 
 // ── Relevés de temps ─────────────────────────────────────────
 function computeTimesheetStatus(dt: DTSnapshot, paris: ReturnType<typeof parisYMD>, now: number) {
-  // Cible : mois M-1 par rapport à aujourd'hui
+  // Cible : mois M-1 par rapport à aujourd'hui.
+  // ATTENTION : DepanTime stocke month en 0-indexé (front utilise
+  // Date.getMonth() qui renvoie 0=Jan, 11=Déc). On compare donc en 0-indexé.
+  let target0 = paris.month - 2; // paris.month est 1-indexé (Mai=5) → mois précédent en 0-indexé = 5-2 = 3 (Avril)
   let targetYear = paris.year;
-  let targetMonth = paris.month - 1;
-  if (targetMonth === 0) { targetYear -= 1; targetMonth = 12; }
-  const periodLabel = `${MONTHS_FR[targetMonth - 1]} ${targetYear}`;
+  if (target0 < 0) { target0 += 12; targetYear -= 1; }
+  const periodLabel = `${MONTHS_FR[target0]} ${targetYear}`;
 
   const totalEmployees = dt.sites.reduce((s, x) => s + x.employee_count, 0);
 
-  // Dedup par employé (clef site+employee) : on garde l'envelope la plus récente non-voided.
-  // Number() : si pg renvoie year/month en string, le === avec number rate.
   const filtered = dt.timesheets.filter(
-    (e) => Number(e.year) === targetYear && Number(e.month) === targetMonth && e.status !== 'voided'
+    (e) => Number(e.year) === targetYear && Number(e.month) === target0 && e.status !== 'voided'
   );
   const bestByEmployee = new Map<string, DTTimesheet>();
   for (const e of filtered) {
