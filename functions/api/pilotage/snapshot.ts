@@ -191,11 +191,13 @@ function computeTimesheetStatus(dt: DTSnapshot, paris: ReturnType<typeof parisYM
   }, 0);
   const daysSinceSent = latestSent > 0 ? Math.floor((now - latestSent) / DAY_MS) : 0;
 
-  // Statut "envoyé" : si au moins la moitié des employés a reçu un envelope
-  const sent = totalEmployees > 0 && uniqueSent >= Math.ceil(totalEmployees / 2);
+  // "Envoyé" dès qu'au moins un envelope existe pour la période.
+  // Les envois partiels (sous-ensemble d'employés) sont volontaires (congés,
+  // exceptions) — on ne pénalise pas le statut pour ça.
+  const sent = uniqueSent > 0;
 
-  // Pourcentage de signature sur le total d'employés (pas sur les seuls envoyés)
-  const signedPct = totalEmployees > 0 ? Math.round((completed / totalEmployees) * 100) : null;
+  // % signature sur le nombre d'envelopes réellement envoyés.
+  const signedPct = uniqueSent > 0 ? Math.round((completed / uniqueSent) * 100) : null;
 
   // Logique de statut
   // - Si on est dans mois courant M, jour 1-10 :
@@ -267,8 +269,9 @@ function computePlanningStatus(dt: DTSnapshot, paris: ReturnType<typeof parisYMD
   }, 0);
   const daysSinceSent = latestSent > 0 ? Math.floor((now - latestSent) / DAY_MS) : 0;
 
-  const sent = totalEmployees > 0 && uniqueSent >= Math.ceil(totalEmployees / 2);
-  const signedPct = totalEmployees > 0 ? Math.round((completed / totalEmployees) * 100) : null;
+  // "Envoyé" dès qu'au moins un envelope existe (cf. note relevés).
+  const sent = uniqueSent > 0;
+  const signedPct = uniqueSent > 0 ? Math.round((completed / uniqueSent) * 100) : null;
 
   // Règle : à partir de lundi de la semaine N, si plannings N+N+1 pas envoyés → rouge
   // (le user a dit "à partir de lundi de la semaine N rouge")
