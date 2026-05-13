@@ -72,6 +72,8 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
   const timesheets = dt ? computeTimesheetStatus(dt, paris, now) : unavailable('relevé');
   const plannings = dt ? computePlanningStatus(dt, paris, now) : unavailable('planning');
 
+  const url = new URL(request.url);
+  const debug = url.searchParams.get('debug') === '1';
   const headers = new Headers({
     'content-type': 'application/json; charset=utf-8',
     'cache-control': 'no-store',
@@ -83,6 +85,25 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
     timesheets,
     plannings,
     depantime: { status: dtError ? 'error' : 'ok', error: dtError },
+    ...(debug && dt
+      ? {
+          _debug: {
+            sites: dt.sites,
+            timesheets_total: dt.timesheets.length,
+            timesheets_first: dt.timesheets[0] ?? null,
+            timesheets_years_months: [
+              ...new Set(dt.timesheets.map((e) => `${e.year}-${e.month}`)),
+            ],
+            timesheets_statuses: [...new Set(dt.timesheets.map((e) => e.status))],
+            target_year: timesheets.period_label,
+            plannings_total: dt.plannings.length,
+            plannings_weeks: [
+              ...new Set(dt.plannings.map((e) => `${e.iso_year}-W${e.start_week}`)),
+            ],
+            current_iso_week: `${paris.iso_year}-W${paris.iso_week}`,
+          },
+        }
+      : {}),
   }), { headers });
 };
 
@@ -169,9 +190,10 @@ function computeTimesheetStatus(dt: DTSnapshot, paris: ReturnType<typeof parisYM
 
   const totalEmployees = dt.sites.reduce((s, x) => s + x.employee_count, 0);
 
-  // Dedup par employé (clef site+employee) : on garde l'envelope la plus récente non-voided
+  // Dedup par employé (clef site+employee) : on garde l'envelope la plus récente non-voided.
+  // Number() : si pg renvoie year/month en string, le === avec number rate.
   const filtered = dt.timesheets.filter(
-    (e) => e.year === targetYear && e.month === targetMonth && e.status !== 'voided'
+    (e) => Number(e.year) === targetYear && Number(e.month) === targetMonth && e.status !== 'voided'
   );
   const bestByEmployee = new Map<string, DTTimesheet>();
   for (const e of filtered) {
@@ -250,7 +272,7 @@ function computePlanningStatus(dt: DTSnapshot, paris: ReturnType<typeof parisYMD
   const totalEmployees = dt.sites.reduce((s, x) => s + x.employee_count, 0);
 
   const filtered = dt.plannings.filter(
-    (e) => e.iso_year === targetYear && e.start_week === targetWeek && e.status !== 'voided'
+    (e) => Number(e.iso_year) === targetYear && Number(e.start_week) === targetWeek && e.status !== 'voided'
   );
   const bestByEmployee = new Map<string, DTPlanning>();
   for (const e of filtered) {
