@@ -277,9 +277,10 @@ const journey = [
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify(payload),
         });
-        const json = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+        const json = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string; debug?: string };
         if (!res.ok || !json.ok) {
-          throw new Error(json.error || `HTTP ${res.status}`);
+          const detail = json.debug ? ` — ${json.debug}` : '';
+          throw new Error(`${json.error || `HTTP ${res.status}`}${detail}`);
         }
         result.textContent = 'Demande envoyée. Nous vous rappelons sous 2 heures.';
         result.classList.add('devis-result-ok');
