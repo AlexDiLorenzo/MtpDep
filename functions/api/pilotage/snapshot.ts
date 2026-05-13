@@ -324,15 +324,17 @@ function computePlanningStatus(dt: DTSnapshot, paris: ReturnType<typeof parisYMD
   };
 }
 
-// ── Signature : rouge < 80% à J+5, orange [80-94%], vert ≥ 95% ──
+// ── Signature : seuils appliqués dès l'envoi pour signaler les % faibles.
+// Vert    : ≥ 95% (conforme)
+// Orange  : 80-94% (à relancer) OU < 80% avant J+5 (à surveiller, on laisse le temps)
+// Rouge   : < 80% ET J+5 dépassé (vraiment en retard, escalade)
 function signaturStatus(pct: number, daysSinceSent: number): { status: Status; sub: string } {
-  if (daysSinceSent < 5) {
-    // Pas encore J+5, pas d'alerte stricte, on indique "en cours"
-    return { status: pct >= 95 ? 'green' : 'green', sub: `Envoyé il y a ${daysSinceSent} j` };
-  }
-  if (pct < 80) return { status: 'red', sub: 'Signatures en retard' };
-  if (pct < 95) return { status: 'orange', sub: 'À relancer' };
-  return { status: 'green', sub: 'Conforme' };
+  const jPrefix = `Envoyé · J+${daysSinceSent}`;
+  if (pct >= 95) return { status: 'green',  sub: `${jPrefix} · Conforme` };
+  if (pct >= 80) return { status: 'orange', sub: `${jPrefix} · À relancer` };
+  // pct < 80
+  if (daysSinceSent < 5) return { status: 'orange', sub: `${jPrefix} · À surveiller` };
+  return { status: 'red', sub: `${jPrefix} · Signatures en retard` };
 }
 
 function statusRank(s: string): number {
