@@ -23,6 +23,18 @@ CREATE TABLE IF NOT EXISTS devis (
 CREATE INDEX IF NOT EXISTS idx_devis_status_created ON devis(status, created_at);
 CREATE INDEX IF NOT EXISTS idx_devis_created ON devis(created_at);
 
+-- Tracking des clics sur les liens "tel:" (bouton appeler).
+-- Une ligne par clic ; on garde un peu de contexte pour analyse.
+CREATE TABLE IF NOT EXISTS call_clicks (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  created_at  INTEGER NOT NULL,        -- unix ms
+  source      TEXT,                    -- pathname (/, /recrutement, …) ou data-call-source explicite
+  user_agent  TEXT,
+  ip_country  TEXT,
+  referer     TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_call_clicks_created ON call_clicks(created_at);
+
 -- Migration pour la table existante (ajoute la colonne destination si pas déjà là).
 -- À lancer une seule fois après mise à jour, ignore l'erreur "duplicate column" :
 --   wrangler d1 execute mtp-dep-db --command="ALTER TABLE devis ADD COLUMN destination TEXT" --remote

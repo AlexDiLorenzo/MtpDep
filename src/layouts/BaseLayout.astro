@@ -91,6 +91,24 @@ const localBusinessSchema = {
     <a href="#main" class="skip-link">Aller au contenu principal</a>
     <slot />
 
+    {/* Tracking des clics sur les liens Appeler (tel:) */}
+    <script is:inline>
+      document.addEventListener('click', (e) => {
+        const t = e.target;
+        const link = t && t.closest && t.closest('a[href^="tel:"]');
+        if (!link) return;
+        const src = link.dataset.callSource || location.pathname || '/';
+        try {
+          fetch('/api/track-call', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ source: src }),
+            keepalive: true,
+          }).catch(() => {});
+        } catch (_) { /* noop */ }
+      });
+    </script>
+
     {/* Cloudflare Web Analytics */}
     <script
       defer

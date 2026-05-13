@@ -70,6 +70,25 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
   const durs = (treatedDurations.results ?? []).map((r) => r.d).filter((d) => d != null);
   const median = durs.length ? durs[Math.floor(durs.length / 2)] : 0;
 
+  // Clics "Appeler" (liens tel:) — gère le cas où la table n'existe pas encore
+  let callsToday = 0, calls7d = 0, calls30d = 0, callsTotal = 0;
+  try {
+    const callRow = await env.DB.prepare(
+      `SELECT
+         SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) AS today,
+         SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) AS d7,
+         SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) AS d30,
+         COUNT(*) AS total
+       FROM call_clicks`
+    )
+      .bind(startOfDay(now), now - 7 * DAY_MS, now - 30 * DAY_MS)
+      .first<{ today: number; d7: number; d30: number; total: number }>();
+    callsToday = callRow?.today ?? 0;
+    calls7d = callRow?.d7 ?? 0;
+    calls30d = callRow?.d30 ?? 0;
+    callsTotal = callRow?.total ?? 0;
+  } catch { /* table call_clicks absente → on garde 0 */ }
+
   // Courbe sur 30 jours (par jour local)
   const dailyRows = await env.DB.prepare(
     `SELECT created_at, status FROM devis WHERE created_at >= ? ORDER BY created_at ASC`
@@ -95,6 +114,7 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
     daily,
     list: list.results ?? [],
     filter,
+    calls: { today: callsToday, d7: calls7d, d30: calls30d, total: callsTotal },
   });
 
   // Set cookie au passage si le token est passé en query
@@ -238,6 +258,7 @@ function renderDashboard(data: {
   daily: { date: string; total: number; treated: number }[];
   list: DevisRow[];
   filter: string;
+  calls: { today: number; d7: number; d30: number; total: number };
 }): string {
   const max = Math.max(1, ...data.daily.map((d) => d.total));
   const w = 720, h = 160, padL = 20, padR = 8, padT = 8, padB = 24;
@@ -340,6 +361,9 @@ function renderDashboard(data: {
       <div class="stat-row"><span>Médiane temps de traitement</span><strong>${escapeHtml(fmtDuration(data.median))}</strong></div>
       <div class="stat-row"><span>Demandes ouvertes</span><strong>${openAll}</strong></div>
       <div class="stat-row"><span>Total traitées</span><strong>${treatedAll}</strong></div>
+      <div class="stat-row"><span>Clics « Appeler » aujourd'hui</span><strong>${data.calls.today}</strong></div>
+      <div class="stat-row"><span>Clics « Appeler » 7&nbsp;j / 30&nbsp;j</span><strong>${data.calls.d7} / ${data.calls.d30}</strong></div>
+      <div class="stat-row"><span>Clics « Appeler » total</span><strong>${data.calls.total}</strong></div>
     </div>
   </section>
 

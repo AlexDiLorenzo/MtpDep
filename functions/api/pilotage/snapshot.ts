@@ -151,6 +151,21 @@ async function computeDevis(env: Env, now: number) {
   const open = r?.open ?? 0;
   const open_over_2h = r?.open_over_2h ?? 0;
 
+  // Clics « Appeler » (tolérant à l'absence de la table)
+  let calls_today = 0, calls_7d = 0;
+  try {
+    const c = await env.DB.prepare(
+      `SELECT
+         SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) AS today,
+         SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) AS d7
+       FROM call_clicks`
+    )
+      .bind(today, since7d)
+      .first<{ today: number; d7: number }>();
+    calls_today = c?.today ?? 0;
+    calls_7d = c?.d7 ?? 0;
+  } catch { /* table absente → 0 */ }
+
   let status: Status;
   let label: string;
   let sub: string;
@@ -174,6 +189,7 @@ async function computeDevis(env: Env, now: number) {
     sub,
     today: today_n,
     last_7d, last_30d, open, open_over_2h,
+    calls_today, calls_7d,
   };
 }
 

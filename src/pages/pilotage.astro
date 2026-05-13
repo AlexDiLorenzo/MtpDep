@@ -49,6 +49,7 @@ import { site } from '../config/site';
             <div class="pil-card-row"><span>7 derniers jours</span><strong data-bind="d7">—</strong></div>
             <div class="pil-card-row"><span>30 derniers jours</span><strong data-bind="d30">—</strong></div>
             <div class="pil-card-row"><span>Ouverts &gt; 2&nbsp;h</span><strong data-bind="over2h">—</strong></div>
+            <div class="pil-card-row"><span>Clics « Appeler » (24&nbsp;h / 7&nbsp;j)</span><strong data-bind="calls">—</strong></div>
           </div>
         </article>
 
@@ -409,6 +410,7 @@ import { site } from '../config/site';
           setBind(cardD, 'd7', String(d.last_7d ?? 0));
           setBind(cardD, 'd30', String(d.last_30d ?? 0));
           setBind(cardD, 'over2h', String(d.open_over_2h ?? 0));
+          setBind(cardD, 'calls', (d.calls_today ?? 0) + ' / ' + (d.calls_7d ?? 0));
 
           // Relevés
           const t = json.timesheets || {};
