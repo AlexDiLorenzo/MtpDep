@@ -1,0 +1,513 @@
+---
+// Dashboard pilotage H24 affiché sur un écran au bureau.
+// Polling toutes les 30s, 3 grandes cartes : devis, relevés, plannings.
+import '../styles/global.css';
+import { site } from '../config/site';
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pilotage · {site.name}</title>
+    <meta name="robots" content="noindex,nofollow" />
+    <link rel="icon" type="image/png" href="/img/logo-mdp.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  </head>
+  <body>
+    <div class="pil" data-state="loading">
+      <header class="pil-header">
+        <div class="pil-brand">
+          <img src="/img/logo-mdp.png" alt="" class="pil-logo" />
+          <div class="pil-title">
+            <div class="pil-overline">Tableau de bord</div>
+            <h1>Pilotage Montpellier&nbsp;Dépannage</h1>
+          </div>
+        </div>
+        <div class="pil-meta">
+          <div class="pil-clock" id="pil-clock">--:--:--</div>
+          <div class="pil-date" id="pil-date">—</div>
+          <div class="pil-conn" id="pil-conn"><span class="pil-conn-dot"></span><span id="pil-conn-text">Connexion…</span></div>
+        </div>
+      </header>
+
+      <main class="pil-cards">
+        <!-- Carte DEVIS -->
+        <article class="pil-card status-gray" data-card="devis" id="card-devis">
+          <div class="pil-card-bar"></div>
+          <div class="pil-card-head">
+            <div class="pil-card-title">Devis</div>
+            <div class="pil-card-status" data-bind="status-label">—</div>
+          </div>
+          <div class="pil-card-body">
+            <div class="pil-card-big" data-bind="big">—</div>
+            <div class="pil-card-bigsub" data-bind="bigsub">reçus aujourd'hui</div>
+          </div>
+          <div class="pil-card-foot">
+            <div class="pil-card-row"><span>7 derniers jours</span><strong data-bind="d7">—</strong></div>
+            <div class="pil-card-row"><span>30 derniers jours</span><strong data-bind="d30">—</strong></div>
+            <div class="pil-card-row"><span>Ouverts &gt; 2&nbsp;h</span><strong data-bind="over2h">—</strong></div>
+          </div>
+        </article>
+
+        <!-- Carte RELEVÉS -->
+        <article class="pil-card status-gray" data-card="timesheets" id="card-timesheets">
+          <div class="pil-card-bar"></div>
+          <div class="pil-card-head">
+            <div class="pil-card-title">Relevés de temps</div>
+            <div class="pil-card-status" data-bind="status-label">—</div>
+          </div>
+          <div class="pil-card-body">
+            <div class="pil-card-big" data-bind="big">—</div>
+            <div class="pil-card-bigsub" data-bind="bigsub">—</div>
+          </div>
+          <div class="pil-card-foot">
+            <div class="pil-card-row"><span>Envoyés</span><strong data-bind="sent">—</strong></div>
+            <div class="pil-card-row"><span>Signés</span><strong data-bind="signed">—</strong></div>
+            <div class="pil-card-row"><span>Échéance</span><strong data-bind="deadline">—</strong></div>
+          </div>
+        </article>
+
+        <!-- Carte PLANNINGS -->
+        <article class="pil-card status-gray" data-card="plannings" id="card-plannings">
+          <div class="pil-card-bar"></div>
+          <div class="pil-card-head">
+            <div class="pil-card-title">Plannings</div>
+            <div class="pil-card-status" data-bind="status-label">—</div>
+          </div>
+          <div class="pil-card-body">
+            <div class="pil-card-big" data-bind="big">—</div>
+            <div class="pil-card-bigsub" data-bind="bigsub">—</div>
+          </div>
+          <div class="pil-card-foot">
+            <div class="pil-card-row"><span>Envoyés</span><strong data-bind="sent">—</strong></div>
+            <div class="pil-card-row"><span>Signés</span><strong data-bind="signed">—</strong></div>
+            <div class="pil-card-row"><span>Période</span><strong data-bind="period">—</strong></div>
+          </div>
+        </article>
+      </main>
+
+      <footer class="pil-footer">
+        <span id="pil-updated">Chargement…</span>
+        <span class="pil-sep">·</span>
+        <span id="pil-source">DepanTime</span>
+      </footer>
+    </div>
+
+    <!-- Login overlay (caché par défaut, affiché si 401) -->
+    <div class="pil-login" id="pil-login" hidden>
+      <form id="pil-login-form" autocomplete="off">
+        <img src="/img/logo-mdp.png" alt="" />
+        <h2>Accès pilotage</h2>
+        <input type="password" name="token" id="pil-token" placeholder="Token d'accès" autofocus required />
+        <button type="submit">Entrer</button>
+        <div class="pil-login-err" id="pil-login-err"></div>
+      </form>
+    </div>
+
+    <style is:global>
+      :root {
+        --status-green: #2C6126;
+        --status-orange: #C67315;
+        --status-red: #A32D2D;
+        --status-gray: #888780;
+        --status-green-bg: #EAF3E4;
+        --status-orange-bg: #FBE9D0;
+        --status-red-bg: #FCEBEB;
+        --status-gray-bg: #F1EFE8;
+      }
+      html, body { margin: 0; padding: 0; height: 100%; background: #F6F5EB; color: #1A190F; font-family: 'DM Sans', system-ui, sans-serif; }
+      body { overflow: hidden; }
+
+      .pil {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        padding: 28px 36px;
+        gap: 24px;
+        box-sizing: border-box;
+      }
+
+      /* ── Header ── */
+      .pil-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+      }
+      .pil-brand { display: flex; align-items: center; gap: 18px; }
+      .pil-logo { height: 56px; width: auto; display: block; }
+      .pil-overline {
+        font-size: 11px; font-weight: 700; letter-spacing: 0.14em;
+        text-transform: uppercase; color: var(--status-gray); margin-bottom: 2px;
+      }
+      .pil-title h1 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 28px; font-weight: 700; margin: 0;
+        letter-spacing: -0.02em;
+      }
+      .pil-meta {
+        display: flex; align-items: center; gap: 28px;
+        font-family: 'JetBrains Mono', ui-monospace, monospace;
+      }
+      .pil-clock {
+        font-size: 44px; font-weight: 700; line-height: 1;
+        font-variant-numeric: tabular-nums;
+        color: #1A190F;
+      }
+      .pil-date {
+        font-size: 13px; color: var(--status-gray); margin-top: 4px;
+        text-transform: capitalize;
+      }
+      .pil-clock-wrap { display: flex; flex-direction: column; align-items: flex-end; }
+      .pil-conn {
+        display: inline-flex; align-items: center; gap: 8px;
+        font-size: 12px; font-weight: 700; color: var(--status-gray);
+        padding: 8px 14px; border-radius: 999px; background: var(--status-gray-bg);
+      }
+      .pil-conn-dot {
+        width: 10px; height: 10px; border-radius: 50%;
+        background: var(--status-gray);
+      }
+      .pil-conn.is-ok { color: var(--status-green); background: var(--status-green-bg); }
+      .pil-conn.is-ok .pil-conn-dot { background: var(--status-green); animation: pil-pulse 2s ease-in-out infinite; }
+      .pil-conn.is-err { color: var(--status-red); background: var(--status-red-bg); }
+      .pil-conn.is-err .pil-conn-dot { background: var(--status-red); }
+      @keyframes pil-pulse {
+        0%, 100% { box-shadow: 0 0 0 0 currentColor; opacity: 1; }
+        50% { box-shadow: 0 0 0 6px transparent; opacity: 0.6; }
+      }
+
+      /* ── Cartes ── */
+      .pil-cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 22px;
+        flex: 1;
+        min-height: 0;
+      }
+      .pil-card {
+        position: relative;
+        background: #fff;
+        border-radius: 22px;
+        padding: 28px 32px 24px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 1px 3px rgba(26,25,15,0.06), 0 6px 24px rgba(26,25,15,0.04);
+        overflow: hidden;
+        transition: background-color 600ms ease, box-shadow 600ms ease;
+      }
+      .pil-card-bar {
+        position: absolute; top: 0; left: 0; right: 0; height: 6px;
+        background: var(--status-gray);
+        transition: background-color 400ms ease;
+      }
+      .pil-card-head {
+        display: flex; align-items: center; justify-content: space-between;
+        margin-bottom: 18px;
+      }
+      .pil-card-title {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 22px; font-weight: 700; letter-spacing: -0.01em;
+      }
+      .pil-card-status {
+        font-size: 13px; font-weight: 700; letter-spacing: 0.04em;
+        text-transform: uppercase;
+        padding: 7px 14px; border-radius: 999px;
+        background: var(--status-gray-bg); color: var(--status-gray);
+        transition: background-color 400ms ease, color 400ms ease;
+      }
+      .pil-card-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+      }
+      .pil-card-big {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: clamp(72px, 11vh, 140px);
+        font-weight: 700;
+        line-height: 1;
+        letter-spacing: -0.04em;
+        color: var(--status-gray);
+        font-variant-numeric: tabular-nums;
+        transition: color 400ms ease;
+      }
+      .pil-card-bigsub {
+        font-size: 17px;
+        color: #5F5E5A;
+        margin-top: 14px;
+        font-weight: 500;
+        line-height: 1.3;
+      }
+      .pil-card-foot {
+        margin-top: 20px;
+        padding-top: 16px;
+        border-top: 1px solid #E8E5DA;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .pil-card-row {
+        display: flex; align-items: center; justify-content: space-between;
+        font-size: 14px; color: #5F5E5A;
+      }
+      .pil-card-row strong {
+        font-family: 'JetBrains Mono', ui-monospace, monospace;
+        font-variant-numeric: tabular-nums;
+        font-weight: 700; color: #1A190F;
+      }
+
+      /* Statuts par classe — appliqués au .pil-card */
+      .pil-card.status-green { background: var(--status-green-bg); }
+      .pil-card.status-green .pil-card-bar { background: var(--status-green); }
+      .pil-card.status-green .pil-card-status { background: var(--status-green); color: #fff; }
+      .pil-card.status-green .pil-card-big { color: var(--status-green); }
+
+      .pil-card.status-orange { background: var(--status-orange-bg); }
+      .pil-card.status-orange .pil-card-bar { background: var(--status-orange); }
+      .pil-card.status-orange .pil-card-status { background: var(--status-orange); color: #fff; }
+      .pil-card.status-orange .pil-card-big { color: var(--status-orange); }
+
+      .pil-card.status-red { background: var(--status-red-bg); }
+      .pil-card.status-red .pil-card-bar { background: var(--status-red); }
+      .pil-card.status-red .pil-card-status { background: var(--status-red); color: #fff; }
+      .pil-card.status-red .pil-card-big { color: var(--status-red); }
+      .pil-card.status-red { animation: pil-card-blink 3s ease-in-out infinite; }
+      @keyframes pil-card-blink {
+        0%, 100% { box-shadow: 0 1px 3px rgba(26,25,15,0.06), 0 6px 24px rgba(163,45,45,0.20); }
+        50% { box-shadow: 0 1px 3px rgba(26,25,15,0.06), 0 12px 36px rgba(163,45,45,0.45); }
+      }
+
+      /* ── Footer ── */
+      .pil-footer {
+        display: flex; align-items: center; gap: 10px;
+        font-size: 12px; color: var(--status-gray);
+        font-family: 'JetBrains Mono', ui-monospace, monospace;
+        font-variant-numeric: tabular-nums;
+      }
+      .pil-sep { opacity: 0.5; }
+
+      /* ── Login overlay ── */
+      .pil-login {
+        position: fixed; inset: 0;
+        background: rgba(26,25,15,0.85);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        display: flex; align-items: center; justify-content: center;
+        z-index: 1000;
+      }
+      .pil-login[hidden] { display: none; }
+      .pil-login form {
+        background: #fff; border-radius: 18px;
+        padding: 36px 32px; width: min(420px, 90vw);
+        display: flex; flex-direction: column; gap: 14px;
+        box-shadow: 0 24px 60px -20px rgba(0,0,0,0.4);
+      }
+      .pil-login img { height: 56px; width: auto; align-self: center; margin-bottom: 8px; }
+      .pil-login h2 {
+        margin: 0 0 8px; text-align: center;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 22px; color: #2C6126;
+      }
+      .pil-login input {
+        padding: 14px 16px; border: 1px solid #D3D1C7; border-radius: 10px;
+        font-size: 15px; font-family: 'JetBrains Mono', monospace;
+        outline: none; transition: border-color 150ms;
+      }
+      .pil-login input:focus { border-color: #2C6126; }
+      .pil-login button {
+        padding: 14px; background: #2C6126; color: #fff; border: 0;
+        border-radius: 10px; font-weight: 700; font-size: 15px; cursor: pointer;
+        transition: background-color 150ms;
+      }
+      .pil-login button:hover { background: #255420; }
+      .pil-login-err {
+        color: var(--status-red); font-size: 13px; min-height: 18px; text-align: center;
+      }
+
+      /* Reduce motion */
+      @media (prefers-reduced-motion: reduce) {
+        .pil-card.status-red { animation: none; }
+        .pil-conn-dot { animation: none !important; }
+      }
+
+      /* Plus grand sur très grand écran TV */
+      @media (min-width: 1600px) {
+        .pil { padding: 36px 48px; gap: 32px; }
+        .pil-card { padding: 36px 40px 30px; border-radius: 26px; }
+        .pil-card-title { font-size: 26px; }
+        .pil-card-status { font-size: 14px; padding: 9px 16px; }
+        .pil-card-big { font-size: clamp(96px, 13vh, 180px); }
+        .pil-card-bigsub { font-size: 19px; }
+        .pil-card-row { font-size: 16px; }
+        .pil-clock { font-size: 52px; }
+      }
+    </style>
+
+    <script is:inline>
+      (function () {
+        const POLL_MS = 30000;
+        const $ = (sel) => document.querySelector(sel);
+
+        const conn = $('#pil-conn');
+        const connText = $('#pil-conn-text');
+        const clockEl = $('#pil-clock');
+        const dateEl = $('#pil-date');
+        const updatedEl = $('#pil-updated');
+        const sourceEl = $('#pil-source');
+        const loginOverlay = $('#pil-login');
+        const loginForm = $('#pil-login-form');
+        const loginInput = $('#pil-token');
+        const loginErr = $('#pil-login-err');
+
+        let lastFetch = 0;
+        let pollHandle = null;
+
+        // ── Horloge locale, 1s ──
+        function tickClock() {
+          const d = new Date();
+          const hh = String(d.getHours()).padStart(2, '0');
+          const mm = String(d.getMinutes()).padStart(2, '0');
+          const ss = String(d.getSeconds()).padStart(2, '0');
+          clockEl.textContent = hh + ':' + mm + ':' + ss;
+          const fmt = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+          dateEl.textContent = fmt.format(d);
+          updatedEl.textContent = lastFetch
+            ? 'Mis à jour il y a ' + Math.max(0, Math.floor((Date.now() - lastFetch) / 1000)) + ' s'
+            : 'Chargement…';
+        }
+        setInterval(tickClock, 1000);
+        tickClock();
+
+        // ── Application des statuts ──
+        function applyStatus(cardId, data) {
+          const card = document.getElementById(cardId);
+          if (!card) return;
+          card.classList.remove('status-green', 'status-orange', 'status-red', 'status-gray');
+          card.classList.add('status-' + (data.status || 'gray'));
+          setBind(card, 'status-label', data.label || '—');
+          setBind(card, 'bigsub', data.sub || '');
+        }
+        function setBind(root, key, value) {
+          const el = root.querySelector('[data-bind="' + key + '"]');
+          if (el) el.textContent = value;
+        }
+
+        function render(json) {
+          // Devis
+          const d = json.devis || {};
+          applyStatus('card-devis', d);
+          const cardD = document.getElementById('card-devis');
+          setBind(cardD, 'big', String(d.today ?? 0));
+          setBind(cardD, 'bigsub', "reçus aujourd'hui");
+          setBind(cardD, 'd7', String(d.last_7d ?? 0));
+          setBind(cardD, 'd30', String(d.last_30d ?? 0));
+          setBind(cardD, 'over2h', String(d.open_over_2h ?? 0));
+
+          // Relevés
+          const t = json.timesheets || {};
+          applyStatus('card-timesheets', t);
+          const cardT = document.getElementById('card-timesheets');
+          setBind(cardT, 'big', t.period_label || '—');
+          setBind(cardT, 'bigsub', t.sub || '');
+          setBind(cardT, 'sent', t.total_employees ? (t.sent_count + ' / ' + t.total_employees) : '—');
+          setBind(cardT, 'signed', t.signed_pct != null ? (t.signed_pct + ' %') : '—');
+          setBind(cardT, 'deadline', t.sent ? ('J+' + (t.days_since_sent || 0)) : 'le 10');
+
+          // Plannings
+          const p = json.plannings || {};
+          applyStatus('card-plannings', p);
+          const cardP = document.getElementById('card-plannings');
+          setBind(cardP, 'big', p.period_label || '—');
+          setBind(cardP, 'bigsub', p.sub || '');
+          setBind(cardP, 'sent', p.total_employees ? (p.sent_count + ' / ' + p.total_employees) : '—');
+          setBind(cardP, 'signed', p.signed_pct != null ? (p.signed_pct + ' %') : '—');
+          setBind(cardP, 'period', p.period_label || '—');
+
+          // Connexion
+          const dtOk = !json.depantime || json.depantime.status === 'ok';
+          conn.classList.remove('is-ok', 'is-err');
+          conn.classList.add(dtOk ? 'is-ok' : 'is-err');
+          connText.textContent = dtOk ? 'En ligne' : 'DepanTime indisponible';
+          sourceEl.textContent = dtOk ? 'DepanTime · D1' : 'D1 seul (DepanTime hors-ligne)';
+        }
+
+        async function fetchSnapshot() {
+          try {
+            const res = await fetch('/api/pilotage/snapshot', { cache: 'no-store' });
+            if (res.status === 401) {
+              showLogin();
+              return;
+            }
+            if (!res.ok) {
+              throw new Error('HTTP ' + res.status);
+            }
+            const json = await res.json();
+            lastFetch = Date.now();
+            hideLogin();
+            render(json);
+          } catch (e) {
+            conn.classList.remove('is-ok');
+            conn.classList.add('is-err');
+            connText.textContent = 'Connexion perdue';
+          }
+        }
+
+        function showLogin() {
+          loginOverlay.hidden = false;
+          setTimeout(() => loginInput.focus(), 50);
+          if (pollHandle) { clearInterval(pollHandle); pollHandle = null; }
+        }
+        function hideLogin() {
+          if (!loginOverlay.hidden) loginOverlay.hidden = true;
+          if (!pollHandle) pollHandle = setInterval(fetchSnapshot, POLL_MS);
+        }
+
+        loginForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          loginErr.textContent = '';
+          const token = loginInput.value.trim();
+          if (!token) return;
+          try {
+            const res = await fetch('/api/pilotage/login', {
+              method: 'POST',
+              headers: { 'content-type': 'application/json' },
+              body: JSON.stringify({ token }),
+            });
+            if (!res.ok) {
+              loginErr.textContent = 'Token invalide.';
+              return;
+            }
+            loginInput.value = '';
+            await fetchSnapshot();
+          } catch (err) {
+            loginErr.textContent = 'Erreur réseau.';
+          }
+        });
+
+        // Si on a un ?token=… dans l'URL, on le pose et on retire la query
+        (function consumeQueryToken() {
+          const params = new URLSearchParams(location.search);
+          const t = params.get('token');
+          if (!t) return;
+          fetch('/api/pilotage/login', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ token: t }),
+          }).then((r) => {
+            if (r.ok) {
+              history.replaceState({}, '', location.pathname);
+              fetchSnapshot();
+            }
+          }).catch(() => {});
+        })();
+
+        fetchSnapshot();
+      })();
+    </script>
+  </body>
+</html>

@@ -19,6 +19,11 @@ export interface Env {
   ALERT_PHONE: string;
 
   SITE_URL: string;
+
+  // Dashboard pilotage RH (page /pilotage)
+  PILOTAGE_TOKEN: string;
+  DEPANTIME_URL: string;
+  DEPANTIME_PILOTAGE_SECRET: string;
 }
 
 export interface DevisRow {
