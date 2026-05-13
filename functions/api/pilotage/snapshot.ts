@@ -153,20 +153,25 @@ async function computeDevis(env: Env, now: number) {
 
   let status: Status;
   let label: string;
+  let sub: string;
   if (open_over_2h > 0) {
     status = 'red';
     label = `${open_over_2h} en attente > 2h`;
+    sub = `${today_n} reçu${today_n > 1 ? 's' : ''} aujourd'hui · à traiter immédiatement`;
   } else if (open > 0) {
     status = 'orange';
     label = `${open} à traiter`;
+    sub = `${today_n} reçu${today_n > 1 ? 's' : ''} aujourd'hui · ouvert · pas encore > 2h`;
   } else {
     status = 'green';
     label = 'Tout traité';
+    sub = `${today_n} reçu${today_n > 1 ? 's' : ''} aujourd'hui · aucun en attente`;
   }
 
   return {
     status,
     label,
+    sub,
     today: today_n,
     last_7d, last_30d, open, open_over_2h,
   };
@@ -246,7 +251,7 @@ function computeTimesheetStatus(dt: DTSnapshot, paris: ReturnType<typeof parisYM
     // Envoyé : on regarde la signature à J+5
     const sig = signaturStatus(signedPct ?? 0, daysSinceSent);
     status = sig.status;
-    label = `${signedPct}% signé`;
+    label = `✓ ${signedPct}% signé`;
     sub = sig.sub;
   }
 
@@ -254,6 +259,7 @@ function computeTimesheetStatus(dt: DTSnapshot, paris: ReturnType<typeof parisYM
     status, label, sub,
     period_label: periodLabel,
     sent,
+    sent_at_label: sent ? formatSentDate(latestSent) : null,
     sent_count: uniqueSent,
     total_employees: totalEmployees,
     completed,
@@ -308,7 +314,7 @@ function computePlanningStatus(dt: DTSnapshot, paris: ReturnType<typeof parisYMD
   } else {
     const sig = signaturStatus(signedPct ?? 0, daysSinceSent);
     status = sig.status;
-    label = `${signedPct}% signé`;
+    label = `✓ ${signedPct}% signé`;
     sub = sig.sub;
   }
 
@@ -316,6 +322,7 @@ function computePlanningStatus(dt: DTSnapshot, paris: ReturnType<typeof parisYMD
     status, label, sub,
     period_label: periodLabel,
     sent,
+    sent_at_label: sent ? formatSentDate(latestSent) : null,
     sent_count: uniqueSent,
     total_employees: totalEmployees,
     completed,
@@ -344,6 +351,15 @@ function statusRank(s: string): number {
   if (s === 'sent') return 2;
   if (s === 'created') return 1;
   return 0;
+}
+
+function formatSentDate(ts: number): string {
+  if (!ts) return '—';
+  const fmt = new Intl.DateTimeFormat('fr-FR', {
+    timeZone: 'Europe/Paris',
+    day: '2-digit', month: 'long',
+  });
+  return fmt.format(new Date(ts));
 }
 
 function unavailable(kind: string) {

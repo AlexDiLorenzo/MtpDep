@@ -66,7 +66,7 @@ import { site } from '../config/site';
           <div class="pil-card-foot">
             <div class="pil-card-row"><span>Envoyés</span><strong data-bind="sent">—</strong></div>
             <div class="pil-card-row"><span>Signés</span><strong data-bind="signed">—</strong></div>
-            <div class="pil-card-row"><span>Échéance</span><strong data-bind="deadline">—</strong></div>
+            <div class="pil-card-row"><span>Envoi</span><strong data-bind="deadline">—</strong></div>
           </div>
         </article>
 
@@ -84,7 +84,7 @@ import { site } from '../config/site';
           <div class="pil-card-foot">
             <div class="pil-card-row"><span>Envoyés</span><strong data-bind="sent">—</strong></div>
             <div class="pil-card-row"><span>Signés</span><strong data-bind="signed">—</strong></div>
-            <div class="pil-card-row"><span>Période</span><strong data-bind="period">—</strong></div>
+            <div class="pil-card-row"><span>Envoi</span><strong data-bind="period">—</strong></div>
           </div>
         </article>
       </main>
@@ -403,7 +403,9 @@ import { site } from '../config/site';
           applyStatus('card-devis', d);
           const cardD = document.getElementById('card-devis');
           setBind(cardD, 'big', String(d.today ?? 0));
-          setBind(cardD, 'bigsub', "reçus aujourd'hui");
+          // Si le snapshot fournit un sub décoré (selon le statut), on le respecte ;
+          // sinon fallback générique.
+          setBind(cardD, 'bigsub', d.sub || "reçus aujourd'hui");
           setBind(cardD, 'd7', String(d.last_7d ?? 0));
           setBind(cardD, 'd30', String(d.last_30d ?? 0));
           setBind(cardD, 'over2h', String(d.open_over_2h ?? 0));
@@ -416,7 +418,7 @@ import { site } from '../config/site';
           setBind(cardT, 'bigsub', t.sub || '');
           setBind(cardT, 'sent', t.total_employees ? (t.sent_count + ' / ' + t.total_employees) : '—');
           setBind(cardT, 'signed', t.signed_pct != null ? (t.signed_pct + ' %') : '—');
-          setBind(cardT, 'deadline', t.sent ? ('J+' + (t.days_since_sent || 0)) : 'le 10');
+          setBind(cardT, 'deadline', t.sent && t.sent_at_label ? ('Envoyé le ' + t.sent_at_label) : 'À envoyer avant le 10');
 
           // Plannings
           const p = json.plannings || {};
@@ -426,7 +428,7 @@ import { site } from '../config/site';
           setBind(cardP, 'bigsub', p.sub || '');
           setBind(cardP, 'sent', p.total_employees ? (p.sent_count + ' / ' + p.total_employees) : '—');
           setBind(cardP, 'signed', p.signed_pct != null ? (p.signed_pct + ' %') : '—');
-          setBind(cardP, 'period', p.period_label || '—');
+          setBind(cardP, 'period', p.sent && p.sent_at_label ? ('Envoyé le ' + p.sent_at_label) : (p.period_label || '—'));
 
           // Connexion
           const dtOk = !json.depantime || json.depantime.status === 'ok';
