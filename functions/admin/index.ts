@@ -130,7 +130,9 @@ export const onRequestDelete: PagesFunction<Env> = async (ctx) => {
   }
 
   const id = url.searchParams.get('id');
-  if (!id || !/^[0-9a-f-]{36}$/i.test(id)) {
+  // Accepte UUID v4 ou tout ID alphanumérique court (rows de seed/test).
+  // La requête SQL est paramétrée donc pas de risque d'injection.
+  if (!id || id.length > 64 || !/^[A-Za-z0-9_-]+$/.test(id)) {
     return jsonResponse({ ok: false, error: 'bad_id' }, 400);
   }
 
