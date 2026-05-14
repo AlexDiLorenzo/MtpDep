@@ -11,6 +11,23 @@ import { jsonResponse, escapeHtml } from '../_lib/html';
 const VEHICLE_TYPES = new Set(['VL', 'UTILITAIRE', 'PL']);
 const MAX_LEN = { name: 120, phone: 30, email: 160, location: 200, destination: 200, details: 2000 };
 
+// Allowlist géographique : zone de chalandise réelle (FR/BE/IT/ES) + reste UE/EEE
+// + voisins immédiats. Les autres pays sont rejetés silencieusement (anti-scam).
+// Cloudflare renvoie ISO-3166 alpha-2 via cf-ipcountry. 'XX' / 'T1' = inconnu/Tor
+// → on autorise par défaut (VPN ou anonymiseur peut être un client légitime).
+const ALLOWED_COUNTRIES = new Set([
+  // UE 27
+  'AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT',
+  'LV','LT','LU','MT','NL','PL','PT','RO','SK','SI','ES','SE',
+  // EEE + voisins
+  'GB','CH','NO','IS','LI','MC','AD','SM','VA',
+  // Inconnu / anonyme — on tolère
+  'XX','T1',
+]);
+
+// URL dans les détails → typique des spams "we offer SEO services". On refuse.
+const URL_REGEX = /https?:\/\/|www\./i;
+
 interface FormPayload {
   name?: string;
   phone?: string;
@@ -63,6 +80,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
 
   // Honeypot : si rempli, on ignore silencieusement (mais on retourne ok pour ne pas indiquer au bot que le filtre existe)
   if (body.website && body.website.trim()) {
+    console.warn('Devis rejected: honeypot filled');
     return jsonResponse({ ok: true, id: 'ignored' });
   }
 
@@ -88,6 +106,24 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
 
   const ip_country = request.headers.get('cf-ipcountry') || null;
   const user_agent = (request.headers.get('user-agent') || '').slice(0, 200) || null;
+
+  // ── Anti-spam : rejets silencieux ──────────────────────────────
+  // 1) Pays hors zone d'intervention → rejet silencieux (réponse ok pour ne pas
+  //    indiquer au scammer que le filtre existe)
+  if (ip_country && !ALLOWED_COUNTRIES.has(ip_country)) {
+    console.warn(`Devis rejected: geo (${ip_country}) phone=${phone} name=${name}`);
+    return jsonResponse({ ok: true, id: 'ignored' });
+  }
+  // 2) URL dans les détails → SEO spam typique
+  if (details && URL_REGEX.test(details)) {
+    console.warn(`Devis rejected: url in details, country=${ip_country} phone=${phone}`);
+    return jsonResponse({ ok: true, id: 'ignored' });
+  }
+  // 3) URL dans le nom → autre pattern fréquent
+  if (name && URL_REGEX.test(name)) {
+    console.warn(`Devis rejected: url in name, country=${ip_country}`);
+    return jsonResponse({ ok: true, id: 'ignored' });
+  }
 
   try {
     await env.DB.prepare(
