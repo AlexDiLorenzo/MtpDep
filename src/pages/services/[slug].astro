@@ -113,22 +113,8 @@ const autresServices = services.filter((s) => s.slug !== service.slug);
       </div>
     </section>
 
-    {/* ====== TARIFS ====== */}
-    <section class="sv-section sv-section--alt">
-      <div class="sv-inner">
-        <div class="sv-overline">Tarifs</div>
-        <h2 class="sv-h2">Combien coûte ce service&nbsp;?</h2>
-        <Todo titre={`Grille tarifaire — ${service.nom}`}>
-          <p>
-            Indiquer les fourchettes de prix, forfaits, conditions de prise en charge
-            par les assurances/assistances. Renvoyer vers la page <a href="/tarifs/">Tarifs</a>.
-          </p>
-        </Todo>
-      </div>
-    </section>
-
     {/* ====== FAQ ====== */}
-    <section class="sv-section">
+    <section class="sv-section sv-section--alt">
       <div class="sv-inner">
         <div class="sv-overline">Questions fréquentes</div>
         <h2 class="sv-h2">FAQ — {service.nom}.</h2>
@@ -142,7 +128,7 @@ const autresServices = services.filter((s) => s.slug !== service.slug);
     </section>
 
     {/* ====== AUTRES SERVICES ====== */}
-    <section class="sv-section sv-section--alt">
+    <section class="sv-section">
       <div class="sv-inner">
         <div class="sv-overline">Nos autres prestations</div>
         <h2 class="sv-h2">Découvrir les autres services.</h2>
