@@ -32,7 +32,6 @@ export const site = {
 export const nav = [
   { label: 'Services', href: '/services/' },
   { label: 'Agences', href: '/agences/' },
-  { label: 'Contact', href: '/contact/' },
 ] as const;
 
 // Photos locales fournies par le client (dossier public/img/).
