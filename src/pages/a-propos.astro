@@ -1,0 +1,69 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TopNav from '../components/TopNav.astro';
+import Footer from '../components/Footer.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import PageHero from '../components/PageHero.astro';
+import ContentSection from '../components/ContentSection.astro';
+import Todo from '../components/Todo.astro';
+import { organizationSchema, breadcrumbSchema } from '../lib/schema';
+
+const pageTitle = 'À propos · Montpellier Dépannage — entreprise familiale depuis 1956';
+const pageDescription =
+  "Montpellier Dépannage, entreprise familiale de remorquage et dépannage depuis 1956. 8 agences, 40 dépanneurs certifiés dans l'Hérault et le Gard.";
+
+const jsonLd = [
+  organizationSchema(),
+  breadcrumbSchema([
+    { name: 'Accueil', url: '/' },
+    { name: 'À propos', url: '/a-propos/' },
+  ]),
+];
+---
+
+<BaseLayout title={pageTitle} description={pageDescription} jsonLd={jsonLd}>
+  <TopNav />
+  <Breadcrumbs items={[{ name: 'Accueil', href: '/' }, { name: 'À propos' }]} />
+
+  <main id="main">
+    <PageHero
+      overline="L'entreprise"
+      title="Montpellier Dépannage, depuis 1956."
+      lead="Une entreprise familiale, devenue un réseau de 8 agences au service de l'Hérault et du Gard."
+    />
+
+    <ContentSection overline="Notre histoire" titre="Plus de 65 ans sur la route.">
+      <Todo titre="Histoire de l'entreprise">
+        <p>
+          Récit de la création en 1956, de la transmission familiale, des grandes
+          étapes (ouverture des agences, agréments autoroute, certifications).
+        </p>
+      </Todo>
+    </ContentSection>
+
+    <ContentSection overline="Nos valeurs" titre="Ce qui nous engage." alt>
+      <Todo titre="Valeurs & engagements">
+        <p>
+          Présentation des valeurs : proximité, réactivité, qualité de service,
+          respect du client et des véhicules, sécurité des équipes.
+        </p>
+      </Todo>
+    </ContentSection>
+
+    <ContentSection overline="Le réseau" titre="8 agences, 40 dépanneurs.">
+      <p>
+        Le réseau Montpellier Dépannage s'appuie sur 8&nbsp;agences réparties dans
+        l'Hérault et le Gard, avec une présence permanente sur l'autoroute&nbsp;A9.
+        <a href="/agences/">Découvrir les agences →</a>
+      </p>
+      <Todo titre="Chiffres clés & présentation des équipes">
+        <p>
+          Détailler l'organisation, les effectifs, la flotte, les formations des
+          dépanneurs. Photos d'équipe à intégrer.
+        </p>
+      </Todo>
+    </ContentSection>
+  </main>
+
+  <Footer />
+</BaseLayout>

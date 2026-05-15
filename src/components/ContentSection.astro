@@ -1,0 +1,76 @@
+---
+// Section de contenu réutilisée par les pages institutionnelles.
+// Fournit l'ossature (overline + titre + corps) ; le corps reçoit
+// soit du contenu réel, soit des blocs <Todo>.
+interface Props {
+  titre: string;
+  overline?: string;
+  /** Fond alterné (gris). */
+  alt?: boolean;
+}
+const { titre, overline, alt = false } = Astro.props;
+---
+
+<section class:list={['cs', { 'cs--alt': alt }]}>
+  <div class="cs-inner">
+    {overline && <div class="cs-overline">{overline}</div>}
+    <h2 class="cs-h2">{titre}</h2>
+    <div class="cs-body"><slot /></div>
+  </div>
+</section>
+
+<style>
+  .cs {
+    padding: 56px var(--pad-x-desktop);
+    background: var(--color-bg);
+  }
+  .cs--alt {
+    background: var(--color-bg-subtle);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .cs-inner { max-width: var(--container-max); margin: 0 auto; }
+  .cs-overline {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    background: var(--color-primary-bg);
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    margin-bottom: 14px;
+  }
+  .cs-h2 {
+    font-family: var(--font-display);
+    font-size: 28px;
+    line-height: 1.14;
+    letter-spacing: var(--tr-display);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 20px;
+  }
+  .cs-body {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--color-text-muted);
+    max-width: 720px;
+  }
+  .cs-body :global(p) { margin: 0 0 14px; }
+  .cs-body :global(p:last-child) { margin-bottom: 0; }
+  .cs-body :global(a) {
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+  .cs-body :global(.todo) { margin-bottom: 14px; }
+  .cs-body :global(.todo:last-child) { margin-bottom: 0; }
+
+  @media (max-width: 1023px) {
+    .cs { padding: 44px var(--pad-x-tablet); }
+    .cs-h2 { font-size: 25px; }
+  }
+  @media (max-width: 639px) {
+    .cs { padding: 36px var(--pad-x-mobile); }
+  }
+</style>

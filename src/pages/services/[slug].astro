@@ -1,0 +1,384 @@
+---
+// Template paramétré des 6 pages services : /services/{slug}/
+// Structure uniforme, contenu rédactionnel en <Todo> (Phase 2).
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TopNav from '../../components/TopNav.astro';
+import Footer from '../../components/Footer.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Todo from '../../components/Todo.astro';
+import { photos } from '../../config/site';
+import { services, type Service } from '../../data/services';
+import { serviceSchema, breadcrumbSchema, serviceUrl } from '../../lib/schema';
+
+export function getStaticPaths() {
+  return services.map((service) => ({
+    params: { slug: service.slug },
+    props: { service },
+  }));
+}
+
+interface Props {
+  service: Service;
+}
+
+const { service } = Astro.props;
+const heroImage = photos[service.photo];
+
+// --- SEO ---------------------------------------------------------
+const pageTitle = `${service.titre} · Montpellier Dépannage — Hérault & Gard`;
+const pageDescription = `${service.resume} Intervention 24h/24, 7j/7 dans l'Hérault et le Gard avec Montpellier Dépannage.`;
+
+// --- Fil d'Ariane ------------------------------------------------
+const crumbs = [
+  { name: 'Accueil', href: '/' },
+  { name: 'Services', href: '/services/' },
+  { name: service.nom },
+];
+
+const jsonLd = [
+  serviceSchema(service),
+  breadcrumbSchema([
+    { name: 'Accueil', url: '/' },
+    { name: 'Services', url: '/services/' },
+    { name: service.nom, url: serviceUrl(service.slug) },
+  ]),
+];
+
+// Autres services (bloc de maillage interne en pied de page).
+const autresServices = services.filter((s) => s.slug !== service.slug);
+---
+
+<BaseLayout title={pageTitle} description={pageDescription} jsonLd={jsonLd}>
+  <TopNav />
+  <Breadcrumbs items={crumbs} />
+
+  <main id="main">
+    {/* ====== HERO ====== */}
+    <section class="sv-hero" style={`--sv-hero-bg: url('${heroImage}');`}>
+      <div class="sv-hero-inner">
+        <div class="sv-hero-tag mono">Service {service.tag}</div>
+        <h1 class="sv-hero-title">{service.titre}</h1>
+        <p class="sv-hero-lead">{service.resume}</p>
+        <a href="tel:+33467421431" class="sv-hero-cta" data-call-source={`service-${service.slug}`}>
+          <span aria-hidden="true">☎</span>
+          <span class="mono">04 67 42 14 31</span>
+          <span class="sv-hero-cta-kicker">Urgence 24/7</span>
+        </a>
+      </div>
+    </section>
+
+    {/* ====== PRÉSENTATION ====== */}
+    <section class="sv-section">
+      <div class="sv-inner">
+        <div class="sv-overline">Le service</div>
+        <h2 class="sv-h2">{service.nom} avec Montpellier Dépannage.</h2>
+        <Todo titre={`Présentation détaillée — ${service.nom}`}>
+          <p>
+            Contenu rédactionnel décrivant le service « {service.titre} » : en quoi il
+            consiste, pour quels véhicules et situations, le matériel mobilisé, les
+            garanties. Texte unique (pas de duplication entre pages services).
+          </p>
+        </Todo>
+      </div>
+    </section>
+
+    {/* ====== DÉROULÉ ====== */}
+    <section class="sv-section sv-section--alt">
+      <div class="sv-inner">
+        <div class="sv-overline">Comment ça se passe</div>
+        <h2 class="sv-h2">Le déroulé de l’intervention.</h2>
+        <Todo titre={`Étapes de l'intervention — ${service.nom}`}>
+          <p>
+            Décrire le déroulé pas à pas : prise d’appel, délai, arrivée du dépanneur,
+            prise en charge, destination du véhicule. À baliser ensuite en JSON-LD
+            <code>HowTo</code> si pertinent (Phase 2).
+          </p>
+        </Todo>
+      </div>
+    </section>
+
+    {/* ====== DISPONIBILITÉ AGENCES ====== */}
+    <section class="sv-section">
+      <div class="sv-inner">
+        <div class="sv-overline">Couverture</div>
+        <h2 class="sv-h2">Disponible dans nos 8&nbsp;agences.</h2>
+        <p class="sv-text">
+          Ce service est assuré 24h/24 et 7j/7 par l’ensemble du réseau Montpellier
+          Dépannage, dans l’Hérault et le Gard, avec une présence permanente sur l’A9.
+        </p>
+        <a href="/agences/" class="sv-link">
+          Voir les 8&nbsp;agences <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </section>
+
+    {/* ====== TARIFS ====== */}
+    <section class="sv-section sv-section--alt">
+      <div class="sv-inner">
+        <div class="sv-overline">Tarifs</div>
+        <h2 class="sv-h2">Combien coûte ce service&nbsp;?</h2>
+        <Todo titre={`Grille tarifaire — ${service.nom}`}>
+          <p>
+            Indiquer les fourchettes de prix, forfaits, conditions de prise en charge
+            par les assurances/assistances. Renvoyer vers la page <a href="/tarifs/">Tarifs</a>.
+          </p>
+        </Todo>
+      </div>
+    </section>
+
+    {/* ====== FAQ ====== */}
+    <section class="sv-section">
+      <div class="sv-inner">
+        <div class="sv-overline">Questions fréquentes</div>
+        <h2 class="sv-h2">FAQ — {service.nom}.</h2>
+        <Todo titre={`FAQ — ${service.nom}`}>
+          <p>
+            4 à 6 questions/réponses propres à ce service. À baliser en JSON-LD
+            <code>FAQPage</code> (Phase 2).
+          </p>
+        </Todo>
+      </div>
+    </section>
+
+    {/* ====== AUTRES SERVICES ====== */}
+    <section class="sv-section sv-section--alt">
+      <div class="sv-inner">
+        <div class="sv-overline">Nos autres prestations</div>
+        <h2 class="sv-h2">Découvrir les autres services.</h2>
+        <ul class="sv-others">
+          {autresServices.map((s) => (
+            <li>
+              <a href={`/services/${s.slug}/`} class="sv-other">
+                <span class="sv-other-tag mono">{s.tag}</span>
+                <span class="sv-other-name">{s.nom}</span>
+                <span class="sv-other-arrow" aria-hidden="true">→</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    {/* ====== CTA ====== */}
+    <section class="sv-cta">
+      <div class="sv-cta-inner">
+        <h2 class="sv-cta-title">Besoin de ce service maintenant&nbsp;?</h2>
+        <p class="sv-cta-lead">Intervention immédiate, 24h/24 et 7j/7.</p>
+        <a href="tel:+33467421431" class="sv-cta-phone" data-call-source={`service-${service.slug}-cta`}>
+          <span aria-hidden="true">☎</span>
+          <span class="mono">04 67 42 14 31</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  /* ====== HERO ====== */
+  .sv-hero {
+    position: relative;
+    background-image:
+      linear-gradient(180deg, rgba(26,25,15,0.6) 0%, rgba(26,25,15,0.82) 100%),
+      var(--sv-hero-bg);
+    background-size: cover;
+    background-position: center;
+    color: #fff;
+    padding: 72px var(--pad-x-desktop) 64px;
+  }
+  .sv-hero-inner { max-width: var(--container-max); margin: 0 auto; }
+  .sv-hero-tag {
+    display: inline-block;
+    background: var(--md-brand-yellow);
+    color: var(--md-brand-black);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 5px 10px;
+    border-radius: var(--radius-xs);
+    margin-bottom: 18px;
+  }
+  .sv-hero-title {
+    font-family: var(--font-display);
+    font-size: 52px;
+    line-height: 1.05;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin: 0 0 16px;
+    max-width: 820px;
+  }
+  .sv-hero-lead {
+    font-size: 17px;
+    line-height: 1.55;
+    color: rgba(255,255,255,0.88);
+    max-width: 620px;
+    margin: 0 0 28px;
+  }
+  .sv-hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 24px;
+    background: var(--md-brand-yellow);
+    color: var(--md-brand-black);
+    border-radius: var(--radius-lg);
+    font-size: 18px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+    transition: transform var(--dur-base) var(--ease-standard);
+  }
+  .sv-hero-cta:hover { transform: translateY(-2px); }
+  .sv-hero-cta-kicker {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.65;
+    font-weight: 700;
+  }
+
+  /* ====== SECTIONS ====== */
+  .sv-section {
+    padding: 64px var(--pad-x-desktop);
+    background: var(--color-bg);
+  }
+  .sv-section--alt {
+    background: var(--color-bg-subtle);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .sv-inner { max-width: var(--container-max); margin: 0 auto; }
+  .sv-overline {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    background: var(--color-primary-bg);
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    margin-bottom: 14px;
+  }
+  .sv-h2 {
+    font-family: var(--font-display);
+    font-size: 30px;
+    line-height: 1.12;
+    letter-spacing: var(--tr-display);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 20px;
+  }
+  .sv-text {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--color-text-muted);
+    max-width: 640px;
+    margin: 0 0 18px;
+  }
+  .sv-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+  .sv-link:hover { text-decoration: underline; }
+
+  /* ====== AUTRES SERVICES ====== */
+  .sv-others {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .sv-other {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 18px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    text-decoration: none;
+    box-shadow: var(--shadow-xs);
+    transition: transform var(--dur-base) var(--ease-standard),
+                box-shadow var(--dur-base) var(--ease-standard);
+  }
+  .sv-other:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .sv-other-tag {
+    background: var(--md-brand-yellow);
+    color: var(--md-brand-black);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 7px;
+    border-radius: var(--radius-xs);
+  }
+  .sv-other-name {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+  .sv-other-arrow { color: var(--color-primary); font-weight: 700; }
+
+  /* ====== CTA ====== */
+  .sv-cta {
+    padding: 64px var(--pad-x-desktop);
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(228,225,60,0.12) 0%, transparent 60%),
+      var(--md-brand-green);
+    text-align: center;
+  }
+  .sv-cta-inner { max-width: var(--container-max); margin: 0 auto; }
+  .sv-cta-title {
+    font-family: var(--font-display);
+    font-size: 30px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 8px;
+  }
+  .sv-cta-lead { font-size: 15px; color: rgba(255,255,255,0.8); margin: 0 0 24px; }
+  .sv-cta-phone {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 28px;
+    background: var(--md-brand-yellow);
+    color: var(--md-brand-black);
+    border-radius: var(--radius-lg);
+    font-size: 20px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+    transition: transform var(--dur-base) var(--ease-standard);
+  }
+  .sv-cta-phone:hover { transform: translateY(-2px); }
+
+  /* ====== RESPONSIVE ====== */
+  @media (max-width: 1023px) {
+    .sv-hero { padding: 56px var(--pad-x-tablet) 52px; }
+    .sv-hero-title { font-size: 40px; }
+    .sv-section { padding: 52px var(--pad-x-tablet); }
+    .sv-cta { padding: 52px var(--pad-x-tablet); }
+    .sv-others { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 639px) {
+    .sv-hero { padding: 44px var(--pad-x-mobile) 40px; }
+    .sv-hero-title { font-size: 30px; }
+    .sv-section { padding: 44px var(--pad-x-mobile); }
+    .sv-cta { padding: 44px var(--pad-x-mobile); }
+    .sv-h2 { font-size: 25px; }
+    .sv-others { grid-template-columns: 1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sv-hero-cta, .sv-cta-phone, .sv-other { transition: none; }
+  }
+</style>

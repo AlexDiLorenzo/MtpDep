@@ -1,0 +1,337 @@
+---
+// Page index des agences : /agences/
+// Carte interactive + grille des 8 agences du réseau.
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TopNav from '../../components/TopNav.astro';
+import Footer from '../../components/Footer.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import CoverageMap from '../../components/CoverageMap.astro';
+import { agences } from '../../data/agences';
+import { organizationSchema, breadcrumbSchema } from '../../lib/schema';
+
+const pageTitle = 'Nos 8 agences · Montpellier Dépannage — Hérault & Gard';
+const pageDescription =
+  "Les 8 agences du réseau Montpellier Dépannage dans l'Hérault et le Gard. Trouvez l'agence de dépannage et de remorquage la plus proche — intervention 24h/24, 7j/7.";
+
+const crumbs = [
+  { name: 'Accueil', href: '/' },
+  { name: 'Agences' },
+];
+
+const jsonLd = [
+  organizationSchema(),
+  breadcrumbSchema([
+    { name: 'Accueil', url: '/' },
+    { name: 'Agences', url: '/agences/' },
+  ]),
+];
+---
+
+<BaseLayout title={pageTitle} description={pageDescription} jsonLd={jsonLd}>
+  <TopNav />
+  <Breadcrumbs items={crumbs} />
+
+  <main id="main">
+    {/* ====== En-tête ====== */}
+    <section class="ax-head">
+      <div class="ax-head-inner">
+        <div class="ax-overline">Le réseau</div>
+        <h1 class="ax-title">
+          8&nbsp;agences dans l’Hérault et le Gard.
+        </h1>
+        <p class="ax-lead">
+          Montpellier Dépannage rayonne sur tout le grand Hérault et jusqu’en Gard,
+          avec une présence permanente sur l’autoroute&nbsp;A9. Choisissez votre agence
+          sur la carte ou dans la liste ci-dessous.
+        </p>
+      </div>
+    </section>
+
+    {/* ====== Carte interactive ====== */}
+    <section class="ax-map-section">
+      <div class="ax-map-wrap">
+        <CoverageMap />
+        <div class="ax-map-badge mono">
+          <span class="ax-map-badge-dot" aria-hidden="true"></span>
+          8 AGENCES · 40 DÉPANNEURS
+        </div>
+      </div>
+      <p class="ax-map-hint">Survolez un marqueur, cliquez pour ouvrir la page de l’agence.</p>
+    </section>
+
+    {/* ====== Liste des agences ====== */}
+    <section class="ax-list-section">
+      <div class="ax-list-inner">
+        <ul class="ax-grid">
+          {agences.map((a) => (
+            <li>
+              <a href={`/agences/${a.slug}/`} class="ax-card">
+                {a.principal && <span class="ax-card-flag">Agence principale</span>}
+                <h2 class="ax-card-name">{a.societe}</h2>
+                <address class="ax-card-address">
+                  {a.adresse.rue}<br />
+                  {a.adresse.codePostal}&nbsp;{a.adresse.ville} · {a.departement}
+                </address>
+                <div class="ax-card-phones">
+                  {a.phones.map((p) => (
+                    <span class="ax-card-phone mono">{p.display}</span>
+                  ))}
+                </div>
+                <span class="ax-card-cta">
+                  Voir l’agence <span aria-hidden="true">→</span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        <p class="ax-note">
+          <strong>Lunel Dépannage</strong> et <strong>Étoile Assistance</strong> sont
+          des sociétés partenaires distinctes, non rattachées au réseau Montpellier
+          Dépannage&nbsp;: elles ne disposent pas de page agence sur ce site.
+        </p>
+      </div>
+    </section>
+
+    {/* ====== CTA ====== */}
+    <section class="ax-cta">
+      <div class="ax-cta-inner">
+        <h2 class="ax-cta-title">Une urgence&nbsp;? Appelez le réseau 24h/24.</h2>
+        <a href="tel:+33467421431" class="ax-cta-phone" data-call-source="agences-index-cta">
+          <span aria-hidden="true">☎</span>
+          <span class="mono">04 67 42 14 31</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  /* ====== En-tête ====== */
+  .ax-head {
+    padding: 64px var(--pad-x-desktop) 40px;
+    background: var(--color-bg);
+  }
+  .ax-head-inner { max-width: var(--container-max); margin: 0 auto; }
+  .ax-overline {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    background: var(--color-primary-bg);
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    margin-bottom: 16px;
+  }
+  .ax-title {
+    font-family: var(--font-display);
+    font-size: 44px;
+    line-height: 1.08;
+    letter-spacing: var(--tr-display);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 16px;
+    max-width: 760px;
+  }
+  .ax-lead {
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    margin: 0;
+    max-width: 680px;
+  }
+
+  /* ====== Carte ====== */
+  .ax-map-section {
+    padding: 0 var(--pad-x-desktop) 16px;
+  }
+  .ax-map-wrap {
+    position: relative;
+    max-width: 1000px;
+    margin: 0 auto;
+    background: radial-gradient(circle at 50% 0%, #F6F5EB 0%, #ECEAD8 100%);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-2xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    aspect-ratio: 770 / 565;
+  }
+  .ax-map-badge {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: rgba(26,25,15,0.88);
+    border-radius: var(--radius-pill);
+    color: var(--md-brand-yellow);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+  .ax-map-badge-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--md-brand-yellow);
+  }
+  .ax-map-hint {
+    text-align: center;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin: 16px 0 0;
+  }
+
+  /* ====== Liste ====== */
+  .ax-list-section {
+    padding: 56px var(--pad-x-desktop) 72px;
+    background: var(--color-bg);
+  }
+  .ax-list-inner { max-width: var(--container-max); margin: 0 auto; }
+  .ax-grid {
+    list-style: none;
+    margin: 0 0 32px;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .ax-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: 24px 22px;
+    text-decoration: none;
+    box-shadow: var(--shadow-xs);
+    transition: transform var(--dur-base) var(--ease-standard),
+                box-shadow var(--dur-base) var(--ease-standard),
+                border-color var(--dur-base) var(--ease-standard);
+  }
+  .ax-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--md-forest-200);
+  }
+  .ax-card-flag {
+    align-self: flex-start;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    background: var(--color-primary-bg);
+    padding: 4px 8px;
+    border-radius: var(--radius-xs);
+    margin-bottom: 10px;
+  }
+  .ax-card-name {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 8px;
+  }
+  .ax-card-address {
+    font-style: normal;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+  .ax-card-phones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .ax-card-phone {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-primary);
+    background: var(--color-primary-bg);
+    padding: 4px 8px;
+    border-radius: var(--radius-xs);
+  }
+  .ax-card-cta {
+    margin-top: auto;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+  .ax-card:hover .ax-card-cta { text-decoration: underline; }
+
+  .ax-note {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    padding: 16px 18px;
+    background: var(--color-bg-subtle);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+  }
+
+  /* ====== CTA ====== */
+  .ax-cta {
+    padding: 56px var(--pad-x-desktop);
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(228,225,60,0.12) 0%, transparent 60%),
+      var(--md-brand-green);
+    text-align: center;
+  }
+  .ax-cta-inner { max-width: var(--container-max); margin: 0 auto; }
+  .ax-cta-title {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 20px;
+  }
+  .ax-cta-phone {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 28px;
+    background: var(--md-brand-yellow);
+    color: var(--md-brand-black);
+    border-radius: var(--radius-lg);
+    font-size: 20px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+    transition: transform var(--dur-base) var(--ease-standard);
+  }
+  .ax-cta-phone:hover { transform: translateY(-2px); }
+
+  /* ====== Responsive ====== */
+  @media (max-width: 1023px) {
+    .ax-head { padding: 48px var(--pad-x-tablet) 32px; }
+    .ax-title { font-size: 34px; }
+    .ax-map-section { padding: 0 var(--pad-x-tablet) 16px; }
+    .ax-list-section { padding: 48px var(--pad-x-tablet) 56px; }
+    .ax-cta { padding: 48px var(--pad-x-tablet); }
+    .ax-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 639px) {
+    .ax-head { padding: 40px var(--pad-x-mobile) 28px; }
+    .ax-title { font-size: 28px; }
+    .ax-map-section { padding: 0 var(--pad-x-mobile) 16px; }
+    .ax-list-section { padding: 40px var(--pad-x-mobile) 48px; }
+    .ax-cta { padding: 40px var(--pad-x-mobile); }
+    .ax-grid { grid-template-columns: 1fr; }
+    .ax-map-badge { font-size: 10px; padding: 6px 10px; top: 12px; left: 12px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ax-card, .ax-cta-phone { transition: none; }
+  }
+</style>

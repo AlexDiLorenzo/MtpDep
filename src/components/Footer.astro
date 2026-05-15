@@ -1,13 +1,39 @@
 ---
 import LogoMark from './LogoMark.astro';
 import { site } from '../config/site';
+import { services } from '../data/services';
 
 const year = new Date().getFullYear();
 
+// Colonnes du footer — liens vers les vraies pages de l'architecture.
 const columns = [
-  { title: 'Services', links: ['Remorquage VL', 'Remorquage PL', 'Autoroute A9', 'Transport international', 'Rapatriement', 'Mécanique · GPL · Clim'] },
-  { title: 'Entreprise', links: ['À propos', 'Certifications NF', 'Équipe', 'Flotte', 'Partenaires'] },
-  { title: 'Informations', links: ['Vous êtes en panne ?', 'Paiement en ligne', "Zone d'intervention", 'Tarifs', 'CGV', 'Mentions légales'] },
+  {
+    title: 'Services',
+    links: [
+      ...services.map((s) => ({ label: s.nom, href: `/services/${s.slug}/` })),
+      { label: 'Tous les services', href: '/services/' },
+    ],
+  },
+  {
+    title: 'Le réseau',
+    links: [
+      { label: 'Nos 8 agences', href: '/agences/' },
+      { label: 'À propos', href: '/a-propos/' },
+      { label: 'Certifications NF', href: '/certifications/' },
+      { label: 'Notre flotte', href: '/flotte/' },
+      { label: 'Recrutement', href: '/recrutement/' },
+    ],
+  },
+  {
+    title: 'Informations',
+    links: [
+      { label: 'Vous êtes en panne ?', href: '/#assistance' },
+      { label: 'Tarifs', href: '/tarifs/' },
+      { label: 'Contact', href: '/contact/' },
+      { label: 'CGV', href: '/cgv/' },
+      { label: 'Mentions légales', href: '/mentions-legales/' },
+    ],
+  },
 ];
 ---
 
@@ -31,7 +57,7 @@ const columns = [
           <div class="footer-col-title">{c.title}</div>
           <ul>
             {c.links.map((l) => (
-              <li><a href="#">{l}</a></li>
+              <li><a href={l.href}>{l.label}</a></li>
             ))}
           </ul>
         </div>

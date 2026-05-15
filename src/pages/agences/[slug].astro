@@ -1,0 +1,593 @@
+---
+// Template paramétré des 8 pages agences : /agences/{slug}/
+//
+// STRUCTURE UNIFORME, CONTENU DIFFÉRENCIÉ — toutes les agences
+// partagent ce gabarit, mais les zones rédactionnelles sont des
+// <Todo> distincts pour éviter le duplicate content (cf. brief).
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TopNav from '../../components/TopNav.astro';
+import Footer from '../../components/Footer.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Todo from '../../components/Todo.astro';
+import { photos } from '../../config/site';
+import { agences, type Agence } from '../../data/agences';
+import { services } from '../../data/services';
+import { automotiveBusinessSchema, breadcrumbSchema, agenceUrl } from '../../lib/schema';
+
+export function getStaticPaths() {
+  return agences.map((agence) => ({
+    params: { slug: agence.slug },
+    props: { agence },
+  }));
+}
+
+interface Props {
+  agence: Agence;
+}
+
+const { agence } = Astro.props;
+const { adresse, phones } = agence;
+const phonePrincipal = phones[0];
+
+// --- SEO ---------------------------------------------------------
+const pageTitle = `Dépannage à ${adresse.ville} (${adresse.codePostal}) · Remorquage 24/7 — Montpellier Dépannage`;
+const pageDescription = `Dépannage et remorquage 24h/24, 7j/7 à ${adresse.ville} et alentours. ${agence.societe}, agence du réseau Montpellier Dépannage. Plateaux VL et PL, intervention rapide. Appelez le ${phonePrincipal.display}.`;
+
+// --- Fil d'Ariane ------------------------------------------------
+const crumbs = [
+  { name: 'Accueil', href: '/' },
+  { name: 'Agences', href: '/agences/' },
+  { name: agence.nomCourt },
+];
+const crumbSchemaItems = [
+  { name: 'Accueil', url: '/' },
+  { name: 'Agences', url: '/agences/' },
+  { name: agence.nomCourt, url: agenceUrl(agence.slug) },
+];
+
+// --- JSON-LD -----------------------------------------------------
+const jsonLd = [
+  automotiveBusinessSchema(agence),
+  breadcrumbSchema(crumbSchemaItems),
+];
+
+// --- Lien Google Maps (dérivé du géocodage) ----------------------
+const mapsHref = agence.geo
+  ? `https://www.google.com/maps/search/?api=1&query=${agence.geo.lat},${agence.geo.lng}`
+  : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+      `${adresse.rue}, ${adresse.codePostal} ${adresse.ville}`,
+    )}`;
+---
+
+<BaseLayout title={pageTitle} description={pageDescription} jsonLd={jsonLd}>
+  <TopNav />
+  <Breadcrumbs items={crumbs} />
+
+  <main id="main">
+    {/* ============ HERO ============ */}
+    <section class="ag-hero" style={`--ag-hero-bg: url('${photos.flotteCamions}');`}>
+      <div class="ag-hero-inner">
+        <div class="ag-hero-pill">
+          <span class="ag-hero-pill-dot" aria-hidden="true"></span>
+          Agence {agence.departement} · 24h/24 · 7j/7
+        </div>
+
+        <h1 class="ag-hero-title">
+          Dépannage et remorquage<br />
+          <span class="ag-hero-title-accent">à {adresse.ville}.</span>
+        </h1>
+
+        <p class="ag-hero-societe">
+          {agence.societe} — {adresse.rue}, {adresse.codePostal}&nbsp;{adresse.ville}
+        </p>
+
+        <div class="ag-hero-phones">
+          {phones.map((p, i) => (
+            <a
+              href={p.href}
+              class:list={['ag-phone', { 'ag-phone--main': i === 0 }]}
+              data-call-source={`agence-${agence.slug}`}
+            >
+              <span class="ag-phone-icon" aria-hidden="true">☎</span>
+              <span class="ag-phone-text">
+                <span class="ag-phone-label">{p.label ?? 'Urgence 24/7'}</span>
+                <span class="ag-phone-number mono">{p.display}</span>
+              </span>
+            </a>
+          ))}
+        </div>
+
+        <p class="ag-hero-network">
+          Membre du réseau <a href="/agences/">Montpellier Dépannage</a> ·
+          8&nbsp;agences dans l'Hérault et le Gard.
+        </p>
+      </div>
+    </section>
+
+    {/* ============ PRÉSENTATION (rédactionnel) ============ */}
+    <section class="ag-section">
+      <div class="ag-inner">
+        <div class="ag-overline">L'agence de {agence.nomCourt}</div>
+        <h2 class="ag-h2">Une présence locale, jour et nuit.</h2>
+        <Todo titre={`Intro locale — ${agence.nomCourt}`}>
+          <p>
+            2 à 3 paragraphes <strong>uniques</strong> présentant l'agence de
+            {' '}{adresse.ville} : histoire, ancrage local, équipe, spécificités du
+            secteur. Contenu différencié obligatoire (ne pas dupliquer entre agences).
+          </p>
+          <p>
+            Mentionner les axes routiers et communes proches, les délais d'intervention
+            typiques, et tout point distinctif de cette agence.
+          </p>
+        </Todo>
+      </div>
+    </section>
+
+    {/* ============ COORDONNÉES & ACCÈS ============ */}
+    <section class="ag-section ag-section--alt">
+      <div class="ag-inner">
+        <div class="ag-overline">Coordonnées &amp; accès</div>
+        <h2 class="ag-h2">Nous joindre à {adresse.ville}.</h2>
+
+        <div class="ag-coords">
+          <div class="ag-card">
+            <h3 class="ag-card-title">{agence.societe}</h3>
+            <address class="ag-card-address">
+              {adresse.rue}<br />
+              {adresse.codePostal}&nbsp;{adresse.ville}<br />
+              <span class="ag-card-dept">{agence.departement}</span>
+            </address>
+
+            <dl class="ag-card-list">
+              {phones.map((p) => (
+                <div class="ag-card-row">
+                  <dt>{p.label ?? 'Téléphone'}</dt>
+                  <dd>
+                    <a href={p.href} class="ag-card-phone mono" data-call-source={`agence-${agence.slug}`}>
+                      {p.display}
+                    </a>
+                  </dd>
+                </div>
+              ))}
+              <div class="ag-card-row">
+                <dt>Horaires</dt>
+                <dd>24h/24, 7j/7 — astreinte permanente</dd>
+              </div>
+            </dl>
+
+            <a href={mapsHref} class="ag-card-maps" target="_blank" rel="noopener">
+              Itinéraire &amp; plan d'accès
+              <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+
+          <div class="ag-access">
+            <Todo titre={`Accès & stationnement — ${agence.nomCourt}`}>
+              <p>
+                Description de l'accès à l'agence : axes routiers, sortie d'autoroute,
+                repères visuels, stationnement, zone de dépôt des véhicules.
+              </p>
+            </Todo>
+            <Todo titre={`Photo de l'agence — ${agence.nomCourt}`}>
+              <p>
+                Photo réelle de l'agence de {adresse.ville} (façade / atelier / plateaux).
+                Pour l'instant : visuel générique de la flotte.
+              </p>
+            </Todo>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {/* ============ SERVICES ============ */}
+    <section class="ag-section">
+      <div class="ag-inner">
+        <div class="ag-overline">Nos prestations</div>
+        <h2 class="ag-h2">Services disponibles à {adresse.ville}.</h2>
+
+        <ul class="ag-services">
+          {services.map((s) => (
+            <li>
+              <a href={`/services/${s.slug}/`} class="ag-service">
+                <span class="ag-service-tag mono">{s.tag}</span>
+                <span class="ag-service-body">
+                  <span class="ag-service-name">{s.nom}</span>
+                  <span class="ag-service-desc">{s.resume}</span>
+                </span>
+                <span class="ag-service-arrow" aria-hidden="true">→</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        <Todo titre={`Spécificités services — ${agence.nomCourt}`}>
+          <p>
+            Préciser, si pertinent, les services particulièrement adaptés au secteur
+            de {adresse.ville} (ex. présence A9, poids lourds, véhicules de luxe…).
+          </p>
+        </Todo>
+      </div>
+    </section>
+
+    {/* ============ ZONE D'INTERVENTION ============ */}
+    <section class="ag-section ag-section--alt">
+      <div class="ag-inner">
+        <div class="ag-overline">Zone d'intervention</div>
+        <h2 class="ag-h2">Communes desservies depuis {adresse.ville}.</h2>
+        <Todo titre={`Communes & rayon d'intervention — ${agence.nomCourt}`}>
+          <p>
+            Lister les communes et axes couverts par l'agence de {adresse.ville}
+            (maillage SEO local). Idéalement 8 à 15 communes proches, chacune
+            renforçant le référencement de proximité.
+          </p>
+        </Todo>
+      </div>
+    </section>
+
+    {/* ============ FAQ ============ */}
+    <section class="ag-section">
+      <div class="ag-inner">
+        <div class="ag-overline">Questions fréquentes</div>
+        <h2 class="ag-h2">FAQ — dépannage à {adresse.ville}.</h2>
+        <Todo titre={`FAQ locale — ${agence.nomCourt}`}>
+          <p>
+            4 à 6 questions/réponses propres à {adresse.ville}. À baliser ensuite en
+            JSON-LD <code>FAQPage</code> (Phase 2). Questions distinctes par agence.
+          </p>
+        </Todo>
+      </div>
+    </section>
+
+    {/* ============ CTA FINAL ============ */}
+    <section class="ag-cta">
+      <div class="ag-cta-inner">
+        <h2 class="ag-cta-title">Besoin d'un dépannage à {adresse.ville}&nbsp;?</h2>
+        <p class="ag-cta-lead">Intervention immédiate, 24h/24 et 7j/7.</p>
+        <a
+          href={phonePrincipal.href}
+          class="ag-cta-phone"
+          data-call-source={`agence-${agence.slug}-cta`}
+        >
+          <span aria-hidden="true">☎</span>
+          <span class="mono">{phonePrincipal.display}</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  /* ============ HERO ============ */
+  .ag-hero {
+    position: relative;
+    background-image:
+      linear-gradient(180deg, rgba(26,25,15,0.62) 0%, rgba(26,25,15,0.82) 100%),
+      var(--ag-hero-bg);
+    background-size: cover;
+    background-position: center;
+    color: #fff;
+    padding: 72px var(--pad-x-desktop) 64px;
+  }
+  .ag-hero-inner {
+    max-width: var(--container-max);
+    margin: 0 auto;
+  }
+  .ag-hero-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    background: rgba(228,225,60,0.95);
+    border-radius: var(--radius-pill);
+    color: var(--md-brand-black);
+    margin-bottom: 24px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .ag-hero-pill-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--md-brand-green);
+    box-shadow: 0 0 0 3px rgba(44,97,38,0.25);
+  }
+  .ag-hero-title {
+    font-family: var(--font-display);
+    font-size: 56px;
+    line-height: 1.04;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin: 0 0 16px;
+  }
+  .ag-hero-title-accent { color: var(--md-brand-yellow); }
+  .ag-hero-societe {
+    font-size: 15px;
+    color: rgba(255,255,255,0.85);
+    margin: 0 0 28px;
+    max-width: 640px;
+  }
+  .ag-hero-phones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+  .ag-phone {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 22px;
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: #fff;
+    transition: background-color var(--dur-base) var(--ease-standard),
+                transform var(--dur-base) var(--ease-standard);
+  }
+  .ag-phone:hover { transform: translateY(-2px); }
+  .ag-phone--main {
+    background: var(--md-brand-yellow);
+    border-color: var(--md-brand-yellow);
+    color: var(--md-brand-black);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+  }
+  .ag-phone--main:hover { background: var(--color-accent-hover); }
+  .ag-phone-icon { font-size: 20px; }
+  .ag-phone-text { display: flex; flex-direction: column; }
+  .ag-phone-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+  .ag-phone-number { font-size: 17px; font-weight: 700; }
+  .ag-hero-network {
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+    margin: 0;
+  }
+  .ag-hero-network a {
+    color: var(--md-brand-yellow);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  /* ============ SECTIONS ============ */
+  .ag-section {
+    padding: 72px var(--pad-x-desktop);
+    background: var(--color-bg);
+  }
+  .ag-section--alt {
+    background: var(--color-bg-subtle);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .ag-inner {
+    max-width: var(--container-max);
+    margin: 0 auto;
+  }
+  .ag-overline {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    background: var(--color-primary-bg);
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    margin-bottom: 14px;
+  }
+  .ag-h2 {
+    font-family: var(--font-display);
+    font-size: 32px;
+    line-height: 1.12;
+    letter-spacing: var(--tr-display);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 24px;
+  }
+
+  /* ============ COORDONNÉES ============ */
+  .ag-coords {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  .ag-card {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-2xl);
+    padding: 28px 26px;
+    box-shadow: var(--shadow-sm);
+  }
+  .ag-card-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 12px;
+    color: var(--color-text);
+  }
+  .ag-card-address {
+    font-style: normal;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    margin-bottom: 18px;
+  }
+  .ag-card-dept {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+  .ag-card-list {
+    margin: 0 0 18px;
+    border-top: 1px solid var(--color-border);
+  }
+  .ag-card-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .ag-card-row dt {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    font-weight: 600;
+  }
+  .ag-card-row dd {
+    margin: 0;
+    font-size: 13px;
+    text-align: right;
+    color: var(--color-text);
+  }
+  .ag-card-phone {
+    color: var(--color-primary);
+    font-weight: 700;
+    font-size: 15px;
+    text-decoration: none;
+  }
+  .ag-card-phone:hover { text-decoration: underline; }
+  .ag-card-maps {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+  .ag-card-maps:hover { text-decoration: underline; }
+  .ag-access { display: flex; flex-direction: column; gap: 14px; }
+
+  /* ============ SERVICES ============ */
+  .ag-services {
+    list-style: none;
+    margin: 0 0 20px;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .ag-service {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    text-decoration: none;
+    box-shadow: var(--shadow-xs);
+    transition: transform var(--dur-base) var(--ease-standard),
+                box-shadow var(--dur-base) var(--ease-standard),
+                border-color var(--dur-base) var(--ease-standard);
+  }
+  .ag-service:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--md-forest-200);
+  }
+  .ag-service-tag {
+    flex-shrink: 0;
+    background: var(--md-brand-yellow);
+    color: var(--md-brand-black);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: var(--radius-xs);
+  }
+  .ag-service-body { display: flex; flex-direction: column; gap: 3px; flex: 1; }
+  .ag-service-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+  .ag-service-desc {
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--color-text-muted);
+  }
+  .ag-service-arrow {
+    flex-shrink: 0;
+    color: var(--color-primary);
+    font-weight: 700;
+    transition: transform var(--dur-base) var(--ease-standard);
+  }
+  .ag-service:hover .ag-service-arrow { transform: translateX(3px); }
+
+  /* ============ CTA ============ */
+  .ag-cta {
+    padding: 64px var(--pad-x-desktop);
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(228,225,60,0.12) 0%, transparent 60%),
+      var(--md-brand-green);
+    text-align: center;
+  }
+  .ag-cta-inner { max-width: var(--container-max); margin: 0 auto; }
+  .ag-cta-title {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 8px;
+  }
+  .ag-cta-lead {
+    font-size: 15px;
+    color: rgba(255,255,255,0.8);
+    margin: 0 0 24px;
+  }
+  .ag-cta-phone {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 28px;
+    background: var(--md-brand-yellow);
+    color: var(--md-brand-black);
+    border-radius: var(--radius-lg);
+    font-size: 20px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+    transition: background-color var(--dur-base) var(--ease-standard),
+                transform var(--dur-base) var(--ease-standard);
+  }
+  .ag-cta-phone:hover {
+    background: var(--color-accent-hover);
+    transform: translateY(-2px);
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 1023px) {
+    .ag-hero { padding: 56px var(--pad-x-tablet) 52px; }
+    .ag-hero-title { font-size: 42px; }
+    .ag-section { padding: 56px var(--pad-x-tablet); }
+    .ag-cta { padding: 52px var(--pad-x-tablet); }
+    .ag-h2 { font-size: 28px; }
+  }
+  @media (max-width: 767px) {
+    .ag-hero { padding: 44px var(--pad-x-mobile) 40px; }
+    .ag-hero-title { font-size: 32px; }
+    .ag-section { padding: 48px var(--pad-x-mobile); }
+    .ag-cta { padding: 44px var(--pad-x-mobile); }
+    .ag-coords { grid-template-columns: 1fr; }
+    .ag-services { grid-template-columns: 1fr; }
+    .ag-phone { flex: 1; justify-content: center; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ag-phone, .ag-service, .ag-cta-phone, .ag-service-arrow { transition: none; }
+  }
+</style>

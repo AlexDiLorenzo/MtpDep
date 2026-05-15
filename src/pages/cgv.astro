@@ -1,0 +1,42 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TopNav from '../components/TopNav.astro';
+import Footer from '../components/Footer.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import PageHero from '../components/PageHero.astro';
+import ContentSection from '../components/ContentSection.astro';
+import Todo from '../components/Todo.astro';
+import { breadcrumbSchema } from '../lib/schema';
+
+const pageTitle = 'Conditions générales de vente · Montpellier Dépannage';
+const pageDescription =
+  'Conditions générales de vente et de service de Montpellier Dépannage : prestations, tarifs, paiement, responsabilités.';
+
+const jsonLd = breadcrumbSchema([
+  { name: 'Accueil', url: '/' },
+  { name: 'CGV', url: '/cgv/' },
+]);
+---
+
+<BaseLayout title={pageTitle} description={pageDescription} jsonLd={jsonLd}>
+  <TopNav />
+  <Breadcrumbs items={[{ name: 'Accueil', href: '/' }, { name: 'CGV' }]} />
+
+  <main id="main">
+    <PageHero overline="Conditions générales" title="Conditions générales de vente." />
+
+    <ContentSection titre="Prestations, tarifs & responsabilités.">
+      <Todo titre="Contenu juridique des CGV">
+        <p>
+          À rédiger : objet et champ d'application, description des prestations,
+          modalités de commande et d'intervention, tarifs et facturation, modalités
+          de paiement, prise en charge par les assurances, responsabilités et
+          assurances, réclamations, droit applicable et juridiction compétente.
+        </p>
+        <p>Contenu à valider par la direction / un conseil juridique avant publication.</p>
+      </Todo>
+    </ContentSection>
+  </main>
+
+  <Footer />
+</BaseLayout>

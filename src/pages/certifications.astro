@@ -1,0 +1,63 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TopNav from '../components/TopNav.astro';
+import Footer from '../components/Footer.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import PageHero from '../components/PageHero.astro';
+import ContentSection from '../components/ContentSection.astro';
+import Todo from '../components/Todo.astro';
+import { breadcrumbSchema } from '../lib/schema';
+
+const pageTitle = 'Certifications & agréments · Montpellier Dépannage — NF Service';
+const pageDescription =
+  "Montpellier Dépannage est certifié NF Service (AFNOR), engagé Envol, agréé autoroutes A9 et toutes compagnies d'assistance.";
+
+const jsonLd = breadcrumbSchema([
+  { name: 'Accueil', url: '/' },
+  { name: 'Certifications', url: '/certifications/' },
+]);
+---
+
+<BaseLayout title={pageTitle} description={pageDescription} jsonLd={jsonLd}>
+  <TopNav />
+  <Breadcrumbs items={[{ name: 'Accueil', href: '/' }, { name: 'Certifications' }]} />
+
+  <main id="main">
+    <PageHero
+      overline="Certifications & agréments"
+      title="Certifiés, agréés, engagés."
+      lead="Des garanties concrètes : qualité de service auditée, engagement environnemental, agréments autoroute et assistances."
+    />
+
+    <ContentSection overline="Qualité" titre="NF Service — certifié AFNOR.">
+      <Todo titre="Détail certification NF Service">
+        <p>
+          Présenter la certification NF Service : périmètre (dépannage VL &amp; PL),
+          organisme certificateur (AFNOR Certification), engagements audités,
+          fréquence des audits. Joindre le certificat.
+        </p>
+      </Todo>
+    </ContentSection>
+
+    <ContentSection overline="Environnement" titre="Engagement Envol." alt>
+      <Todo titre="Détail engagement Envol">
+        <p>
+          Présenter la démarche Envol : engagement volontaire pour l'environnement,
+          actions concrètes, flotte électrique zéro émission pour le centre-ville.
+        </p>
+      </Todo>
+    </ContentSection>
+
+    <ContentSection overline="Agréments" titre="Autoroutes A9 & assistances.">
+      <Todo titre="Détail des agréments">
+        <p>
+          Détailler l'agrément autoroutes (partenariat Vinci, intervention sur l'A9)
+          et l'agrément auprès de toutes les compagnies d'assistance — prise en charge
+          directe, sans avance de frais.
+        </p>
+      </Todo>
+    </ContentSection>
+  </main>
+
+  <Footer />
+</BaseLayout>

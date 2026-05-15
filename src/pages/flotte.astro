@@ -1,0 +1,61 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TopNav from '../components/TopNav.astro';
+import Footer from '../components/Footer.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import PageHero from '../components/PageHero.astro';
+import ContentSection from '../components/ContentSection.astro';
+import Todo from '../components/Todo.astro';
+import { breadcrumbSchema } from '../lib/schema';
+
+const pageTitle = 'Notre flotte · Montpellier Dépannage — 40 plateaux VL & PL';
+const pageDescription =
+  "La flotte Montpellier Dépannage : 40 plateaux de remorquage VL et PL, véhicules 4×4, plateaux rabaissés et flotte électrique zéro émission.";
+
+const jsonLd = breadcrumbSchema([
+  { name: 'Accueil', url: '/' },
+  { name: 'Flotte', url: '/flotte/' },
+]);
+---
+
+<BaseLayout title={pageTitle} description={pageDescription} jsonLd={jsonLd}>
+  <TopNav />
+  <Breadcrumbs items={[{ name: 'Accueil', href: '/' }, { name: 'Flotte' }]} />
+
+  <main id="main">
+    <PageHero
+      overline="Notre flotte"
+      title="40 plateaux, tous gabarits."
+      lead="Une flotte complète pour intervenir sur tout type de véhicule, partout, jour et nuit."
+    />
+
+    <ContentSection overline="Véhicules légers" titre="Plateaux VL & véhicules de luxe.">
+      <Todo titre="Présentation flotte VL">
+        <p>
+          Détailler les plateaux VL, les plateaux rabaissés pour véhicules de prestige,
+          les capacités d'accès aux sous-sols. Photos et caractéristiques.
+        </p>
+      </Todo>
+    </ContentSection>
+
+    <ContentSection overline="Poids lourds" titre="Plateaux PL & 4×4 avec bras." alt>
+      <Todo titre="Présentation flotte PL">
+        <p>
+          Détailler les plateaux poids lourds, les véhicules 4×4 équipés de bras, les
+          capacités de récupération tout gabarit et tout terrain.
+        </p>
+      </Todo>
+    </ContentSection>
+
+    <ContentSection overline="Centre-ville" titre="Flotte électrique zéro émission.">
+      <Todo titre="Présentation flotte électrique">
+        <p>
+          Présenter le véhicule compact et les scooters électriques dédiés au cœur
+          historique de Montpellier (Comédie, Antigone, Peyrou).
+        </p>
+      </Todo>
+    </ContentSection>
+  </main>
+
+  <Footer />
+</BaseLayout>

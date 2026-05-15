@@ -1,0 +1,201 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TopNav from '../components/TopNav.astro';
+import Footer from '../components/Footer.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import PageHero from '../components/PageHero.astro';
+import Todo from '../components/Todo.astro';
+import { site } from '../config/site';
+import { agences } from '../data/agences';
+import { organizationSchema, breadcrumbSchema } from '../lib/schema';
+
+const pageTitle = 'Contact · Montpellier Dépannage — 04 67 42 14 31';
+const pageDescription =
+  "Contactez Montpellier Dépannage : urgence 24h/24 au 04 67 42 14 31, e-mail, et les coordonnées des 8 agences de l'Hérault et du Gard.";
+
+const jsonLd = [
+  organizationSchema(),
+  breadcrumbSchema([
+    { name: 'Accueil', url: '/' },
+    { name: 'Contact', url: '/contact/' },
+  ]),
+];
+---
+
+<BaseLayout title={pageTitle} description={pageDescription} jsonLd={jsonLd}>
+  <TopNav />
+  <Breadcrumbs items={[{ name: 'Accueil', href: '/' }, { name: 'Contact' }]} />
+
+  <main id="main">
+    <PageHero
+      overline="Contact"
+      title="Nous joindre, 24h/24."
+      lead="Une urgence, une question, un devis : l'équipe Montpellier Dépannage est joignable en permanence."
+    />
+
+    <section class="ct-section">
+      <div class="ct-inner">
+        {/* Coordonnées principales */}
+        <div class="ct-main">
+          <a href={site.phone.href} class="ct-card ct-card--phone" data-call-source="contact-page">
+            <span class="ct-card-label">Urgence 24/7</span>
+            <span class="ct-card-value mono">{site.phone.display}</span>
+            <span class="ct-card-hint">Appel immédiat — intervention garantie</span>
+          </a>
+          <a href={site.email.href} class="ct-card">
+            <span class="ct-card-label">E-mail</span>
+            <span class="ct-card-value ct-card-value--sm">{site.email.display}</span>
+            <span class="ct-card-hint">Devis &amp; demandes non urgentes</span>
+          </a>
+          <div class="ct-card">
+            <span class="ct-card-label">Siège — Montpellier Garosud</span>
+            <span class="ct-card-value ct-card-value--sm">
+              {site.address.street}<br />
+              {site.address.postalCode}&nbsp;{site.address.city}
+            </span>
+            <span class="ct-card-hint">{site.address.region}</span>
+          </div>
+        </div>
+
+        {/* Formulaire — à venir */}
+        <div class="ct-form">
+          <h2 class="ct-h2">Formulaire de contact</h2>
+          <Todo titre="Formulaire de contact / demande de devis">
+            <p>
+              Intégrer le formulaire de demande de devis (endpoint <code>/api/devis</code>
+              déjà en place) ou un formulaire de contact dédié.
+            </p>
+          </Todo>
+        </div>
+
+        {/* Agences */}
+        <div class="ct-agences">
+          <h2 class="ct-h2">Contacter une agence</h2>
+          <ul class="ct-agences-list">
+            {agences.map((a) => (
+              <li>
+                <a href={`/agences/${a.slug}/`} class="ct-agence">
+                  <span class="ct-agence-name">{a.nomCourt}</span>
+                  <span class="ct-agence-phone mono">{a.phones[0].display}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+          <p class="ct-agences-link">
+            <a href="/agences/">Voir toutes les agences sur la carte →</a>
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .ct-section {
+    padding: 56px var(--pad-x-desktop);
+    background: var(--color-bg);
+  }
+  .ct-inner { max-width: var(--container-max); margin: 0 auto; }
+
+  .ct-main {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+  .ct-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 24px 22px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xs);
+    text-decoration: none;
+  }
+  a.ct-card { transition: transform var(--dur-base) var(--ease-standard), box-shadow var(--dur-base) var(--ease-standard); }
+  a.ct-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .ct-card--phone {
+    background: var(--md-brand-green);
+    border-color: var(--md-brand-green);
+  }
+  .ct-card-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+  .ct-card--phone .ct-card-label { color: rgba(255,255,255,0.7); }
+  .ct-card-value {
+    font-family: var(--font-mono);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+  .ct-card-value--sm { font-size: 15px; line-height: 1.5; }
+  .ct-card--phone .ct-card-value { color: var(--md-brand-yellow); }
+  .ct-card-hint {
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  .ct-card--phone .ct-card-hint { color: rgba(255,255,255,0.7); }
+
+  .ct-h2 {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 16px;
+  }
+  .ct-form { margin-bottom: 48px; }
+
+  .ct-agences-list {
+    list-style: none;
+    margin: 0 0 16px;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  .ct-agence {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 14px 16px;
+    background: var(--color-bg-subtle);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    transition: border-color var(--dur-base) var(--ease-standard);
+  }
+  .ct-agence:hover { border-color: var(--md-forest-200); }
+  .ct-agence-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+  .ct-agence-phone {
+    font-size: 12px;
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+  .ct-agences-link { margin: 0; font-size: 14px; }
+  .ct-agences-link a { color: var(--color-primary); font-weight: 700; }
+
+  @media (max-width: 1023px) {
+    .ct-section { padding: 44px var(--pad-x-tablet); }
+    .ct-main { grid-template-columns: 1fr; }
+    .ct-agences-list { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 639px) {
+    .ct-section { padding: 36px var(--pad-x-mobile); }
+    .ct-agences-list { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    a.ct-card, .ct-agence { transition: none; }
+  }
+</style>

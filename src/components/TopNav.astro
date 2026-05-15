@@ -21,7 +21,7 @@ import { site, nav } from '../config/site';
     </ul>
 
     <div class="topnav-cta">
-      <a href="#assistance" class="topnav-assist">Vous êtes en panne&nbsp;?</a>
+      <a href="/#assistance" class="topnav-assist">Vous êtes en panne&nbsp;?</a>
       <a href={site.phone.href} class="btn btn-primary topnav-phone-cta mono">
         <span aria-hidden="true">☎</span> {site.phone.display}
       </a>
@@ -38,7 +38,7 @@ import { site, nav } from '../config/site';
         <li><a href={item.href}>{item.label}</a></li>
       ))}
       <li><a href="/recrutement" class="mobile-recruit"><span class="topnav-recruit-dot" aria-hidden="true"></span> MDP recrute</a></li>
-      <li><a href="#assistance" class="mobile-assist">Vous êtes en panne&nbsp;?</a></li>
+      <li><a href="/#assistance" class="mobile-assist">Vous êtes en panne&nbsp;?</a></li>
       <li><a href={site.phone.href} class="btn btn-primary mobile-phone-cta mono">☎ {site.phone.display}</a></li>
     </ul>
   </div>

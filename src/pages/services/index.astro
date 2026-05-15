@@ -1,0 +1,240 @@
+---
+// Page index des services : /services/
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TopNav from '../../components/TopNav.astro';
+import Footer from '../../components/Footer.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { photos } from '../../config/site';
+import { services } from '../../data/services';
+import { organizationSchema, breadcrumbSchema } from '../../lib/schema';
+
+const pageTitle = 'Nos services de dépannage et remorquage · Montpellier Dépannage';
+const pageDescription =
+  "Remorquage VL et poids lourds, autoroute A9, transport international, centre-ville, mécanique GPL : les 6 services de Montpellier Dépannage, 24h/24 dans l'Hérault et le Gard.";
+
+const crumbs = [
+  { name: 'Accueil', href: '/' },
+  { name: 'Services' },
+];
+
+const jsonLd = [
+  organizationSchema(),
+  breadcrumbSchema([
+    { name: 'Accueil', url: '/' },
+    { name: 'Services', url: '/services/' },
+  ]),
+];
+---
+
+<BaseLayout title={pageTitle} description={pageDescription} jsonLd={jsonLd}>
+  <TopNav />
+  <Breadcrumbs items={crumbs} />
+
+  <main id="main">
+    <section class="sx-head">
+      <div class="sx-head-inner">
+        <div class="sx-overline">Nos activités</div>
+        <h1 class="sx-title">Un savoir-faire pour chaque situation.</h1>
+        <p class="sx-lead">
+          Six services complémentaires, assurés 24h/24 et 7j/7 par les 8&nbsp;agences
+          du réseau Montpellier Dépannage, dans l’Hérault et le Gard.
+        </p>
+      </div>
+    </section>
+
+    <section class="sx-grid-section">
+      <div class="sx-grid-inner">
+        <ul class="sx-grid">
+          {services.map((s) => (
+            <li>
+              <a href={`/services/${s.slug}/`} class="sx-card">
+                <div class="sx-card-img" style={`--sx-img: url('${photos[s.photo]}');`}>
+                  <span class="sx-card-tag mono">{s.tag}</span>
+                </div>
+                <div class="sx-card-body">
+                  <h2 class="sx-card-title">{s.titre}</h2>
+                  <p class="sx-card-desc">{s.resume}</p>
+                  <span class="sx-card-link">
+                    En savoir plus <span aria-hidden="true">→</span>
+                  </span>
+                </div>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <section class="sx-cta">
+      <div class="sx-cta-inner">
+        <h2 class="sx-cta-title">Une urgence&nbsp;? Appelez 24h/24.</h2>
+        <a href="tel:+33467421431" class="sx-cta-phone" data-call-source="services-index-cta">
+          <span aria-hidden="true">☎</span>
+          <span class="mono">04 67 42 14 31</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .sx-head {
+    padding: 64px var(--pad-x-desktop) 40px;
+    background: var(--color-bg);
+  }
+  .sx-head-inner { max-width: var(--container-max); margin: 0 auto; }
+  .sx-overline {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    background: var(--color-primary-bg);
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    margin-bottom: 16px;
+  }
+  .sx-title {
+    font-family: var(--font-display);
+    font-size: 44px;
+    line-height: 1.08;
+    letter-spacing: var(--tr-display);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 16px;
+    max-width: 760px;
+  }
+  .sx-lead {
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    margin: 0;
+    max-width: 640px;
+  }
+
+  .sx-grid-section {
+    padding: 24px var(--pad-x-desktop) 72px;
+    background: var(--color-bg);
+  }
+  .sx-grid-inner { max-width: var(--container-max); margin: 0 auto; }
+  .sx-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .sx-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    text-decoration: none;
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--dur-base) var(--ease-standard),
+                box-shadow var(--dur-base) var(--ease-standard);
+  }
+  .sx-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .sx-card-img {
+    height: 168px;
+    background-image: linear-gradient(180deg, rgba(26,25,15,0) 40%, rgba(26,25,15,0.7) 100%), var(--sx-img);
+    background-size: cover;
+    background-position: center;
+    position: relative;
+  }
+  .sx-card-tag {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 4px 8px;
+    background: var(--md-brand-yellow);
+    color: var(--md-brand-black);
+    border-radius: var(--radius-xs);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .sx-card-body {
+    padding: 20px 22px 22px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  .sx-card-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 8px;
+  }
+  .sx-card-desc {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    margin: 0 0 16px;
+    line-height: 1.55;
+    flex: 1;
+  }
+  .sx-card-link {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-primary);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .sx-cta {
+    padding: 56px var(--pad-x-desktop);
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(228,225,60,0.12) 0%, transparent 60%),
+      var(--md-brand-green);
+    text-align: center;
+  }
+  .sx-cta-inner { max-width: var(--container-max); margin: 0 auto; }
+  .sx-cta-title {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 20px;
+  }
+  .sx-cta-phone {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 28px;
+    background: var(--md-brand-yellow);
+    color: var(--md-brand-black);
+    border-radius: var(--radius-lg);
+    font-size: 20px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+    transition: transform var(--dur-base) var(--ease-standard);
+  }
+  .sx-cta-phone:hover { transform: translateY(-2px); }
+
+  @media (max-width: 1023px) {
+    .sx-head { padding: 48px var(--pad-x-tablet) 32px; }
+    .sx-title { font-size: 34px; }
+    .sx-grid-section { padding: 24px var(--pad-x-tablet) 56px; }
+    .sx-cta { padding: 48px var(--pad-x-tablet); }
+    .sx-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 639px) {
+    .sx-head { padding: 40px var(--pad-x-mobile) 28px; }
+    .sx-title { font-size: 28px; }
+    .sx-grid-section { padding: 20px var(--pad-x-mobile) 48px; }
+    .sx-cta { padding: 40px var(--pad-x-mobile); }
+    .sx-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sx-card, .sx-cta-phone { transition: none; }
+  }
+</style>

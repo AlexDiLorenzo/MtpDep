@@ -5,49 +5,35 @@ import { site } from '../config/site';
 interface Props {
   title?: string;
   description?: string;
+  /** Surcharge l'URL canonique (par défaut : dérivée du chemin courant). */
   canonical?: string;
+  /** Image Open Graph (URL absolue ou chemin racine). */
+  ogImage?: string;
+  /** Empêche l'indexation (pages internes). */
+  noindex?: boolean;
+  /** Schéma(s) JSON-LD à injecter dans le <head>. */
+  jsonLd?: object | object[];
 }
 
 const {
   title = `${site.name} · Remorquage et dépannage 24/7 · Hérault · A9`,
   description = "Remorquage et dépannage 24h/24, 7j/7 à Montpellier et dans l'Hérault. Plateaux VL et PL, autoroute A9, transport international. Certifié NF Service, plus de 30 ans d'expérience.",
-  canonical = site.url,
+  ogImage = `${site.url}/og-default.jpg`,
+  noindex = false,
+  jsonLd,
 } = Astro.props;
 
-const localBusinessSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'AutomotiveBusiness',
-  name: site.name,
-  image: `${site.url}/og-default.jpg`,
-  url: site.url,
-  telephone: site.phone.display,
-  address: {
-    '@type': 'PostalAddress',
-    streetAddress: site.address.street,
-    postalCode: site.address.postalCode,
-    addressLocality: site.address.city,
-    addressRegion: site.address.region,
-    addressCountry: site.address.country,
-  },
-  openingHoursSpecification: [
-    {
-      '@type': 'OpeningHoursSpecification',
-      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-      opens: '00:00',
-      closes: '23:59',
-    },
-  ],
-  priceRange: '€€',
-  areaServed: [
-    { '@type': 'City', name: 'Montpellier' },
-    { '@type': 'AdministrativeArea', name: 'Hérault' },
-    { '@type': 'Country', name: 'France' },
-    { '@type': 'Country', name: 'Belgique' },
-    { '@type': 'Country', name: 'Italie' },
-    { '@type': 'Country', name: 'Espagne' },
-  ],
-  slogan: site.tagline,
-};
+// URL canonique : dérivée du chemin courant, normalisée avec slash final.
+const pathname = Astro.url.pathname;
+const canonicalPath =
+  pathname === '/' ? '/' : pathname.endsWith('/') ? pathname : `${pathname}/`;
+const canonical = Astro.props.canonical ?? new URL(canonicalPath, site.url).href;
+
+// Image OG : absolue telle quelle, sinon préfixée par l'origine du site.
+const ogImageUrl = ogImage.startsWith('http') ? ogImage : `${site.url}${ogImage}`;
+
+// Normalise les schémas en tableau pour itération.
+const schemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 ---
 
 <!doctype html>
@@ -59,6 +45,7 @@ const localBusinessSchema = {
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" type="image/png" href="/img/logo-mdp.png" />
     <link rel="apple-touch-icon" href="/img/logo-mdp.png" />
 
@@ -69,13 +56,13 @@ const localBusinessSchema = {
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={`${site.url}/og-default.jpg`} />
+    <meta property="og:image" content={ogImageUrl} />
 
     {/* Twitter */}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={`${site.url}/og-default.jpg`} />
+    <meta name="twitter:image" content={ogImageUrl} />
 
     {/* Theme */}
     <meta name="theme-color" content="#2C6126" />
@@ -84,8 +71,10 @@ const localBusinessSchema = {
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-    {/* LocalBusiness schema.org */}
-    <script type="application/ld+json" set:html={JSON.stringify(localBusinessSchema)} />
+    {/* Données structurées JSON-LD */}
+    {schemas.map((schema) => (
+      <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+    ))}
   </head>
   <body>
     <a href="#main" class="skip-link">Aller au contenu principal</a>

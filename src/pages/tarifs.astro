@@ -1,0 +1,61 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TopNav from '../components/TopNav.astro';
+import Footer from '../components/Footer.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import PageHero from '../components/PageHero.astro';
+import ContentSection from '../components/ContentSection.astro';
+import Todo from '../components/Todo.astro';
+import { breadcrumbSchema } from '../lib/schema';
+
+const pageTitle = 'Tarifs · Montpellier Dépannage — remorquage & dépannage';
+const pageDescription =
+  "Tarifs de dépannage et de remorquage Montpellier Dépannage. Prise en charge directe par les assurances et compagnies d'assistance.";
+
+const jsonLd = breadcrumbSchema([
+  { name: 'Accueil', url: '/' },
+  { name: 'Tarifs', url: '/tarifs/' },
+]);
+---
+
+<BaseLayout title={pageTitle} description={pageDescription} jsonLd={jsonLd}>
+  <TopNav />
+  <Breadcrumbs items={[{ name: 'Accueil', href: '/' }, { name: 'Tarifs' }]} />
+
+  <main id="main">
+    <PageHero
+      overline="Tarifs"
+      title="Des tarifs clairs, sans surprise."
+      lead="Devis transparent avant intervention, prise en charge directe par votre assurance ou assistance."
+    />
+
+    <ContentSection overline="Principes" titre="Comment fonctionne notre tarification.">
+      <Todo titre="Principes de tarification">
+        <p>
+          Expliquer les principes : forfaits de base, facteurs de prix (distance,
+          gabarit, horaire, autoroute), transparence du devis avant intervention.
+        </p>
+      </Todo>
+    </ContentSection>
+
+    <ContentSection overline="Prise en charge" titre="Assurance & assistance." alt>
+      <Todo titre="Prise en charge assurance / assistance">
+        <p>
+          Expliquer la prise en charge directe par les compagnies d'assistance,
+          l'absence d'avance de frais, le rôle de la carte verte.
+        </p>
+      </Todo>
+    </ContentSection>
+
+    <ContentSection overline="Grille" titre="Grille tarifaire indicative.">
+      <Todo titre="Grille tarifaire détaillée">
+        <p>
+          Tableau des tarifs indicatifs par prestation (remorquage VL, PL, autoroute,
+          transport longue distance). À valider avec la direction avant publication.
+        </p>
+      </Todo>
+    </ContentSection>
+  </main>
+
+  <Footer />
+</BaseLayout>

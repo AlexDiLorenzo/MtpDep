@@ -28,11 +28,13 @@ export const site = {
   url: 'https://montpellierdepannage.com',
 } as const;
 
+// Navigation principale — pages multi-pages (architecture SEO).
 export const nav = [
-  { label: 'Services', href: '#services' },
-  { label: 'Capacité', href: '#capacite' },
-  { label: 'Zones', href: '#zones' },
-  { label: 'Contact', href: '#contact' },
+  { label: 'Services', href: '/services/' },
+  { label: 'Agences', href: '/agences/' },
+  { label: 'Flotte', href: '/flotte/' },
+  { label: 'Tarifs', href: '/tarifs/' },
+  { label: 'Contact', href: '/contact/' },
 ] as const;
 
 // Photos locales fournies par le client (dossier public/img/).

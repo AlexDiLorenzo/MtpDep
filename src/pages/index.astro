@@ -8,9 +8,10 @@ import ServicesGrid from '../components/home/ServicesGrid.astro';
 import CoverageBand from '../components/home/CoverageBand.astro';
 import Certifications from '../components/home/Certifications.astro';
 import AssistanceCTA from '../components/home/AssistanceCTA.astro';
+import { organizationSchema } from '../lib/schema';
 ---
 
-<BaseLayout>
+<BaseLayout jsonLd={organizationSchema()}>
   <TopNav />
   <main id="main">
     <Hero />

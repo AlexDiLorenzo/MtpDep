@@ -1,0 +1,85 @@
+---
+// Fil d'Ariane visuel. Le schéma BreadcrumbList correspondant est
+// généré séparément via lib/schema.ts → breadcrumbSchema() et passé
+// à BaseLayout (jsonLd) par la page.
+
+interface Crumb {
+  name: string;
+  /** Chemin relatif. Omis pour l'élément courant (dernier). */
+  href?: string;
+}
+
+interface Props {
+  items: Crumb[];
+}
+
+const { items } = Astro.props;
+---
+
+<nav class="breadcrumbs" aria-label="Fil d'Ariane">
+  <div class="breadcrumbs-inner">
+    <ol>
+      {items.map((it, i) => {
+        const isLast = i === items.length - 1;
+        return (
+          <li class="breadcrumbs-item">
+            {it.href && !isLast ? (
+              <a href={it.href}>{it.name}</a>
+            ) : (
+              <span aria-current="page">{it.name}</span>
+            )}
+            {!isLast && <span class="breadcrumbs-sep" aria-hidden="true">/</span>}
+          </li>
+        );
+      })}
+    </ol>
+  </div>
+</nav>
+
+<style>
+  .breadcrumbs {
+    background: var(--color-bg-subtle);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .breadcrumbs-inner {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: 12px var(--pad-x-desktop);
+  }
+  .breadcrumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .breadcrumbs-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+  }
+  .breadcrumbs a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: color var(--dur-fast) var(--ease-standard);
+  }
+  .breadcrumbs a:hover { color: var(--color-primary); }
+  .breadcrumbs [aria-current='page'] {
+    color: var(--color-text);
+    font-weight: 700;
+  }
+  .breadcrumbs-sep {
+    color: var(--md-stone-300);
+    user-select: none;
+  }
+
+  @media (max-width: 1023px) {
+    .breadcrumbs-inner { padding: 10px var(--pad-x-tablet); }
+  }
+  @media (max-width: 767px) {
+    .breadcrumbs-inner { padding: 10px var(--pad-x-mobile); }
+  }
+</style>
