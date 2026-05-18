@@ -127,6 +127,22 @@ function parisYMD(d: Date): { year: number; month: number; day: number; iso_year
   return { year, month, day, iso_year: pd.getUTCFullYear(), iso_week };
 }
 
+// Nombre de semaines ISO dans une année (52 ou 53).
+function isoWeeksInYear(year: number): number {
+  const jan1 = new Date(Date.UTC(year, 0, 1)).getUTCDay();
+  const isLeap = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+  return jan1 === 4 || (isLeap && jan1 === 3) ? 53 : 52;
+}
+
+// Avance (ou recule) de `delta` semaines ISO en gérant le passage d'année.
+function addIsoWeeks(year: number, week: number, delta: number): { year: number; week: number } {
+  let y = year;
+  let w = week + delta;
+  while (w > isoWeeksInYear(y)) { w -= isoWeeksInYear(y); y += 1; }
+  while (w < 1) { y -= 1; w += isoWeeksInYear(y); }
+  return { year: y, week: w };
+}
+
 // ── Devis (D1) ────────────────────────────────────────────────
 async function computeDevis(env: Env, now: number) {
   const today = startOfDayParis(now);
@@ -286,10 +302,16 @@ function computeTimesheetStatus(dt: DTSnapshot, paris: ReturnType<typeof parisYM
 
 // ── Plannings ────────────────────────────────────────────────
 function computePlanningStatus(dt: DTSnapshot, paris: ReturnType<typeof parisYMD>, now: number) {
-  // Cible : envelope dont start_week === current_iso_week (couvre N et N+1)
-  const targetYear = paris.iso_year;
-  const targetWeek = paris.iso_week;
-  const periodLabel = `S${targetWeek} + S${targetWeek + 1}`;
+  // Les plannings sont envoyés par blocs de 2 semaines ISO, ancrés sur les
+  // semaines paires (S20+S21, S22+S23, …). On suit toujours le PROCHAIN bloc :
+  // pendant le bloc calendaire courant, c'est celui-là qu'on prépare et fait
+  // signer. La cible avance donc par pas de 2 semaines, jamais d'une seule.
+  const blockStart = paris.iso_week - (paris.iso_week % 2); // semaine paire du bloc courant
+  const target = addIsoWeeks(paris.iso_year, blockStart, 2); // bloc suivant
+  const targetYear = target.year;
+  const targetWeek = target.week;
+  const secondWeek = addIsoWeeks(targetYear, targetWeek, 1).week;
+  const periodLabel = `S${targetWeek} + S${secondWeek}`;
 
   const totalEmployees = dt.sites.reduce((s, x) => s + x.employee_count, 0);
 
@@ -326,7 +348,7 @@ function computePlanningStatus(dt: DTSnapshot, paris: ReturnType<typeof parisYMD
   if (!sent) {
     status = 'red';
     label = 'Non envoyé';
-    sub = `Plannings S${targetWeek} et S${targetWeek + 1} attendus`;
+    sub = `Plannings S${targetWeek} et S${secondWeek} attendus`;
   } else {
     const sig = signaturStatus(signedPct ?? 0, daysSinceSent);
     status = sig.status;
