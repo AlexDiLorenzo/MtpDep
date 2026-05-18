@@ -255,6 +255,7 @@ export const agences: Agence[] = [
   },
   {
     slug: 'villetelle',
+    reviewUrl: 'https://maps.app.goo.gl/u1ej8ZCsX9ZBcPGs5',
     societe: 'VILLETELLE DÉPANNAGE',
     nomCourt: 'Villetelle',
     adresse: { rue: '154 Impasse du Campaillou', codePostal: '34400', ville: 'Villetelle' },
