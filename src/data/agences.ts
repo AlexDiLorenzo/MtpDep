@@ -304,7 +304,7 @@ export const agences: Agence[] = [
     adresse: { rue: '11 Rue du Four à Chaux', codePostal: '34680', ville: "Saint-Georges-d'Orques" },
     departement: 'Hérault',
     phones: [tel('04 67 42 14 31')],
-    carte: { x: 513.0, y: 398.0 },
+    carte: { x: 527.0, y: 393.5 },
     geo: { lat: 43.628716, lng: 3.767828 },
     contenu: {
       intro: [
@@ -381,7 +381,7 @@ export const agences: Agence[] = [
     adresse: { rue: 'Lieu-dit Les Jasses', codePostal: '34430', ville: 'Saint-Jean-de-Védas' },
     departement: 'Hérault',
     phones: [tel('04 67 42 14 31')],
-    carte: { x: 531.0, y: 421.0 },
+    carte: { x: 540.5, y: 410.1 },
     // TODO Phase 2 : géocodage précis du lieu-dit Les Jasses.
     // Valeur actuelle = centre-ville de St-Jean-de-Védas (approximatif).
     geo: { lat: 43.575179, lng: 3.82642 },
