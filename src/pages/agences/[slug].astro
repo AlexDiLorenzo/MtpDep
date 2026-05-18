@@ -151,18 +151,45 @@ const mapsHref = agence.geo
               Itinéraire &amp; plan d'accès
               <span aria-hidden="true">↗</span>
             </a>
+            {agence.reviewUrl && (
+              <a
+                href={agence.reviewUrl}
+                class="ag-card-maps ag-card-reviews"
+                target="_blank"
+                rel="noopener"
+              >
+                Voir &amp; laisser un avis Google
+                <span aria-hidden="true">↗</span>
+              </a>
+            )}
           </div>
 
           <div class="ag-access">
             <div class="ag-prose">
               <p>{agence.contenu.acces}</p>
             </div>
-            <Todo titre={`Photo de l'agence — ${agence.nomCourt}`}>
-              <p>
-                Photo réelle de l'agence de {adresse.ville} (façade / atelier / plateaux).
-                Pour l'instant : visuel générique de la flotte.
-              </p>
-            </Todo>
+            {agence.contenu.images.length > 0 ? (
+              <div class="ag-photos">
+                {agence.contenu.images.map((img) => (
+                  <img
+                    src={img.src}
+                    width={img.width}
+                    height={img.height}
+                    alt={`${agence.societe} — ${adresse.ville}`}
+                    class="ag-photo"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ))}
+              </div>
+            ) : (
+              <Todo titre={`Photo de l'agence — ${agence.nomCourt}`}>
+                <p>
+                  Photo réelle de l'agence de {adresse.ville} (façade / atelier / plateaux).
+                  Pour l'instant : visuel générique de la flotte.
+                </p>
+              </Todo>
+            )}
           </div>
         </div>
       </div>
@@ -434,7 +461,16 @@ const mapsHref = agence.geo
     text-decoration: none;
   }
   .ag-card-maps:hover { text-decoration: underline; }
+  .ag-card-reviews { display: flex; margin-top: 10px; }
   .ag-access { display: flex; flex-direction: column; gap: 14px; }
+  .ag-photos { display: flex; flex-direction: column; gap: 14px; }
+  .ag-photo {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-2xl);
+    border: 1px solid var(--color-border);
+  }
 
   /* ============ SERVICES ============ */
   .ag-services {

@@ -9,9 +9,11 @@
 // pas de page agence dédiée (cf. brief refonte SEO).
 //
 // Le bloc `contenu` porte le rédactionnel local de chaque page
-// agence (intro, accès, prestations, communes). Il doit rester
-// UNIQUE par agence — pas de duplicate content entre agences.
+// agence (intro, accès, prestations, communes, photos). Il doit
+// rester UNIQUE par agence — pas de duplicate content entre agences.
 // ============================================================
+
+import { photos } from '../config/site';
 
 export type AgencePhone = {
   /** Numéro formaté pour l'affichage, ex. « 04 67 71 07 20 ». */
@@ -30,6 +32,14 @@ export type AgenceService = {
   description: string;
 };
 
+/** Une photo réelle de l'agence (dimensions = anti-CLS au rendu). */
+export type AgenceImage = {
+  /** Chemin servi — toujours une clé de `photos` (config/site.ts). */
+  src: string;
+  width: number;
+  height: number;
+};
+
 /** Rédactionnel local d'une page agence — unique par agence. */
 export type AgenceContenu = {
   /** Paragraphes de présentation (section « L'agence de … »). */
@@ -40,6 +50,8 @@ export type AgenceContenu = {
   services: AgenceService[];
   /** Communes desservies — maillage SEO de proximité. */
   communes: string[];
+  /** Photos réelles de l'agence — vide si non fournies par le client. */
+  images: AgenceImage[];
 };
 
 export type Agence = {
@@ -64,6 +76,8 @@ export type Agence = {
   geo: { lat: number; lng: number } | null;
   /** Rédactionnel local de la page agence. */
   contenu: AgenceContenu;
+  /** Lien Google pour consulter / laisser un avis — absent si non fourni. */
+  reviewUrl?: string;
   /** Site principal du réseau (Montpellier Garosud). */
   principal?: boolean;
 };
@@ -89,7 +103,7 @@ export const agences: Agence[] = [
     contenu: {
       intro: [
         "Installée dans la ZAC de Garosud, au sud de Montpellier, notre agence est le siège historique du réseau Montpellier Dépannage. Depuis 1956, nos équipes interviennent jour et nuit sur l'ensemble de l'agglomération, du cœur de ville aux grands axes qui la traversent.",
-        "C'est ici que sont basés notre atelier mécanique, notre parc de plateaux pour véhicules légers et poids lourds, ainsi que notre flotte électrique dédiée aux zones piétonnes. Cette concentration de moyens nous permet de couvrir tous les types d'intervention sans délai de mobilisation, 24 h/24 et 7 j/7.",
+        "C'est ici que sont basés notre atelier mécanique, notre parc de plateaux pour véhicules légers et poids lourds, ainsi que notre flotte électrique dédiée aux zones piétonnes. Cette concentration de moyens nous permet de couvrir tous les types d'intervention sans délai de mobilisation, 24 h/24 et 7 j/7.",
       ],
       acces: "L'agence se situe avenue de Maurin, dans la ZAC de Garosud, à proximité immédiate de l'A709 et de la sortie Montpellier-Sud. L'accès poids lourds est aisé et un parking sécurisé permet le dépôt des véhicules en attente d'expertise ou de réparation.",
       services: [
@@ -111,11 +125,11 @@ export const agences: Agence[] = [
         },
         {
           nom: 'Centre-ville & zones piétonnes',
-          description: "Flotte électrique zéro émission, véhicule compact et scooters pour intervenir dans le cœur historique : Comédie, Antigone, Peyrou.",
+          description: "Flotte électrique zéro émission, véhicule compact et scooters pour intervenir dans le cœur historique : Comédie, Antigone, Peyrou.",
         },
         {
           nom: 'Mécanique, GPL & climatisation',
-          description: "Atelier intégré : entretien courant, installation de systèmes GPL et révision de la climatisation.",
+          description: "Atelier intégré : entretien courant, installation de systèmes GPL et révision de la climatisation.",
         },
       ],
       communes: [
@@ -123,6 +137,7 @@ export const agences: Agence[] = [
         'Juvignac', 'Lavérune', 'Saint-Jean-de-Védas', 'Grabels', 'Clapiers',
         'Jacou', 'Vendargues', 'Mauguio', 'Pignan', 'Saint-Clément-de-Rivière',
       ],
+      images: [],
     },
   },
   {
@@ -140,13 +155,13 @@ export const agences: Agence[] = [
     contenu: {
       intro: [
         "L'agence de Pérols dessert la frange littorale de l'agglomération montpelliéraine, entre les étangs et les stations balnéaires. Idéalement placée entre Montpellier et l'aéroport, elle répond aux pannes et accidents sur un secteur à forte circulation tout au long de l'année.",
-        "Notre site de Pérols dispose d'un atelier mécanique et d'une importante capacité poids lourds : on y traite aussi bien l'entretien et la réparation que le remorquage de véhicules légers et de gros porteurs. Une astreinte permanente garantit une intervention à toute heure, 24 h/24 et 7 j/7.",
+        "Notre site de Pérols dispose d'un atelier mécanique et d'une importante capacité poids lourds : on y traite aussi bien l'entretien et la réparation que le remorquage de véhicules légers et de gros porteurs. Une astreinte permanente garantit une intervention à toute heure, 24 h/24 et 7 j/7.",
       ],
       acces: "L'agence est rue Louis-Lépine, dans la zone d'activités de Pérols, à quelques minutes de l'aéroport Montpellier-Méditerranée et des grands axes du littoral. Un stationnement dédié accueille les véhicules légers comme les poids lourds.",
       services: [
         {
           nom: 'Mécanique, GPL & climatisation',
-          description: "Atelier équipé : entretien, réparation, pose de systèmes GPL et révision de la climatisation.",
+          description: "Atelier équipé : entretien, réparation, pose de systèmes GPL et révision de la climatisation.",
         },
         {
           nom: 'Remorquage poids lourds',
@@ -160,6 +175,9 @@ export const agences: Agence[] = [
       communes: [
         'Pérols', 'Lattes', 'Mauguio', 'Carnon', 'La Grande-Motte',
         'Palavas-les-Flots', 'Montpellier', 'Candillargues', 'Mudaison', 'Saint-Aunès',
+      ],
+      images: [
+        { src: photos.agencePerols, width: 1360, height: 800 },
       ],
     },
   },
@@ -175,7 +193,7 @@ export const agences: Agence[] = [
     contenu: {
       intro: [
         "Implantée à Laroque, dans la vallée de l'Hérault, notre agence couvre un secteur rural et vallonné où la rapidité d'intervention fait toute la différence. Elle assure le dépannage de proximité autour de Ganges, de Saint-Bauzille-de-Putois et des communes situées aux portes des Cévennes.",
-        "Spécialisée dans le dépannage de véhicules légers et d'utilitaires, l'agence de Laroque connaît parfaitement les routes sinueuses et étroites de la vallée. Nos équipes interviennent 24 h/24 sur panne, accident ou véhicule immobilisé.",
+        "Spécialisée dans le dépannage de véhicules légers et d'utilitaires, l'agence de Laroque connaît parfaitement les routes sinueuses et étroites de la vallée. Nos équipes interviennent 24 h/24 sur panne, accident ou véhicule immobilisé.",
       ],
       acces: "L'agence se trouve avenue de l'Europe, à l'entrée de Laroque, le long de l'axe Ganges – Saint-Martin-de-Londres (RD986). L'accès est direct et une zone de dépôt accueille les véhicules en attente.",
       services: [
@@ -193,6 +211,7 @@ export const agences: Agence[] = [
         'Moulès-et-Baucels', 'Brissac', 'Agonès', 'Montoulieu',
         'Saint-Jean-de-Buèges', 'Causse-de-la-Selle',
       ],
+      images: [],
     },
   },
   {
@@ -207,7 +226,7 @@ export const agences: Agence[] = [
     contenu: {
       intro: [
         "Seule agence du réseau implantée dans le Gard, Fournès dessert le Gard rhodanien et la basse vallée du Rhône. Sa position, entre Nîmes, Avignon et le pont du Gard, en fait un point d'appui stratégique pour les interventions sur les grands axes de la région.",
-        "L'agence de Fournès traite aussi bien le remorquage de véhicules légers que celui des poids lourds, et intervient sur autoroute auprès des automobilistes comme des transporteurs. Une astreinte est assurée en permanence, 24 h/24 et 7 j/7.",
+        "L'agence de Fournès traite aussi bien le remorquage de véhicules légers que celui des poids lourds, et intervient sur autoroute auprès des automobilistes comme des transporteurs. Une astreinte est assurée en permanence, 24 h/24 et 7 j/7.",
       ],
       acces: "L'agence est située au lieu-dit de la Pale, à Fournès, à proximité de Remoulins et des accès autoroutiers du Gard rhodanien. Une vaste zone de dépôt accueille les véhicules légers et les poids lourds.",
       services: [
@@ -228,6 +247,7 @@ export const agences: Agence[] = [
         'Fournès', 'Remoulins', 'Vers-Pont-du-Gard', 'Castillon-du-Gard',
         'Estézargues', 'Théziers', 'Domazan', 'Saze', 'Meynes', 'Valliguières',
       ],
+      images: [],
     },
   },
   {
@@ -264,6 +284,10 @@ export const agences: Agence[] = [
         'Saturargues', 'Saint-Sériès', 'Boisseron', 'Gallargues-le-Montueux',
         'Aigues-Vives', 'Sommières',
       ],
+      images: [
+        { src: photos.agenceVilletelle, width: 1021, height: 1020 },
+        { src: photos.agenceVilletelleDepanneuse, width: 1360, height: 1020 },
+      ],
     },
   },
   {
@@ -278,7 +302,7 @@ export const agences: Agence[] = [
     contenu: {
       intro: [
         "À l'ouest de Montpellier, l'agence de Saint-Georges-d'Orques couvre le secteur viticole qui s'étend entre la ville et les premiers reliefs. Elle assure une présence rapide sur les communes résidentielles de l'ouest montpelliérain et leurs axes de liaison.",
-        "L'agence intervient sur autoroute, notamment vers l'A75, ainsi que sur le remorquage de véhicules légers et de poids lourds. Une astreinte permanente garantit une prise en charge à toute heure, 7 j/7.",
+        "L'agence intervient sur autoroute, notamment vers l'A75, ainsi que sur le remorquage de véhicules légers et de poids lourds. Une astreinte permanente garantit une prise en charge à toute heure, 7 j/7.",
       ],
       acces: "L'agence est rue du Four à Chaux, à Saint-Georges-d'Orques, à proximité de la RD5 et des accès vers l'A750 et l'A75. Une zone de dépôt sécurisée accueille les véhicules pris en charge.",
       services: [
@@ -300,6 +324,7 @@ export const agences: Agence[] = [
         'Murviel-lès-Montpellier', 'Saint-Paul-et-Valmalle', 'Montarnaud',
         'Grabels', 'Cournonterral', 'Cournonsec', 'Fabrègues',
       ],
+      images: [],
     },
   },
   {
@@ -316,7 +341,7 @@ export const agences: Agence[] = [
     contenu: {
       intro: [
         "Au cœur du Clermontais, l'agence de Clermont-l'Hérault dessert un vaste bassin rural organisé autour du lac du Salagou et de la vallée de l'Hérault. Sa position sur l'A75 en fait un relais essentiel pour les automobilistes et les transporteurs qui empruntent cet axe nord-sud.",
-        "L'agence assure le remorquage de véhicules légers et de poids lourds, ainsi que le dépannage sur autoroute. Nos équipes connaissent parfaitement le secteur, ses petites communes et ses routes de causse, et interviennent 24 h/24.",
+        "L'agence assure le remorquage de véhicules légers et de poids lourds, ainsi que le dépannage sur autoroute. Nos équipes connaissent parfaitement le secteur, ses petites communes et ses routes de causse, et interviennent 24 h/24.",
       ],
       acces: "L'agence se trouve dans la ZAC de la Salamane à Clermont-l'Hérault, à proximité immédiate de l'A75 et de ses sorties Clermont-l'Hérault. L'accès poids lourds est aisé et une zone de dépôt accueille les véhicules en attente.",
       services: [
@@ -338,6 +363,7 @@ export const agences: Agence[] = [
         'Brignac', 'Ceyras', 'Saint-Félix-de-Lodez', 'Villeneuvette',
         'Mourèze', 'Cabrières', 'Lacoste',
       ],
+      images: [],
     },
   },
   {
@@ -354,13 +380,13 @@ export const agences: Agence[] = [
     contenu: {
       intro: [
         "Implantée aux portes sud-ouest de Montpellier, l'agence de Saint-Jean-de-Védas est dédiée au dépannage autoroutier. Elle veille en priorité sur l'A9 et l'A709, deux des axes les plus circulés du littoral méditerranéen.",
-        "Positionnée pour intervenir au plus vite sur le réseau autoroutier, l'agence prend également en charge le remorquage de véhicules légers et de poids lourds sur le secteur. Une présence permanente est assurée, 24 h/24 et 7 j/7.",
+        "Positionnée pour intervenir au plus vite sur le réseau autoroutier, l'agence prend également en charge le remorquage de véhicules légers et de poids lourds sur le secteur. Une présence permanente est assurée, 24 h/24 et 7 j/7.",
       ],
       acces: "L'agence est située au lieu-dit Les Jasses à Saint-Jean-de-Védas, à proximité immédiate de l'A9, de l'A709 et de la sortie Saint-Jean-de-Védas. L'accès direct au réseau autoroutier permet une mobilisation rapide.",
       services: [
         {
           nom: 'Dépannage autoroute A9',
-          description: "Cœur de métier de l'agence : intervention rapide sur l'A9 et l'A709, en lien avec les concessionnaires autoroutiers et les services de sécurité.",
+          description: "Cœur de métier de l'agence : intervention rapide sur l'A9 et l'A709, en lien avec les concessionnaires autoroutiers et les services de sécurité.",
         },
         {
           nom: 'Remorquage VL',
@@ -376,6 +402,7 @@ export const agences: Agence[] = [
         'Cournonsec', 'Cournonterral', 'Pignan', 'Villeneuve-lès-Maguelone',
         'Lattes', 'Montpellier',
       ],
+      images: [],
     },
   },
 ];

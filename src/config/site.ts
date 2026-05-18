@@ -48,5 +48,10 @@ export const photos = {
   interventionA9: '/img/intervention-a9.jpg',     // Autoroute A9
   plRecuperation: '/img/pl-recuperation.jpg',     // Poids lourd dans le fossé
   plRenversement: '/img/pl-renversement.jpg',     // PL renversé
+
+  // Photos d'agences (fournies par le client, optimisées en JPEG)
+  agencePerols: '/img/agence-perols.jpg',                       // Site de Pérols
+  agenceVilletelle: '/img/agence-villetelle.jpg',               // Site de Villetelle
+  agenceVilletelleDepanneuse: '/img/agence-villetelle-depanneuse.jpg', // Dépanneuse à Villetelle
 } as const;
 
