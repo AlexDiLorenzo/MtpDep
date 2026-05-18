@@ -304,7 +304,7 @@ export const agences: Agence[] = [
     adresse: { rue: '11 Rue du Four à Chaux', codePostal: '34680', ville: "Saint-Georges-d'Orques" },
     departement: 'Hérault',
     phones: [tel('04 67 42 14 31')],
-    carte: { x: 527.0, y: 393.5 },
+    carte: { x: 521.0, y: 399.5 },
     geo: { lat: 43.628716, lng: 3.767828 },
     contenu: {
       intro: [

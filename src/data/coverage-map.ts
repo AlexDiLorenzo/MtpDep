@@ -31,7 +31,7 @@ export type MapLabel = {
 export const mapLabels: Record<string, MapLabel> = {
   'montpellier-garosud': { name: 'Montpellier', lx: 556, ly: 446, anchor: 'middle' },
   'clermont-l-herault': { name: "Clermont l'Hérault", lx: 395, ly: 386, anchor: 'end' },
-  'saint-georges-d-orques': { name: "St-Georges d'Orques", lx: 522, ly: 397, anchor: 'end' },
+  'saint-georges-d-orques': { name: "St-Georges d'Orques", lx: 516, ly: 403, anchor: 'end' },
   'saint-jean-de-vedas-a9': {
     name: 'St-Jean de Védas',
     lx: 470,
