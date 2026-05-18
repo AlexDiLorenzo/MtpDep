@@ -12,7 +12,6 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import Todo from '../../components/Todo.astro';
 import { photos } from '../../config/site';
 import { agences, type Agence } from '../../data/agences';
-import { services } from '../../data/services';
 import { automotiveBusinessSchema, breadcrumbSchema, agenceUrl } from '../../lib/schema';
 
 export function getStaticPaths() {
@@ -110,17 +109,9 @@ const mapsHref = agence.geo
       <div class="ag-inner">
         <div class="ag-overline">L'agence de {agence.nomCourt}</div>
         <h2 class="ag-h2">Une présence locale, jour et nuit.</h2>
-        <Todo titre={`Intro locale — ${agence.nomCourt}`}>
-          <p>
-            2 à 3 paragraphes <strong>uniques</strong> présentant l'agence de
-            {' '}{adresse.ville} : histoire, ancrage local, équipe, spécificités du
-            secteur. Contenu différencié obligatoire (ne pas dupliquer entre agences).
-          </p>
-          <p>
-            Mentionner les axes routiers et communes proches, les délais d'intervention
-            typiques, et tout point distinctif de cette agence.
-          </p>
-        </Todo>
+        <div class="ag-prose">
+          {agence.contenu.intro.map((p) => <p>{p}</p>)}
+        </div>
       </div>
     </section>
 
@@ -163,12 +154,9 @@ const mapsHref = agence.geo
           </div>
 
           <div class="ag-access">
-            <Todo titre={`Accès & stationnement — ${agence.nomCourt}`}>
-              <p>
-                Description de l'accès à l'agence : axes routiers, sortie d'autoroute,
-                repères visuels, stationnement, zone de dépôt des véhicules.
-              </p>
-            </Todo>
+            <div class="ag-prose">
+              <p>{agence.contenu.acces}</p>
+            </div>
             <Todo titre={`Photo de l'agence — ${agence.nomCourt}`}>
               <p>
                 Photo réelle de l'agence de {adresse.ville} (façade / atelier / plateaux).
@@ -187,26 +175,16 @@ const mapsHref = agence.geo
         <h2 class="ag-h2">Services disponibles à {adresse.ville}.</h2>
 
         <ul class="ag-services">
-          {services.map((s) => (
-            <li>
-              <a href={`/services/${s.slug}/`} class="ag-service">
-                <span class="ag-service-tag mono">{s.tag}</span>
-                <span class="ag-service-body">
-                  <span class="ag-service-name">{s.nom}</span>
-                  <span class="ag-service-desc">{s.resume}</span>
-                </span>
-                <span class="ag-service-arrow" aria-hidden="true">→</span>
-              </a>
+          {agence.contenu.services.map((s, i) => (
+            <li class="ag-service">
+              <span class="ag-service-tag mono">{String(i + 1).padStart(2, '0')}</span>
+              <span class="ag-service-body">
+                <span class="ag-service-name">{s.nom}</span>
+                <span class="ag-service-desc">{s.description}</span>
+              </span>
             </li>
           ))}
         </ul>
-
-        <Todo titre={`Spécificités services — ${agence.nomCourt}`}>
-          <p>
-            Préciser, si pertinent, les services particulièrement adaptés au secteur
-            de {adresse.ville} (ex. présence A9, poids lourds, véhicules de luxe…).
-          </p>
-        </Todo>
       </div>
     </section>
 
@@ -215,27 +193,13 @@ const mapsHref = agence.geo
       <div class="ag-inner">
         <div class="ag-overline">Zone d'intervention</div>
         <h2 class="ag-h2">Communes desservies depuis {adresse.ville}.</h2>
-        <Todo titre={`Communes & rayon d'intervention — ${agence.nomCourt}`}>
-          <p>
-            Lister les communes et axes couverts par l'agence de {adresse.ville}
-            (maillage SEO local). Idéalement 8 à 15 communes proches, chacune
-            renforçant le référencement de proximité.
-          </p>
-        </Todo>
-      </div>
-    </section>
-
-    {/* ============ FAQ ============ */}
-    <section class="ag-section">
-      <div class="ag-inner">
-        <div class="ag-overline">Questions fréquentes</div>
-        <h2 class="ag-h2">FAQ — dépannage à {adresse.ville}.</h2>
-        <Todo titre={`FAQ locale — ${agence.nomCourt}`}>
-          <p>
-            4 à 6 questions/réponses propres à {adresse.ville}. À baliser ensuite en
-            JSON-LD <code>FAQPage</code> (Phase 2). Questions distinctes par agence.
-          </p>
-        </Todo>
+        <p class="ag-zone-lead">
+          Nos équipes interviennent à {adresse.ville} et dans les communes
+          environnantes, 24&nbsp;h/24 et 7&nbsp;j/7&nbsp;:
+        </p>
+        <ul class="ag-communes">
+          {agence.contenu.communes.map((c) => <li>{c}</li>)}
+        </ul>
       </div>
     </section>
 
@@ -481,24 +445,16 @@ const mapsHref = agence.geo
     grid-template-columns: 1fr 1fr;
     gap: 12px;
   }
+  /* Prestations : cartes informatives, non cliquables. */
   .ag-service {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 14px;
     padding: 16px 18px;
     background: var(--color-bg);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-xl);
-    text-decoration: none;
     box-shadow: var(--shadow-xs);
-    transition: transform var(--dur-base) var(--ease-standard),
-                box-shadow var(--dur-base) var(--ease-standard),
-                border-color var(--dur-base) var(--ease-standard);
-  }
-  .ag-service:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-    border-color: var(--md-forest-200);
   }
   .ag-service-tag {
     flex-shrink: 0;
@@ -520,13 +476,40 @@ const mapsHref = agence.geo
     line-height: 1.45;
     color: var(--color-text-muted);
   }
-  .ag-service-arrow {
-    flex-shrink: 0;
-    color: var(--color-primary);
-    font-weight: 700;
-    transition: transform var(--dur-base) var(--ease-standard);
+
+  /* ============ RÉDACTIONNEL & COMMUNES ============ */
+  .ag-prose p {
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--color-text-muted);
+    margin: 0 0 16px;
+    max-width: 70ch;
   }
-  .ag-service:hover .ag-service-arrow { transform: translateX(3px); }
+  .ag-prose p:last-child { margin-bottom: 0; }
+  .ag-zone-lead {
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--color-text-muted);
+    margin: 0 0 20px;
+    max-width: 70ch;
+  }
+  .ag-communes {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .ag-communes li {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    padding: 8px 14px;
+  }
 
   /* ============ CTA ============ */
   .ag-cta {
@@ -588,6 +571,6 @@ const mapsHref = agence.geo
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .ag-phone, .ag-service, .ag-cta-phone, .ag-service-arrow { transition: none; }
+    .ag-phone, .ag-cta-phone { transition: none; }
   }
 </style>
