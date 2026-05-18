@@ -92,6 +92,7 @@ const tel = (display: string, label?: string): AgencePhone => ({
 export const agences: Agence[] = [
   {
     slug: 'montpellier-garosud',
+    reviewUrl: 'https://maps.app.goo.gl/bsSnb6yBAg5UhT7r5',
     societe: 'MONTPELLIER DÉPANNAGE',
     nomCourt: 'Montpellier Garosud',
     adresse: { rue: '2501 Av de Maurin, ZAC Garosud', codePostal: '34070', ville: 'Montpellier' },
@@ -142,6 +143,7 @@ export const agences: Agence[] = [
   },
   {
     slug: 'perols',
+    reviewUrl: 'https://maps.app.goo.gl/eWBoGdKXRKibPzw97',
     societe: 'PÉROLS DÉPANNAGE',
     nomCourt: 'Pérols',
     adresse: { rue: 'Rue Louis Lépine', codePostal: '34470', ville: 'Pérols' },
@@ -183,6 +185,7 @@ export const agences: Agence[] = [
   },
   {
     slug: 'laroque',
+    reviewUrl: 'https://maps.app.goo.gl/EVbEdJxcWhGxLzkVA',
     societe: 'MONTPELLIER DÉPANNAGE LAROQUE',
     nomCourt: 'Laroque',
     adresse: { rue: "620 Avenue de l'Europe", codePostal: '34190', ville: 'Laroque' },
@@ -292,6 +295,7 @@ export const agences: Agence[] = [
   },
   {
     slug: 'saint-georges-d-orques',
+    reviewUrl: 'https://maps.app.goo.gl/ad3AQ6zaARWygKKH8',
     societe: "ST GEORGES D'ORQUES DÉPANNAGE",
     nomCourt: "St-Georges-d'Orques",
     adresse: { rue: '11 Rue du Four à Chaux', codePostal: '34680', ville: "Saint-Georges-d'Orques" },
@@ -329,6 +333,7 @@ export const agences: Agence[] = [
   },
   {
     slug: 'clermont-l-herault',
+    reviewUrl: 'https://maps.app.goo.gl/BZWjviTi3J5TpmF69',
     societe: "CLERMONT L'HÉRAULT DÉPANNAGE",
     nomCourt: "Clermont-l'Hérault",
     adresse: { rue: '1790 ZAC de la Salamane', codePostal: '34800', ville: "Clermont-l'Hérault" },
