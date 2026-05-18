@@ -5,7 +5,6 @@ import Footer from '../components/Footer.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import PageHero from '../components/PageHero.astro';
 import ContentSection from '../components/ContentSection.astro';
-import Todo from '../components/Todo.astro';
 import { breadcrumbSchema } from '../lib/schema';
 
 const pageTitle = 'Conditions générales de vente · Montpellier Dépannage';
@@ -26,15 +25,6 @@ const jsonLd = breadcrumbSchema([
     <PageHero overline="Conditions générales" title="Conditions générales de vente." />
 
     <ContentSection titre="Prestations, tarifs & responsabilités.">
-      <Todo titre="Contenu juridique des CGV">
-        <p>
-          À rédiger : objet et champ d'application, description des prestations,
-          modalités de commande et d'intervention, tarifs et facturation, modalités
-          de paiement, prise en charge par les assurances, responsabilités et
-          assurances, réclamations, droit applicable et juridiction compétente.
-        </p>
-        <p>Contenu à valider par la direction / un conseil juridique avant publication.</p>
-      </Todo>
     </ContentSection>
   </main>
 

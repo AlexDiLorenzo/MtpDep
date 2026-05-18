@@ -1,12 +1,11 @@
 ---
 // Template paramétré des 6 pages services : /services/{slug}/
-// Structure uniforme, contenu rédactionnel en <Todo> (Phase 2).
+// Structure uniforme.
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import TopNav from '../../components/TopNav.astro';
 import Footer from '../../components/Footer.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
-import Todo from '../../components/Todo.astro';
 import { photos } from '../../config/site';
 import { services, type Service } from '../../data/services';
 import { serviceSchema, breadcrumbSchema, serviceUrl } from '../../lib/schema';
@@ -73,13 +72,6 @@ const autresServices = services.filter((s) => s.slug !== service.slug);
       <div class="sv-inner">
         <div class="sv-overline">Le service</div>
         <h2 class="sv-h2">{service.nom} avec Montpellier Dépannage.</h2>
-        <Todo titre={`Présentation détaillée — ${service.nom}`}>
-          <p>
-            Contenu rédactionnel décrivant le service « {service.titre} » : en quoi il
-            consiste, pour quels véhicules et situations, le matériel mobilisé, les
-            garanties. Texte unique (pas de duplication entre pages services).
-          </p>
-        </Todo>
       </div>
     </section>
 
@@ -88,13 +80,6 @@ const autresServices = services.filter((s) => s.slug !== service.slug);
       <div class="sv-inner">
         <div class="sv-overline">Comment ça se passe</div>
         <h2 class="sv-h2">Le déroulé de l’intervention.</h2>
-        <Todo titre={`Étapes de l'intervention — ${service.nom}`}>
-          <p>
-            Décrire le déroulé pas à pas : prise d’appel, délai, arrivée du dépanneur,
-            prise en charge, destination du véhicule. À baliser ensuite en JSON-LD
-            <code>HowTo</code> si pertinent (Phase 2).
-          </p>
-        </Todo>
       </div>
     </section>
 
@@ -110,20 +95,6 @@ const autresServices = services.filter((s) => s.slug !== service.slug);
         <a href="/agences/" class="sv-link">
           Voir les 8&nbsp;agences <span aria-hidden="true">→</span>
         </a>
-      </div>
-    </section>
-
-    {/* ====== FAQ ====== */}
-    <section class="sv-section sv-section--alt">
-      <div class="sv-inner">
-        <div class="sv-overline">Questions fréquentes</div>
-        <h2 class="sv-h2">FAQ — {service.nom}.</h2>
-        <Todo titre={`FAQ — ${service.nom}`}>
-          <p>
-            4 à 6 questions/réponses propres à ce service. À baliser en JSON-LD
-            <code>FAQPage</code> (Phase 2).
-          </p>
-        </Todo>
       </div>
     </section>
 

@@ -5,7 +5,6 @@ import Footer from '../components/Footer.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import PageHero from '../components/PageHero.astro';
 import ContentSection from '../components/ContentSection.astro';
-import Todo from '../components/Todo.astro';
 import { breadcrumbSchema } from '../lib/schema';
 
 const pageTitle = 'Mentions légales · Montpellier Dépannage';
@@ -26,15 +25,6 @@ const jsonLd = breadcrumbSchema([
     <PageHero overline="Informations légales" title="Mentions légales." />
 
     <ContentSection titre="Éditeur, hébergeur & données personnelles.">
-      <Todo titre="Contenu juridique des mentions légales">
-        <p>
-          À rédiger avec les informations légales exactes : raison sociale, forme
-          juridique, capital, SIREN/SIRET, RCS, TVA intracommunautaire, adresse du
-          siège, directeur de la publication, hébergeur, propriété intellectuelle,
-          traitement des données personnelles (RGPD) et cookies.
-        </p>
-        <p>Contenu à valider par la direction / un conseil juridique avant publication.</p>
-      </Todo>
     </ContentSection>
   </main>
 

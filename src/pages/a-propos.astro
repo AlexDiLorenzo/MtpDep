@@ -5,7 +5,6 @@ import Footer from '../components/Footer.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import PageHero from '../components/PageHero.astro';
 import ContentSection from '../components/ContentSection.astro';
-import Todo from '../components/Todo.astro';
 import { organizationSchema, breadcrumbSchema } from '../lib/schema';
 
 const pageTitle = 'À propos · Montpellier Dépannage — entreprise familiale depuis 1956';
@@ -33,21 +32,9 @@ const jsonLd = [
     />
 
     <ContentSection overline="Notre histoire" titre="Plus de 65 ans sur la route.">
-      <Todo titre="Histoire de l'entreprise">
-        <p>
-          Récit de la création en 1956, de la transmission familiale, des grandes
-          étapes (ouverture des agences, agréments autoroute, certifications).
-        </p>
-      </Todo>
     </ContentSection>
 
     <ContentSection overline="Nos valeurs" titre="Ce qui nous engage." alt>
-      <Todo titre="Valeurs & engagements">
-        <p>
-          Présentation des valeurs : proximité, réactivité, qualité de service,
-          respect du client et des véhicules, sécurité des équipes.
-        </p>
-      </Todo>
     </ContentSection>
 
     <ContentSection overline="Le réseau" titre="8 agences, 40 dépanneurs.">
@@ -56,12 +43,6 @@ const jsonLd = [
         l'Hérault et le Gard, avec une présence permanente sur l'autoroute&nbsp;A9.
         <a href="/agences/">Découvrir les agences →</a>
       </p>
-      <Todo titre="Chiffres clés & présentation des équipes">
-        <p>
-          Détailler l'organisation, les effectifs, la flotte, les formations des
-          dépanneurs. Photos d'équipe à intégrer.
-        </p>
-      </Todo>
     </ContentSection>
   </main>
 

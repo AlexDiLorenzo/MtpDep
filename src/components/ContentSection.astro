@@ -1,7 +1,6 @@
 ---
 // Section de contenu réutilisée par les pages institutionnelles.
-// Fournit l'ossature (overline + titre + corps) ; le corps reçoit
-// soit du contenu réel, soit des blocs <Todo>.
+// Fournit l'ossature (overline + titre + corps).
 interface Props {
   titre: string;
   overline?: string;
@@ -63,8 +62,6 @@ const { titre, overline, alt = false } = Astro.props;
     color: var(--color-primary);
     font-weight: 600;
   }
-  .cs-body :global(.todo) { margin-bottom: 14px; }
-  .cs-body :global(.todo:last-child) { margin-bottom: 0; }
 
   @media (max-width: 1023px) {
     .cs { padding: 44px var(--pad-x-tablet); }

@@ -2,14 +2,13 @@
 // Template paramétré des 8 pages agences : /agences/{slug}/
 //
 // STRUCTURE UNIFORME, CONTENU DIFFÉRENCIÉ — toutes les agences
-// partagent ce gabarit, mais les zones rédactionnelles sont des
-// <Todo> distincts pour éviter le duplicate content (cf. brief).
+// partagent ce gabarit ; le rédactionnel unique de chaque agence
+// provient de `contenu` dans data/agences.ts (anti duplicate content).
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import TopNav from '../../components/TopNav.astro';
 import Footer from '../../components/Footer.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
-import Todo from '../../components/Todo.astro';
 import { photos } from '../../config/site';
 import { agences, type Agence } from '../../data/agences';
 import { automotiveBusinessSchema, breadcrumbSchema, agenceUrl } from '../../lib/schema';
@@ -168,7 +167,7 @@ const mapsHref = agence.geo
             <div class="ag-prose">
               <p>{agence.contenu.acces}</p>
             </div>
-            {agence.contenu.images.length > 0 ? (
+            {agence.contenu.images.length > 0 && (
               <div class="ag-photos">
                 {agence.contenu.images.map((img) => (
                   <img
@@ -182,13 +181,6 @@ const mapsHref = agence.geo
                   />
                 ))}
               </div>
-            ) : (
-              <Todo titre={`Photo de l'agence — ${agence.nomCourt}`}>
-                <p>
-                  Photo réelle de l'agence de {adresse.ville} (façade / atelier / plateaux).
-                  Pour l'instant : visuel générique de la flotte.
-                </p>
-              </Todo>
             )}
           </div>
         </div>

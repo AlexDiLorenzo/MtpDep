@@ -138,7 +138,9 @@ export const agences: Agence[] = [
         'Juvignac', 'Lavérune', 'Saint-Jean-de-Védas', 'Grabels', 'Clapiers',
         'Jacou', 'Vendargues', 'Mauguio', 'Pignan', 'Saint-Clément-de-Rivière',
       ],
-      images: [],
+      images: [
+        { src: photos.flotteCamions, width: 1200, height: 800 },
+      ],
     },
   },
   {
