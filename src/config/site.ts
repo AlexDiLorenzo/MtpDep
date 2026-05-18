@@ -53,5 +53,8 @@ export const photos = {
   agencePerols: '/img/agence-perols.jpg',                       // Site de Pérols
   agenceVilletelle: '/img/agence-villetelle.jpg',               // Site de Villetelle
   agenceVilletelleDepanneuse: '/img/agence-villetelle-depanneuse.jpg', // Dépanneuse à Villetelle
+
+  // Raccourci avis (page d'accueil)
+  qrAvis: '/img/qr-avis.png',                     // QR code avis Google
 } as const;
 

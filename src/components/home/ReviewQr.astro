@@ -1,0 +1,215 @@
+---
+// Raccourci « avis Google » — page d'accueil.
+//
+// Bouton discret dans le coin haut-droit du hero. Au clic, le QR code
+// d'avis passe en plein écran sur fond blanc. Pensé pour les dépanneurs
+// en intervention : ils ouvrent le site sur leur téléphone et montrent
+// le QR au client.
+//
+// Limite navigateur : aucune API web ne permet de régler la luminosité
+// matérielle de l'écran. On fait au mieux — fond 100 % blanc (luminosité
+// perçue maximale, surtout sur OLED) + Wake Lock pour empêcher la mise
+// en veille / l'atténuation automatique pendant l'affichage.
+import { photos } from '../../config/site';
+---
+
+<button
+  class="qr-shortcut"
+  id="qr-open"
+  type="button"
+  aria-label="Afficher le QR code pour laisser un avis Google"
+>
+  <svg class="qr-shortcut-icon" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M3 3h8v8H3V3zm2 2v4h4V5H5z" />
+    <path d="M13 3h8v8h-8V3zm2 2v4h4V5h-4z" />
+    <path d="M3 13h8v8H3v-8zm2 2v4h4v-4H5z" />
+    <path d="M13 13h3v3h-3zm5 0h3v3h-3zm-5 5h3v3h-3zm5 0h3v3h-3z" />
+  </svg>
+  <span class="qr-shortcut-label">Laissez un avis</span>
+</button>
+
+<div class="qr-overlay" id="qr-overlay" hidden>
+  <button class="qr-close" id="qr-close" type="button" aria-label="Fermer">✕</button>
+  <div class="qr-overlay-inner">
+    <p class="qr-overlay-over">Montpellier&nbsp;Dépannage</p>
+    <img
+      class="qr-big"
+      src={photos.qrAvis}
+      width="1044"
+      height="1044"
+      alt="QR code pour laisser un avis Google sur Montpellier Dépannage"
+    />
+    <p class="qr-overlay-text">Scannez ce code pour laisser un avis&nbsp;Google</p>
+  </div>
+</div>
+
+<style>
+  /* ── Bouton discret — coin haut-droit du hero ── */
+  .qr-shortcut {
+    position: absolute;
+    top: 14px;
+    right: var(--pad-x-desktop);
+    z-index: 5;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 14px;
+    border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    transition: background-color var(--dur-base) var(--ease-standard),
+                transform var(--dur-base) var(--ease-standard);
+  }
+  .qr-shortcut:hover {
+    background: rgba(255, 255, 255, 0.22);
+    transform: translateY(-1px);
+  }
+  .qr-shortcut-icon {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+    flex-shrink: 0;
+  }
+
+  /* ── Plein écran QR ── */
+  .qr-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .qr-overlay[hidden] { display: none; }
+
+  .qr-overlay-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    text-align: center;
+  }
+  .qr-overlay-over {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--md-brand-green);
+  }
+  .qr-big {
+    width: min(82vw, 70vh);
+    height: auto;
+    display: block;
+  }
+  .qr-overlay-text {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--md-brand-black);
+    max-width: 26ch;
+  }
+  .qr-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: 1px solid var(--color-border);
+    background: #fff;
+    color: var(--md-brand-black);
+    font-size: 19px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  @media (max-width: 1023px) {
+    .qr-shortcut { right: var(--pad-x-tablet); }
+  }
+  @media (max-width: 767px) {
+    .qr-shortcut { right: var(--pad-x-mobile); top: 12px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .qr-shortcut { transition: none; }
+    .qr-shortcut:hover { transform: none; }
+  }
+</style>
+
+<script>
+  (function () {
+    const openBtn = document.getElementById('qr-open');
+    const overlay = document.getElementById('qr-overlay');
+    const closeBtn = document.getElementById('qr-close');
+    if (!openBtn || !overlay || !closeBtn) return;
+
+    // Wake Lock — empêche l'écran de s'éteindre / s'atténuer.
+    let wakeLock: any = null;
+
+    async function acquireWakeLock() {
+      try {
+        if ('wakeLock' in navigator) {
+          wakeLock = await (navigator as any).wakeLock.request('screen');
+        }
+      } catch {
+        /* refusé ou non supporté — sans effet bloquant */
+      }
+    }
+    function releaseWakeLock() {
+      try { wakeLock?.release(); } catch { /* ignore */ }
+      wakeLock = null;
+    }
+
+    async function open() {
+      overlay!.hidden = false;
+      document.body.style.overflow = 'hidden';
+      await acquireWakeLock();
+      // Plein écran natif quand c'est possible (Android Chrome).
+      // iOS Safari ne le supporte pas pour un <div> : l'overlay couvre
+      // déjà tout l'écran, c'est suffisant.
+      try {
+        if (overlay!.requestFullscreen) await overlay!.requestFullscreen();
+      } catch {
+        /* ignore */
+      }
+    }
+
+    async function close() {
+      try {
+        if (document.fullscreenElement) await document.exitFullscreen();
+      } catch {
+        /* ignore */
+      }
+      releaseWakeLock();
+      overlay!.hidden = true;
+      document.body.style.overflow = '';
+    }
+
+    openBtn.addEventListener('click', open);
+    closeBtn.addEventListener('click', close);
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) close();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !overlay.hidden) close();
+    });
+    // Le Wake Lock est libéré quand l'onglet passe en arrière-plan :
+    // on le redemande au retour si le QR est encore affiché.
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && !overlay.hidden && !wakeLock) {
+        acquireWakeLock();
+      }
+    });
+  })();
+</script>

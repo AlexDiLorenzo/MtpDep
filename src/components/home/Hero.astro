@@ -1,5 +1,6 @@
 ---
 import { site, photos } from '../../config/site';
+import ReviewQr from './ReviewQr.astro';
 
 const stats = [
   { value: '30+', label: "Années d'expérience", kicker: 'Entreprise familiale' },
@@ -10,6 +11,8 @@ const stats = [
 ---
 
 <section class="hero" style={`--hero-bg: url('${photos.heroComedie}');`}>
+  <ReviewQr />
+
   <div class="hero-content">
     <div class="hero-pill">
       <span class="hero-pill-dot" aria-hidden="true"></span>
