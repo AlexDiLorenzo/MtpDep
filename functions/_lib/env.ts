@@ -24,6 +24,21 @@ export interface Env {
   PILOTAGE_TOKEN: string;
   DEPANTIME_URL: string;
   DEPANTIME_PILOTAGE_SECRET: string;
+
+  // Pilotage — flotte (app Flotte, contrôle technique)
+  FLOTTE_URL: string;
+  FLOTTE_PILOTAGE_SECRET: string;
+
+  // Pilotage — habilitations (app Habilitation, conformité dépanneurs)
+  HABILITATION_URL: string;
+  HABILITATION_PILOTAGE_SECRET: string;
+
+  // Pilotage — avis Google (API Google Business Profile)
+  // OAuth : refresh token issu d'une autorisation `business.manage`.
+  GOOGLE_CLIENT_ID: string;
+  GOOGLE_CLIENT_SECRET: string;
+  GOOGLE_REFRESH_TOKEN: string;
+  GBP_ACCOUNT_ID: string;
 }
 
 export interface DevisRow {

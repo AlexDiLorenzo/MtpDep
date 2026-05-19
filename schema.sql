@@ -35,6 +35,16 @@ CREATE TABLE IF NOT EXISTS call_clicks (
 );
 CREATE INDEX IF NOT EXISTS idx_call_clicks_created ON call_clicks(created_at);
 
+-- Cache clé/valeur générique (JSON sérialisé + horodatage).
+-- Utilisé par le dashboard de pilotage pour mémoriser le dernier
+-- snapshot des avis Google et éviter de marteler l'API Google
+-- Business Profile (quota faible) à chaque polling de l'écran.
+CREATE TABLE IF NOT EXISTS kv_cache (
+  k          TEXT PRIMARY KEY,
+  v          TEXT NOT NULL,           -- payload JSON
+  updated_at INTEGER NOT NULL         -- unix ms
+);
+
 -- Migration pour la table existante (ajoute la colonne destination si pas déjà là).
 -- À lancer une seule fois après mise à jour, ignore l'erreur "duplicate column" :
 --   wrangler d1 execute mtp-dep-db --command="ALTER TABLE devis ADD COLUMN destination TEXT" --remote

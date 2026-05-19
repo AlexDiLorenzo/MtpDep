@@ -1,6 +1,8 @@
 ---
 // Dashboard pilotage H24 affiché sur un écran au bureau.
-// Polling toutes les 30s, 3 grandes cartes : devis, relevés, plannings.
+// Polling toutes les 30s. Les indicateurs ne tiennent pas sur un seul
+// écran : ils sont répartis sur 3 pages qui défilent automatiquement
+// toutes les 15s (Opérations · Conformité & flotte · Avis Google).
 import '../styles/global.css';
 import { site } from '../config/site';
 ---
@@ -22,7 +24,7 @@ import { site } from '../config/site';
         <div class="pil-brand">
           <img src="/img/logo-mdp.png" alt="" class="pil-logo" />
           <div class="pil-title">
-            <div class="pil-overline">Tableau de bord</div>
+            <div class="pil-overline" id="pil-overline">Tableau de bord</div>
             <h1>Pilotage Montpellier&nbsp;Dépannage</h1>
           </div>
         </div>
@@ -33,67 +35,170 @@ import { site } from '../config/site';
         </div>
       </header>
 
-      <main class="pil-cards">
-        <!-- Carte DEVIS -->
-        <article class="pil-card status-gray" data-card="devis" id="card-devis">
-          <div class="pil-card-bar"></div>
-          <div class="pil-card-head">
-            <div class="pil-card-title">Devis</div>
-            <div class="pil-card-status" data-bind="status-label">—</div>
-          </div>
-          <div class="pil-card-body">
-            <div class="pil-card-big" data-bind="big">—</div>
-            <div class="pil-card-bigsub" data-bind="bigsub">reçus aujourd'hui</div>
-          </div>
-          <div class="pil-card-foot">
-            <div class="pil-card-row"><span>7 derniers jours</span><strong data-bind="d7">—</strong></div>
-            <div class="pil-card-row"><span>30 derniers jours</span><strong data-bind="d30">—</strong></div>
-            <div class="pil-card-row"><span>Ouverts &gt; 2&nbsp;h</span><strong data-bind="over2h">—</strong></div>
-            <div class="pil-card-row"><span>Clics « Appeler » (24&nbsp;h / 7&nbsp;j)</span><strong data-bind="calls">—</strong></div>
-          </div>
-        </article>
+      <main class="pil-stage">
+        <div class="pil-track" id="pil-track">
+          <!-- ════ PAGE 1 — Opérations ════ -->
+          <section class="pil-page">
+            <div class="pil-cards cols-3">
+              <!-- Carte DEVIS -->
+              <article class="pil-card status-gray" data-card="devis" id="card-devis">
+                <div class="pil-card-bar"></div>
+                <div class="pil-card-head">
+                  <div class="pil-card-title">Devis</div>
+                  <div class="pil-card-status" data-bind="status-label">—</div>
+                </div>
+                <div class="pil-card-body">
+                  <div class="pil-card-big" data-bind="big">—</div>
+                  <div class="pil-card-bigsub" data-bind="bigsub">reçus aujourd'hui</div>
+                </div>
+                <div class="pil-card-foot">
+                  <div class="pil-card-row"><span>7 derniers jours</span><strong data-bind="d7">—</strong></div>
+                  <div class="pil-card-row"><span>30 derniers jours</span><strong data-bind="d30">—</strong></div>
+                  <div class="pil-card-row"><span>Ouverts &gt; 2&nbsp;h</span><strong data-bind="over2h">—</strong></div>
+                  <div class="pil-card-row"><span>Clics « Appeler » (24&nbsp;h / 7&nbsp;j)</span><strong data-bind="calls">—</strong></div>
+                </div>
+              </article>
 
-        <!-- Carte RELEVÉS -->
-        <article class="pil-card status-gray" data-card="timesheets" id="card-timesheets">
-          <div class="pil-card-bar"></div>
-          <div class="pil-card-head">
-            <div class="pil-card-title">Relevés de temps</div>
-            <div class="pil-card-status" data-bind="status-label">—</div>
-          </div>
-          <div class="pil-card-body">
-            <div class="pil-card-big" data-bind="big">—</div>
-            <div class="pil-card-bigsub" data-bind="bigsub">—</div>
-          </div>
-          <div class="pil-card-foot">
-            <div class="pil-card-row"><span>Envoyés</span><strong data-bind="sent">—</strong></div>
-            <div class="pil-card-row"><span>Signés</span><strong data-bind="signed">—</strong></div>
-            <div class="pil-card-row"><span>Envoi</span><strong data-bind="deadline">—</strong></div>
-          </div>
-        </article>
+              <!-- Carte RELEVÉS -->
+              <article class="pil-card status-gray" data-card="timesheets" id="card-timesheets">
+                <div class="pil-card-bar"></div>
+                <div class="pil-card-head">
+                  <div class="pil-card-title">Relevés de temps</div>
+                  <div class="pil-card-status" data-bind="status-label">—</div>
+                </div>
+                <div class="pil-card-body">
+                  <div class="pil-card-big" data-bind="big">—</div>
+                  <div class="pil-card-bigsub" data-bind="bigsub">—</div>
+                </div>
+                <div class="pil-card-foot">
+                  <div class="pil-card-row"><span>Envoyés</span><strong data-bind="sent">—</strong></div>
+                  <div class="pil-card-row"><span>Signés</span><strong data-bind="signed">—</strong></div>
+                  <div class="pil-card-row"><span>Envoi</span><strong data-bind="deadline">—</strong></div>
+                </div>
+              </article>
 
-        <!-- Carte PLANNINGS -->
-        <article class="pil-card status-gray" data-card="plannings" id="card-plannings">
-          <div class="pil-card-bar"></div>
-          <div class="pil-card-head">
-            <div class="pil-card-title">Plannings</div>
-            <div class="pil-card-status" data-bind="status-label">—</div>
-          </div>
-          <div class="pil-card-body">
-            <div class="pil-card-big" data-bind="big">—</div>
-            <div class="pil-card-bigsub" data-bind="bigsub">—</div>
-          </div>
-          <div class="pil-card-foot">
-            <div class="pil-card-row"><span>Envoyés</span><strong data-bind="sent">—</strong></div>
-            <div class="pil-card-row"><span>Signés</span><strong data-bind="signed">—</strong></div>
-            <div class="pil-card-row"><span>Envoi</span><strong data-bind="period">—</strong></div>
-          </div>
-        </article>
+              <!-- Carte PLANNINGS -->
+              <article class="pil-card status-gray" data-card="plannings" id="card-plannings">
+                <div class="pil-card-bar"></div>
+                <div class="pil-card-head">
+                  <div class="pil-card-title">Plannings</div>
+                  <div class="pil-card-status" data-bind="status-label">—</div>
+                </div>
+                <div class="pil-card-body">
+                  <div class="pil-card-big" data-bind="big">—</div>
+                  <div class="pil-card-bigsub" data-bind="bigsub">—</div>
+                </div>
+                <div class="pil-card-foot">
+                  <div class="pil-card-row"><span>Envoyés</span><strong data-bind="sent">—</strong></div>
+                  <div class="pil-card-row"><span>Signés</span><strong data-bind="signed">—</strong></div>
+                  <div class="pil-card-row"><span>Envoi</span><strong data-bind="period">—</strong></div>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <!-- ════ PAGE 2 — Conformité & flotte ════ -->
+          <section class="pil-page">
+            <div class="pil-cards cols-2">
+              <!-- Carte FLOTTE — contrôle technique -->
+              <article class="pil-card status-gray" id="card-flotte">
+                <div class="pil-card-bar"></div>
+                <div class="pil-card-head">
+                  <div class="pil-card-title">Contrôle technique flotte</div>
+                  <div class="pil-card-status" data-bind="status-label">—</div>
+                </div>
+                <div class="pil-card-body">
+                  <div class="pil-card-big" data-bind="big">—</div>
+                  <div class="pil-card-bigsub" data-bind="bigsub">des véhicules ont un CT planifié</div>
+                </div>
+                <div class="pil-card-foot">
+                  <div class="pil-card-row"><span>Véhicules suivis</span><strong data-bind="considered">—</strong></div>
+                  <div class="pil-card-row"><span>CT planifié</span><strong data-bind="planned">—</strong></div>
+                  <div class="pil-card-row"><span>CT en retard</span><strong data-bind="overdue">—</strong></div>
+                  <div class="pil-card-row"><span>Sans date de CT</span><strong data-bind="missing">—</strong></div>
+                </div>
+              </article>
+
+              <!-- Carte HABILITATION — conformité dépanneurs -->
+              <article class="pil-card status-gray" id="card-habilitation">
+                <div class="pil-card-bar"></div>
+                <div class="pil-card-head">
+                  <div class="pil-card-title">Conformité dépanneurs</div>
+                  <div class="pil-card-status" data-bind="status-label">—</div>
+                </div>
+                <div class="pil-card-body">
+                  <div class="pil-card-big" data-bind="big">—</div>
+                  <div class="pil-card-bigsub" data-bind="bigsub">taux de conformité documentaire moyen</div>
+                </div>
+                <div class="pil-card-foot">
+                  <div class="pil-card-row"><span>Dépanneurs actifs</span><strong data-bind="drivers">—</strong></div>
+                  <div class="pil-card-row"><span>Documents conformes</span><strong data-bind="conformes">—</strong></div>
+                  <div class="pil-card-row"><span>Documents non conformes</span><strong data-bind="nonconformes">—</strong></div>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <!-- ════ PAGE 3 — Avis Google ════ -->
+          <section class="pil-page">
+            <div class="pil-cards cols-3">
+              <!-- Carte NOTE GLOBALE -->
+              <article class="pil-card status-gray" id="card-google-global">
+                <div class="pil-card-bar"></div>
+                <div class="pil-card-head">
+                  <div class="pil-card-title">Note Google — réseau</div>
+                  <div class="pil-card-status" data-bind="status-label">—</div>
+                </div>
+                <div class="pil-card-body">
+                  <div class="pil-card-big" data-bind="big">—</div>
+                  <div class="pil-stars" data-bind="stars"></div>
+                  <div class="pil-card-bigsub" data-bind="bigsub">—</div>
+                </div>
+                <div class="pil-card-foot">
+                  <div class="pil-card-row"><span>Avis cumulés</span><strong data-bind="count">—</strong></div>
+                  <div class="pil-card-row"><span>Établissements suivis</span><strong data-bind="establishments">—</strong></div>
+                </div>
+              </article>
+
+              <!-- Carte CE MOIS-CI -->
+              <article class="pil-card status-gray" id="card-google-month">
+                <div class="pil-card-bar"></div>
+                <div class="pil-card-head">
+                  <div class="pil-card-title">Avis ce mois-ci</div>
+                  <div class="pil-card-status" data-bind="status-label">—</div>
+                </div>
+                <div class="pil-card-body">
+                  <div class="pil-card-big" data-bind="big">—</div>
+                  <div class="pil-stars" data-bind="stars"></div>
+                  <div class="pil-card-bigsub" data-bind="bigsub">—</div>
+                </div>
+                <div class="pil-card-foot">
+                  <div class="pil-card-row"><span>Avis reçus ce mois</span><strong data-bind="monthcount">—</strong></div>
+                  <div class="pil-card-row" data-row="onestar"><span>Avis 1&nbsp;★ ce mois</span><strong data-bind="onestar">—</strong></div>
+                </div>
+              </article>
+
+              <!-- Carte PAR ÉTABLISSEMENT -->
+              <article class="pil-card status-gray pil-card--list" id="card-google-sites">
+                <div class="pil-card-bar"></div>
+                <div class="pil-card-head">
+                  <div class="pil-card-title">Note par établissement</div>
+                  <div class="pil-card-status" data-bind="status-label">—</div>
+                </div>
+                <div class="pil-sitelist" data-bind="sitelist">
+                  <div class="pil-site-empty">Chargement…</div>
+                </div>
+              </article>
+            </div>
+          </section>
+        </div>
       </main>
 
       <footer class="pil-footer">
         <span id="pil-updated">Chargement…</span>
         <span class="pil-sep">·</span>
         <span id="pil-source">DepanTime</span>
+        <div class="pil-dots" id="pil-dots"></div>
       </footer>
     </div>
 
@@ -118,6 +223,7 @@ import { site } from '../config/site';
         --status-orange-bg: #FBE9D0;
         --status-red-bg: #FCEBEB;
         --status-gray-bg: #F1EFE8;
+        --star-gold: #D89B16;
       }
       html, body { margin: 0; padding: 0; height: 100%; background: #F6F5EB; color: #1A190F; font-family: 'DM Sans', system-ui, sans-serif; }
       body { overflow: hidden; }
@@ -143,6 +249,7 @@ import { site } from '../config/site';
       .pil-overline {
         font-size: 11px; font-weight: 700; letter-spacing: 0.14em;
         text-transform: uppercase; color: var(--status-gray); margin-bottom: 2px;
+        transition: color 300ms ease;
       }
       .pil-title h1 {
         font-family: 'Space Grotesk', sans-serif;
@@ -181,6 +288,23 @@ import { site } from '../config/site';
         50% { box-shadow: 0 0 0 6px transparent; opacity: 0.6; }
       }
 
+      /* ── Carrousel de pages ── */
+      .pil-stage {
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+      }
+      .pil-track {
+        display: flex;
+        height: 100%;
+        transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .pil-page {
+        flex: 0 0 100%;
+        min-width: 0;
+        display: flex;
+      }
+
       /* ── Cartes ── */
       .pil-cards {
         display: grid;
@@ -189,6 +313,8 @@ import { site } from '../config/site';
         flex: 1;
         min-height: 0;
       }
+      .pil-cards.cols-2 { grid-template-columns: repeat(2, 1fr); }
+      .pil-cards.cols-3 { grid-template-columns: repeat(3, 1fr); }
       .pil-card {
         position: relative;
         background: #fff;
@@ -219,6 +345,7 @@ import { site } from '../config/site';
         padding: 7px 14px; border-radius: 999px;
         background: var(--status-gray-bg); color: var(--status-gray);
         transition: background-color 400ms ease, color 400ms ease;
+        white-space: nowrap;
       }
       .pil-card-body {
         flex: 1;
@@ -244,6 +371,14 @@ import { site } from '../config/site';
         font-weight: 500;
         line-height: 1.3;
       }
+      .pil-stars {
+        margin-top: 12px;
+        font-size: 30px;
+        letter-spacing: 4px;
+        color: var(--star-gold);
+        line-height: 1;
+        min-height: 30px;
+      }
       .pil-card-foot {
         margin-top: 20px;
         padding-top: 16px;
@@ -260,6 +395,48 @@ import { site } from '../config/site';
         font-family: 'JetBrains Mono', ui-monospace, monospace;
         font-variant-numeric: tabular-nums;
         font-weight: 700; color: #1A190F;
+      }
+      /* Ligne « avis 1★ » mise en évidence dès qu'il y en a. */
+      .pil-card-row.is-alert { color: var(--status-red); font-weight: 700; }
+      .pil-card-row.is-alert strong { color: var(--status-red); }
+
+      /* ── Carte liste (note par établissement) ── */
+      .pil-card--list .pil-card-body { display: none; }
+      .pil-sitelist {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 16px;
+      }
+      .pil-site {
+        display: flex; align-items: center; gap: 14px;
+      }
+      .pil-site-dot {
+        width: 13px; height: 13px; border-radius: 50%; flex: none;
+        background: var(--status-gray);
+      }
+      .pil-site-name {
+        flex: 1; min-width: 0;
+        font-size: 17px; font-weight: 600;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      }
+      .pil-site-stars {
+        font-size: 14px; letter-spacing: 2px; color: var(--star-gold);
+      }
+      .pil-site-rating {
+        font-family: 'JetBrains Mono', ui-monospace, monospace;
+        font-variant-numeric: tabular-nums;
+        font-size: 24px; font-weight: 700; color: #1A190F;
+        min-width: 56px; text-align: right;
+      }
+      .pil-site-count {
+        font-size: 12px; color: var(--status-gray);
+        min-width: 64px; text-align: right;
+      }
+      .pil-site-empty {
+        text-align: center; color: var(--status-gray);
+        font-size: 15px;
       }
 
       /* Statuts par classe — appliqués au .pil-card */
@@ -283,7 +460,7 @@ import { site } from '../config/site';
         50% { box-shadow: 0 1px 3px rgba(26,25,15,0.06), 0 12px 36px rgba(163,45,45,0.45); }
       }
 
-      /* ── Footer ── */
+      /* ── Footer + pastilles de page ── */
       .pil-footer {
         display: flex; align-items: center; gap: 10px;
         font-size: 12px; color: var(--status-gray);
@@ -291,6 +468,16 @@ import { site } from '../config/site';
         font-variant-numeric: tabular-nums;
       }
       .pil-sep { opacity: 0.5; }
+      .pil-dots { display: flex; gap: 9px; margin-left: auto; }
+      .pil-dot {
+        width: 9px; height: 9px; border-radius: 999px;
+        background: var(--status-gray); opacity: 0.32;
+        transition: opacity 300ms ease, width 300ms ease, background-color 300ms ease;
+      }
+      .pil-dot.is-active {
+        opacity: 1; width: 26px;
+        background: var(--status-green);
+      }
 
       /* ── Login overlay ── */
       .pil-login {
@@ -334,6 +521,7 @@ import { site } from '../config/site';
       @media (prefers-reduced-motion: reduce) {
         .pil-card.status-red { animation: none; }
         .pil-conn-dot { animation: none !important; }
+        .pil-track { transition: none; }
       }
 
       /* Plus grand sur très grand écran TV */
@@ -346,12 +534,17 @@ import { site } from '../config/site';
         .pil-card-bigsub { font-size: 19px; }
         .pil-card-row { font-size: 16px; }
         .pil-clock { font-size: 52px; }
+        .pil-stars { font-size: 38px; }
+        .pil-site-name { font-size: 19px; }
+        .pil-site-rating { font-size: 27px; }
       }
     </style>
 
     <script is:inline>
       (function () {
         const POLL_MS = 30000;
+        const ROTATE_MS = 15000;
+        const PAGES = ['Opérations', 'Conformité & flotte', 'Avis clients Google'];
         const $ = (sel) => document.querySelector(sel);
 
         const conn = $('#pil-conn');
@@ -360,6 +553,9 @@ import { site } from '../config/site';
         const dateEl = $('#pil-date');
         const updatedEl = $('#pil-updated');
         const sourceEl = $('#pil-source');
+        const overlineEl = $('#pil-overline');
+        const trackEl = $('#pil-track');
+        const dotsEl = $('#pil-dots');
         const loginOverlay = $('#pil-login');
         const loginForm = $('#pil-login-form');
         const loginInput = $('#pil-token');
@@ -384,35 +580,77 @@ import { site } from '../config/site';
         setInterval(tickClock, 1000);
         tickClock();
 
-        // ── Application des statuts ──
-        function applyStatus(cardId, data) {
-          const card = document.getElementById(cardId);
-          if (!card) return;
-          card.classList.remove('status-green', 'status-orange', 'status-red', 'status-gray');
-          card.classList.add('status-' + (data.status || 'gray'));
-          setBind(card, 'status-label', data.label || '—');
-          setBind(card, 'bigsub', data.sub || '');
+        // ── Carrousel de pages ──
+        let pageIdx = 0;
+        let rotateHandle = null;
+        for (let i = 0; i < PAGES.length; i++) {
+          const dot = document.createElement('span');
+          dot.className = 'pil-dot';
+          dotsEl.appendChild(dot);
         }
+        const dotEls = dotsEl.querySelectorAll('.pil-dot');
+
+        function showPage(i) {
+          pageIdx = ((i % PAGES.length) + PAGES.length) % PAGES.length;
+          trackEl.style.transform = 'translateX(-' + (pageIdx * 100) + '%)';
+          overlineEl.textContent = PAGES[pageIdx];
+          dotEls.forEach((d, k) => d.classList.toggle('is-active', k === pageIdx));
+        }
+        function startRotation() {
+          if (rotateHandle) clearInterval(rotateHandle);
+          rotateHandle = setInterval(() => showPage(pageIdx + 1), ROTATE_MS);
+        }
+        // Navigation clavier (flèches) — réinitialise le minuteur.
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowRight') { showPage(pageIdx + 1); startRotation(); }
+          else if (e.key === 'ArrowLeft') { showPage(pageIdx - 1); startRotation(); }
+        });
+        showPage(0);
+        startRotation();
+
+        // ── Helpers de rendu ──
         function setBind(root, key, value) {
           const el = root.querySelector('[data-bind="' + key + '"]');
           if (el) el.textContent = value;
         }
+        function setCardStatus(cardId, status) {
+          const card = document.getElementById(cardId);
+          if (!card) return card;
+          card.classList.remove('status-green', 'status-orange', 'status-red', 'status-gray');
+          card.classList.add('status-' + (status || 'gray'));
+          return card;
+        }
+        // applyStatus : cartes qui exposent { status, label, sub }.
+        function applyStatus(cardId, data) {
+          const card = setCardStatus(cardId, data.status);
+          if (!card) return;
+          setBind(card, 'status-label', data.label || '—');
+          setBind(card, 'bigsub', data.sub || '');
+        }
+        function fmt1(n) {
+          return Number(n).toFixed(1).replace('.', ',');
+        }
+        function starString(rating) {
+          const full = Math.max(0, Math.min(5, Math.round(rating)));
+          return '★'.repeat(full) + '☆'.repeat(5 - full);
+        }
+        const STATUS_COLOR = {
+          green: '#2C6126', orange: '#C67315', red: '#A32D2D', gray: '#888780',
+        };
 
         function render(json) {
-          // Devis
+          // ── Devis ──
           const d = json.devis || {};
           applyStatus('card-devis', d);
           const cardD = document.getElementById('card-devis');
           setBind(cardD, 'big', String(d.today ?? 0));
-          // Si le snapshot fournit un sub décoré (selon le statut), on le respecte ;
-          // sinon fallback générique.
           setBind(cardD, 'bigsub', d.sub || "reçus aujourd'hui");
           setBind(cardD, 'd7', String(d.last_7d ?? 0));
           setBind(cardD, 'd30', String(d.last_30d ?? 0));
           setBind(cardD, 'over2h', String(d.open_over_2h ?? 0));
           setBind(cardD, 'calls', (d.calls_today ?? 0) + ' / ' + (d.calls_7d ?? 0));
 
-          // Relevés
+          // ── Relevés ──
           const t = json.timesheets || {};
           applyStatus('card-timesheets', t);
           const cardT = document.getElementById('card-timesheets');
@@ -422,7 +660,7 @@ import { site } from '../config/site';
           setBind(cardT, 'signed', t.signed_pct != null ? (t.signed_pct + ' %') : '—');
           setBind(cardT, 'deadline', t.sent && t.sent_at_label ? ('Envoyé le ' + t.sent_at_label) : 'À envoyer avant le 10');
 
-          // Plannings
+          // ── Plannings ──
           const p = json.plannings || {};
           applyStatus('card-plannings', p);
           const cardP = document.getElementById('card-plannings');
@@ -432,12 +670,99 @@ import { site } from '../config/site';
           setBind(cardP, 'signed', p.signed_pct != null ? (p.signed_pct + ' %') : '—');
           setBind(cardP, 'period', p.sent && p.sent_at_label ? ('Envoyé le ' + p.sent_at_label) : (p.period_label || '—'));
 
-          // Connexion
+          // ── Flotte : contrôle technique ──
+          const fl = json.flotte || {};
+          applyStatus('card-flotte', fl);
+          const cardFl = document.getElementById('card-flotte');
+          setBind(cardFl, 'big', fl.pct != null ? (fl.pct + '%') : '—');
+          setBind(cardFl, 'considered', String(fl.considered ?? 0));
+          setBind(cardFl, 'planned', String(fl.planned ?? 0));
+          setBind(cardFl, 'overdue', String(fl.overdue ?? 0));
+          setBind(cardFl, 'missing', String(fl.missing ?? 0));
+
+          // ── Habilitation : conformité dépanneurs ──
+          const ha = json.habilitation || {};
+          applyStatus('card-habilitation', ha);
+          const cardHa = document.getElementById('card-habilitation');
+          setBind(cardHa, 'big', ha.score != null ? (ha.score + '%') : '—');
+          setBind(cardHa, 'drivers', String(ha.drivers_total ?? 0));
+          setBind(cardHa, 'conformes', String(ha.conformes ?? 0));
+          setBind(cardHa, 'nonconformes', String(ha.non_conformes ?? 0));
+
+          // ── Avis Google ──
+          const gg = json.google || {};
+          const gl = gg.global || {};
+          const gm = gg.month || {};
+          const sites = gg.sites || [];
+
+          // Note globale
+          const cardGl = setCardStatus('card-google-global', gl.status);
+          setBind(cardGl, 'big', gl.avg != null ? fmt1(gl.avg) : '—');
+          setBind(cardGl, 'stars', gl.avg != null ? starString(gl.avg) : '');
+          setBind(cardGl, 'bigsub', gl.avg != null
+            ? 'note moyenne du réseau'
+            : 'en attente des données Google');
+          setBind(cardGl, 'status-label', gl.avg != null
+            ? (gl.status === 'green' ? 'Excellente' : gl.status === 'orange' ? 'Correcte' : 'Fragile')
+            : '—');
+          setBind(cardGl, 'count', String(gl.count ?? 0));
+          setBind(cardGl, 'establishments', String(sites.length || '—'));
+
+          // Ce mois-ci
+          const cardGm = setCardStatus('card-google-month', gm.status);
+          setBind(cardGm, 'big', gm.avg != null ? fmt1(gm.avg) : '—');
+          setBind(cardGm, 'stars', gm.avg != null ? starString(gm.avg) : '');
+          setBind(cardGm, 'bigsub', gm.count
+            ? ('note moyenne sur ' + gm.count + ' avis')
+            : 'aucun avis reçu ce mois-ci');
+          const oneStar = gm.one_star ?? 0;
+          setBind(cardGm, 'status-label', oneStar > 0
+            ? (oneStar + ' avis 1 ★')
+            : 'Aucun avis 1 ★');
+          setBind(cardGm, 'monthcount', String(gm.count ?? 0));
+          setBind(cardGm, 'onestar', String(oneStar));
+          const osRow = cardGm.querySelector('[data-row="onestar"]');
+          if (osRow) osRow.classList.toggle('is-alert', oneStar > 0);
+
+          // Par établissement
+          renderSites(sites);
+
+          // ── Connexion (état DepanTime) ──
           const dtOk = !json.depantime || json.depantime.status === 'ok';
           conn.classList.remove('is-ok', 'is-err');
           conn.classList.add(dtOk ? 'is-ok' : 'is-err');
           connText.textContent = dtOk ? 'En ligne' : 'DepanTime indisponible';
           sourceEl.textContent = dtOk ? 'DepanTime · D1' : 'D1 seul (DepanTime hors-ligne)';
+        }
+
+        function renderSites(sites) {
+          const host = document.querySelector('#card-google-sites [data-bind="sitelist"]');
+          if (!host) return;
+          if (!sites.length) {
+            host.innerHTML = '<div class="pil-site-empty">En attente des données Google</div>';
+            setCardStatus('card-google-sites', 'gray');
+            setBind(document.getElementById('card-google-sites'), 'status-label', '—');
+            return;
+          }
+          host.innerHTML = sites.map((s) => {
+            const color = STATUS_COLOR[s.status] || STATUS_COLOR.gray;
+            const rating = s.rating != null ? fmt1(s.rating) : '—';
+            const stars = s.rating != null ? starString(s.rating) : '';
+            return '<div class="pil-site">'
+              + '<span class="pil-site-dot" style="background:' + color + '"></span>'
+              + '<span class="pil-site-name">' + s.name + '</span>'
+              + '<span class="pil-site-stars">' + stars + '</span>'
+              + '<span class="pil-site-rating">' + rating + '</span>'
+              + '<span class="pil-site-count">' + (s.review_count || 0) + ' avis</span>'
+              + '</div>';
+          }).join('');
+          // Statut de la carte = le pire établissement.
+          const worst = sites.some((s) => s.status === 'red') ? 'red'
+            : sites.some((s) => s.status === 'orange') ? 'orange'
+            : sites.some((s) => s.status === 'gray') ? 'gray' : 'green';
+          setCardStatus('card-google-sites', worst);
+          setBind(document.getElementById('card-google-sites'), 'status-label',
+            worst === 'green' ? 'Réseau sain' : worst === 'orange' ? 'À surveiller' : worst === 'red' ? 'Point faible' : '—');
         }
 
         async function fetchSnapshot() {

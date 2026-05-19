@@ -6,6 +6,11 @@
 import type { Env } from '../../_lib/env';
 import { jsonResponse } from '../../_lib/html';
 import { checkToken } from '../../_lib/auth';
+import {
+  fetchGoogleReviews,
+  googleConfigured,
+  type GoogleReviewsData,
+} from '../../_lib/google-reviews';
 
 const COOKIE_NAME = 'mdp_pilotage';
 const TWO_HOURS_MS = 2 * 60 * 60 * 1000;
@@ -43,6 +48,13 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
   const now = Date.now();
   const paris = parisYMD(new Date(now));
 
+  // ── Apps voisines : on lance les appels HTTP en parallèle, ils
+  // tournent pendant la requête D1 + DepanTime ci-dessous. Chaque
+  // fonction est tolérante à l'échec et renvoie une carte « grise ».
+  const flottePromise = computeFlotte(env);
+  const habilitationPromise = computeHabilitation(env);
+  const googlePromise = computeGoogle(env, now);
+
   // ── 1. Devis (D1) ──────────────────────────────────────────
   const devis = await computeDevis(env, now);
 
@@ -72,6 +84,10 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
   const timesheets = dt ? computeTimesheetStatus(dt, paris, now) : unavailable('relevé');
   const plannings = dt ? computePlanningStatus(dt, paris, now) : unavailable('planning');
 
+  const [flotte, habilitation, google] = await Promise.all([
+    flottePromise, habilitationPromise, googlePromise,
+  ]);
+
   const url = new URL(request.url);
   const debug = url.searchParams.get('debug') === '1';
   const headers = new Headers({
@@ -84,6 +100,9 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
     devis,
     timesheets,
     plannings,
+    flotte,
+    habilitation,
+    google,
     depantime: { status: dtError ? 'error' : 'ok', error: dtError },
     ...(debug && dt
       ? {
@@ -413,5 +432,214 @@ function unavailable(kind: string) {
     signed_pct: null as number | null,
     days_since_sent: 0,
     _kind: kind,
+  };
+}
+
+// ── Helpers apps voisines (Flotte, Habilitation, Google) ─────
+const num = (x: unknown): number =>
+  typeof x === 'number' ? x : (Number(x) || 0);
+
+// GET JSON avec timeout court ; lève en cas d'erreur HTTP.
+async function fetchJson(
+  url: string,
+  bearer: string | null,
+  extraHeaders: Record<string, string> = {}
+): Promise<Record<string, unknown>> {
+  const headers: Record<string, string> = { ...extraHeaders };
+  if (bearer) headers.authorization = `Bearer ${bearer}`;
+  const res = await fetch(url, { headers, signal: AbortSignal.timeout(5000) });
+  if (!res.ok) {
+    const body = await res.text().catch(() => '');
+    throw new Error(`HTTP ${res.status} ${body.slice(0, 80)}`);
+  }
+  return (await res.json()) as Record<string, unknown>;
+}
+
+// ── Flotte : % de véhicules avec contrôle technique planifié ──
+async function computeFlotte(env: Env) {
+  if (!env.FLOTTE_URL || !env.FLOTTE_PILOTAGE_SECRET) {
+    return flotteGray('non configuré');
+  }
+  try {
+    const r = await fetchJson(
+      `${env.FLOTTE_URL.replace(/\/$/, '')}/api/pilotage-public/snapshot`,
+      env.FLOTTE_PILOTAGE_SECRET
+    );
+    const considered = num(r.fleet_considered);
+    const planned = num(r.ct_planned);
+    const overdue = num(r.ct_overdue);
+    const missing = num(r.ct_missing);
+    if (considered === 0) return flotteGray('aucun véhicule suivi');
+
+    const pct = Math.round((planned / considered) * 100);
+    let status: Status;
+    let label: string;
+    if (pct >= 95) { status = 'green'; label = 'Sous contrôle'; }
+    else if (pct >= 80) { status = 'orange'; label = 'À surveiller'; }
+    else { status = 'red'; label = 'Action requise'; }
+
+    const toPlan = overdue + missing;
+    const sub = toPlan > 0
+      ? `${toPlan} véhicule${toPlan > 1 ? 's' : ''} à planifier · ${overdue} CT en retard`
+      : `Les ${considered} véhicules suivis ont un CT planifié`;
+
+    return { status, label, sub, pct, considered, planned, overdue, missing };
+  } catch (e) {
+    return flotteGray(e instanceof Error ? e.message : String(e));
+  }
+}
+
+function flotteGray(reason: string) {
+  return {
+    status: 'gray' as Status,
+    label: 'Indisponible',
+    sub: 'Connexion à Flotte impossible',
+    pct: null as number | null,
+    considered: 0, planned: 0, overdue: 0, missing: 0,
+    _error: reason,
+  };
+}
+
+// ── Habilitation : taux de conformité documentaire moyen ─────
+async function computeHabilitation(env: Env) {
+  if (!env.HABILITATION_URL || !env.HABILITATION_PILOTAGE_SECRET) {
+    return habilitationGray('non configuré');
+  }
+  try {
+    const r = await fetchJson(
+      `${env.HABILITATION_URL.replace(/\/$/, '')}/api/pilotage/snapshot`,
+      null,
+      { 'X-Pilotage-Secret': env.HABILITATION_PILOTAGE_SECRET }
+    );
+    const bs = (r.by_status ?? {}) as Record<string, unknown>;
+    const green = num(bs.green);
+    const orange = num(bs.orange);
+    const red = num(bs.red);
+    const driversTotal = num(r.drivers_total);
+    const score = r.score_global == null ? null : num(r.score_global);
+    if (score == null) return habilitationGray('aucune donnée de conformité');
+
+    let status: Status;
+    let label: string;
+    if (score >= 90) { status = 'green'; label = 'Conforme'; }
+    else if (score >= 75) { status = 'orange'; label = 'À compléter'; }
+    else { status = 'red'; label = 'Non conforme'; }
+
+    const sub = red > 0
+      ? `${red} document${red > 1 ? 's' : ''} non conforme${red > 1 ? 's' : ''} · ${driversTotal} dépanneurs`
+      : `${driversTotal} dépanneurs actifs · dossiers à jour`;
+
+    return {
+      status, label, sub, score,
+      drivers_total: driversTotal,
+      conformes: green + orange,
+      non_conformes: red,
+    };
+  } catch (e) {
+    return habilitationGray(e instanceof Error ? e.message : String(e));
+  }
+}
+
+function habilitationGray(reason: string) {
+  return {
+    status: 'gray' as Status,
+    label: 'Indisponible',
+    sub: 'Connexion à Habilitation impossible',
+    score: null as number | null,
+    drivers_total: 0, conformes: 0, non_conformes: 0,
+    _error: reason,
+  };
+}
+
+// ── Avis Google : note par site, globale et activité du mois ──
+// L'API Google Business Profile a un quota faible ; on met le
+// résultat en cache 30 min dans D1 (table kv_cache). En cas
+// d'échec, on sert le dernier cache disponible.
+const GOOGLE_CACHE_KEY = 'google_reviews';
+const GOOGLE_CACHE_TTL_MS = 30 * 60 * 1000;
+
+async function computeGoogle(env: Env, now: number) {
+  let cached: { data: GoogleReviewsData; updated_at: number } | null = null;
+  try {
+    const row = await env.DB
+      .prepare('SELECT v, updated_at FROM kv_cache WHERE k = ?')
+      .bind(GOOGLE_CACHE_KEY)
+      .first<{ v: string; updated_at: number }>();
+    if (row) cached = { data: JSON.parse(row.v), updated_at: row.updated_at };
+  } catch { /* table absente → on refetch */ }
+
+  let data: GoogleReviewsData | null = cached?.data ?? null;
+  let updatedAt = cached?.updated_at ?? 0;
+  let error: string | null = null;
+
+  const stale = !cached || now - cached.updated_at > GOOGLE_CACHE_TTL_MS;
+  if (!googleConfigured(env)) {
+    error = 'non configuré';
+  } else if (stale) {
+    try {
+      data = await fetchGoogleReviews(env);
+      updatedAt = now;
+      await env.DB
+        .prepare(
+          `INSERT INTO kv_cache (k, v, updated_at) VALUES (?, ?, ?)
+           ON CONFLICT(k) DO UPDATE SET v = excluded.v, updated_at = excluded.updated_at`
+        )
+        .bind(GOOGLE_CACHE_KEY, JSON.stringify(data), now)
+        .run();
+    } catch (e) {
+      // On conserve l'ancien cache (`data`) s'il existe.
+      error = e instanceof Error ? e.message : String(e);
+    }
+  }
+
+  return buildGoogleCard(data, updatedAt, error);
+}
+
+function ratingStatus(avg: number | null): Status {
+  if (avg == null) return 'gray';
+  if (avg >= 4.5) return 'green';
+  if (avg >= 4.0) return 'orange';
+  return 'red';
+}
+
+function buildGoogleCard(
+  data: GoogleReviewsData | null,
+  updatedAt: number,
+  error: string | null
+) {
+  if (!data) {
+    return {
+      status: 'gray' as Status,
+      error,
+      updated_at: updatedAt,
+      global: { status: 'gray' as Status, avg: null as number | null, count: 0 },
+      month: { status: 'gray' as Status, avg: null as number | null, count: 0, one_star: 0 },
+      sites: [] as { name: string; rating: number | null; review_count: number; status: Status }[],
+    };
+  }
+  const oneStar = data.month_one_star;
+  const monthStatus: Status = oneStar >= 3 ? 'red' : oneStar >= 1 ? 'orange' : 'green';
+  return {
+    // `stale` = on sert un cache mais le dernier refresh a échoué.
+    status: error ? ('stale' as const) : ('ok' as const),
+    error,
+    updated_at: updatedAt,
+    global: {
+      status: ratingStatus(data.global_avg),
+      avg: data.global_avg,
+      count: data.global_count,
+    },
+    month: {
+      status: monthStatus,
+      avg: data.month_avg,
+      count: data.month_count,
+      one_star: oneStar,
+    },
+    sites: data.sites.map((s) => ({
+      name: s.name,
+      rating: s.rating,
+      review_count: s.review_count,
+      status: ratingStatus(s.rating),
+    })),
   };
 }
