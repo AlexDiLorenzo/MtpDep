@@ -17,6 +17,9 @@ pnpm-debug.log*
 .env.local
 .env.*.local
 
+# Secrets
+SECRET_GOOGLE.txt
+
 # macOS
 .DS_Store
 
