@@ -14,6 +14,7 @@ import type { Env } from './env';
 const GBP_LOCATIONS: { name: string; locationId: string }[] = [
   { name: 'Montpellier', locationId: '13226346560059197832' },
   { name: 'Laroque', locationId: '5378763637788146760' },
+  { name: 'Pérols', locationId: '13394403558681774811' },
   { name: "Clermont-l'Hérault", locationId: '8289695854872502451' },
   { name: 'Étoile Assistance 2 Roues', locationId: '4399399974492064927' },
   { name: 'Garage Garosud 34', locationId: '16258940987569720760' },
