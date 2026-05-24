@@ -47,7 +47,7 @@ export const photos = {
   // Interventions terrain
   interventionA9: '/img/intervention-a9.jpg',     // Autoroute A9
   plRecuperation: '/img/pl-recuperation.jpg',     // Poids lourd dans le fossé
-  plRenversement: '/img/pl-renversement.jpg',     // PL renversé
+  transportInternational: '/img/transport-international.jpg', // Transport international / rapatriement
 
   // Photos d'agences (fournies par le client, optimisées en JPEG)
   agencePerols: '/img/agence-perols.jpg',                       // Site de Pérols

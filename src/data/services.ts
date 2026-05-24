@@ -58,7 +58,7 @@ export const services: Service[] = [
     tag: '04',
     resume:
       'France, Belgique, Italie, Espagne. Rapatriement de véhicules accidentés.',
-    photo: 'plRenversement',
+    photo: 'transportInternational',
   },
   {
     slug: 'centre-ville-zones-pietonnes',
