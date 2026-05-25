@@ -47,6 +47,9 @@ export function organizationSchema() {
     name: site.name,
     url: site.url,
     logo: `${site.url}/img/logo-mdp.png`,
+    image: `${site.url}/img/logo-mdp.png`,
+    description:
+      "Remorquage et dépannage 24h/24, 7j/7 à Montpellier et dans l'Hérault et le Gard. Plateaux VL et PL, autoroute A9, transport international. Plus de 30 ans d'expérience.",
     telephone: site.phone.display,
     email: site.email.display,
     address: postalAddress(agencePrincipale),

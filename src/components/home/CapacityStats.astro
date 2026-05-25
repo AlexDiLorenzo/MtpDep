@@ -31,6 +31,12 @@ const kpis = [
     kicker: 'Formations PL, autoroute, GPL',
   },
 ];
+
+// Format SSR pour que la valeur cible apparaisse dans le HTML statique
+// (bon pour le SEO et les visiteurs sans JS). L'animation au scroll
+// remettra le compteur à 0 puis l'animera vers la cible une fois en vue.
+const fmtTarget = (n: number) =>
+  n >= 1000 ? n.toLocaleString('fr-FR') : String(n);
 ---
 
 <section class="cap" id="capacite" aria-labelledby="cap-title">
@@ -55,7 +61,7 @@ const kpis = [
             <span class="cap-kpi-prefix">{k.prefix}</span><span
               data-counter
               data-target={k.value}
-            >0</span><span class="cap-kpi-suffix">{k.suffix}</span>
+            >{fmtTarget(k.value)}</span><span class="cap-kpi-suffix">{k.suffix}</span>
           </div>
           <div class="cap-kpi-label">{k.label}</div>
           <div class="cap-kpi-kicker">{k.kicker}</div>
@@ -88,21 +94,36 @@ const kpis = [
 </section>
 
 <script>
-  // Compteurs animés au scroll
+  // Compteurs animés au scroll.
+  // Le HTML statique contient déjà les valeurs cibles formatées
+  // (cf. CapacityStats.astro / fmtTarget). Le JS, optionnel, anime
+  // de 0 vers la cible quand l'élément entre dans le viewport APRÈS scroll.
+  // Si l'utilisateur n'a pas scrollé (élément déjà visible au chargement),
+  // on n'anime pas — la valeur SSR reste affichée, pas de flash "0".
   const counters = document.querySelectorAll<HTMLElement>('[data-counter]');
-  if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (counters.length && 'IntersectionObserver' in window && !prefersReducedMotion) {
+    let hasScrolled = window.scrollY > 0;
+    window.addEventListener(
+      'scroll',
+      () => { hasScrolled = true; },
+      { once: true, passive: true },
+    );
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (!entry.isIntersecting) return;
           const el = entry.target as HTMLElement;
+          io.unobserve(el);
+          // Élément visible avant tout scroll : on garde la valeur SSR.
+          if (!hasScrolled) return;
           const target = parseFloat(el.dataset.target || '0');
           const duration = 1400;
           const start = performance.now();
-          const fmt = (n: number) => {
-            if (target >= 1000) return Math.round(n).toLocaleString('fr-FR');
-            return Math.round(n).toString();
-          };
+          const fmt = (n: number) =>
+            target >= 1000
+              ? Math.round(n).toLocaleString('fr-FR')
+              : Math.round(n).toString();
           const tick = (now: number) => {
             const t = Math.min(1, (now - start) / duration);
             const eased = 1 - Math.pow(1 - t, 3);
@@ -110,17 +131,11 @@ const kpis = [
             if (t < 1) requestAnimationFrame(tick);
           };
           requestAnimationFrame(tick);
-          io.unobserve(el);
         });
       },
-      { threshold: 0.4 }
+      { threshold: 0.4 },
     );
     counters.forEach((c) => io.observe(c));
-  } else {
-    counters.forEach((el) => {
-      const target = parseFloat(el.dataset.target || '0');
-      el.textContent = target >= 1000 ? Math.round(target).toLocaleString('fr-FR') : String(target);
-    });
   }
 </script>
 
