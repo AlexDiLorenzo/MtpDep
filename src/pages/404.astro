@@ -1,0 +1,172 @@
+---
+// Page 404 — generee statiquement par Astro puis servie par Cloudflare
+// Pages avec un statut HTTP 404 pour toute URL non matchee par les routes
+// du site ni par public/_redirects.
+//
+// noindex active pour ne jamais remonter dans les SERP.
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TopNav from '../components/TopNav.astro';
+import Footer from '../components/Footer.astro';
+import PageHero from '../components/PageHero.astro';
+import { site } from '../config/site';
+
+const pageTitle = `Page introuvable · ${site.name}`;
+const pageDescription =
+  "La page que vous cherchez n'existe pas ou a ete deplacee. Retrouvez nos services de remorquage et de depannage 24/7 dans l'Herault et le Gard.";
+---
+
+<BaseLayout title={pageTitle} description={pageDescription} noindex>
+  <TopNav />
+
+  <main id="main">
+    <PageHero
+      overline="Erreur 404"
+      title="Page introuvable."
+      lead="La page que vous cherchez n'existe pas ou a été déplacée. Voici quelques pistes pour vous orienter."
+    />
+
+    <section class="nf-section">
+      <div class="nf-inner">
+        <ul class="nf-links">
+          <li>
+            <a href="/" class="nf-link">
+              <span class="nf-link-label">Accueil</span>
+              <span class="nf-link-desc">Présentation du réseau Montpellier Dépannage</span>
+            </a>
+          </li>
+          <li>
+            <a href="/services/" class="nf-link">
+              <span class="nf-link-label">Nos services</span>
+              <span class="nf-link-desc">Remorquage VL, PL, A9, transport international</span>
+            </a>
+          </li>
+          <li>
+            <a href="/agences/" class="nf-link">
+              <span class="nf-link-label">Nos agences</span>
+              <span class="nf-link-desc">8 agences dans l'Hérault et le Gard</span>
+            </a>
+          </li>
+        </ul>
+
+        <div class="nf-cta">
+          <p class="nf-cta-lead">Besoin d'une intervention immédiate&nbsp;?</p>
+          <a href={site.phone.href} class="nf-cta-phone" data-call-source="404">
+            <span aria-hidden="true">☎</span>
+            <span class="mono">{site.phone.display}</span>
+          </a>
+          <p class="nf-cta-kicker">24h/24, 7j/7 — astreinte permanente</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .nf-section {
+    padding: 64px var(--pad-x-desktop) 96px;
+    background: var(--color-bg);
+  }
+  .nf-inner {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+
+  .nf-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .nf-link {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 18px 22px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    text-decoration: none;
+    color: var(--color-text);
+    box-shadow: var(--shadow-xs);
+    transition: transform var(--dur-base) var(--ease-standard),
+                box-shadow var(--dur-base) var(--ease-standard),
+                border-color var(--dur-base) var(--ease-standard);
+  }
+  .nf-link:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-primary);
+  }
+  .nf-link-label {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+  .nf-link-desc {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+  }
+
+  .nf-cta {
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(228,225,60,0.12) 0%, transparent 60%),
+      var(--md-brand-green);
+    border-radius: var(--radius-2xl);
+    padding: 32px 28px;
+    text-align: center;
+    color: #fff;
+  }
+  .nf-cta-lead {
+    font-size: 15px;
+    color: rgba(255,255,255,0.85);
+    margin: 0 0 16px;
+  }
+  .nf-cta-phone {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 24px;
+    background: var(--md-brand-yellow);
+    color: var(--md-brand-black);
+    border-radius: var(--radius-lg);
+    font-size: 18px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+    transition: background-color var(--dur-base) var(--ease-standard),
+                transform var(--dur-base) var(--ease-standard);
+  }
+  .nf-cta-phone:hover {
+    background: var(--color-accent-hover);
+    transform: translateY(-2px);
+  }
+  .nf-cta-kicker {
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    margin: 14px 0 0;
+    letter-spacing: 0.04em;
+  }
+
+  @media (max-width: 1023px) {
+    .nf-section { padding: 52px var(--pad-x-tablet) 72px; }
+    .nf-inner { grid-template-columns: 1fr; gap: 32px; }
+  }
+  @media (max-width: 639px) {
+    .nf-section { padding: 40px var(--pad-x-mobile) 56px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nf-link, .nf-cta-phone { transition: none; }
+  }
+</style>

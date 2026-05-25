@@ -1,0 +1,24 @@
+# Redirections 301 — anciennes URL WordPress vers le nouveau site.
+# Cloudflare Pages : premier match gagnant, motifs specifiques avant wildcards.
+
+# --- Pages exactes ---
+/devis                /#devis  301
+/embed                /        301
+/photos               /        301
+/videos               /        301
+/paiement-remorquage  /        301
+
+# --- Familles WordPress (archives, medias, admin) ---
+/category/*           /        301
+/author/*             /        301
+/page/*               /        301
+/photos/*             /        301
+/videos/*             /        301
+/wp-content/*         /        301
+/wp-admin/*           /        301
+
+# --- Anciens articles patrimoniaux (prefixes) ---
+/accident-*           /        301
+/championnat-*        /        301
+/salon-*              /        301
+/rallye-*             /        301
