@@ -25,7 +25,7 @@ export const site = {
   },
 
   hours: '24/7',
-  url: 'https://montpellierdepannage.com',
+  url: 'https://www.montpellierdepannage.com',
 } as const;
 
 // Navigation principale — pages multi-pages (architecture SEO).

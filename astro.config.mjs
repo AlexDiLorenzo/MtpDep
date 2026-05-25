@@ -2,7 +2,7 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://montpellierdepannage.com',
+  site: 'https://www.montpellierdepannage.com',
   trailingSlash: 'ignore',
   compressHTML: true,
   integrations: [

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://montpellierdepannage.com/sitemap-index.xml
+Sitemap: https://www.montpellierdepannage.com/sitemap-index.xml
