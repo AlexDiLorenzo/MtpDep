@@ -1,6 +1,6 @@
 # Montpellier Dépannage — Site web
 
-Site vitrine Astro pour Montpellier Dépannage (remorquage 24/7, depuis 1956).
+Site vitrine Astro pour Montpellier Dépannage (remorquage 24/7, entreprise familiale, plus de 30 ans d'expérience).
 Stack : **Astro 4** static, vanilla TS, CSS scopé par composant. Pas de framework JS (pas de React, Vue, etc.).
 
 ## Source unique de vérité
