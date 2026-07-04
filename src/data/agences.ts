@@ -103,7 +103,7 @@ export const agences: Agence[] = [
     principal: true,
     contenu: {
       intro: [
-        "Installée dans la ZAC de Garosud, au sud de Montpellier, notre agence est le siège historique du réseau Montpellier Dépannage. Depuis 1956, nos équipes interviennent jour et nuit sur l'ensemble de l'agglomération, du cœur de ville aux grands axes qui la traversent.",
+        "Installée dans la ZAC de Garosud, au sud de Montpellier, notre agence est le siège historique du réseau Montpellier Dépannage. Depuis plus de 30 ans, nos équipes interviennent jour et nuit sur l'ensemble de l'agglomération, du cœur de ville aux grands axes qui la traversent.",
         "C'est ici que sont basés notre atelier mécanique, notre parc de plateaux pour véhicules légers et poids lourds, ainsi que notre flotte électrique dédiée aux zones piétonnes. Cette concentration de moyens nous permet de couvrir tous les types d'intervention sans délai de mobilisation, 24 h/24 et 7 j/7.",
       ],
       acces: "L'agence se situe avenue de Maurin, dans la ZAC de Garosud, à proximité immédiate de l'A709 et de la sortie Montpellier-Sud. L'accès poids lourds est aisé et un parking sécurisé permet le dépôt des véhicules en attente d'expertise ou de réparation.",
