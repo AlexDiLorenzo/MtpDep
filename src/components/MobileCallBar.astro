@@ -1,0 +1,98 @@
+---
+// Barre d'appel flottante — mobile uniquement (≤ 767px).
+//
+// Service d'urgence : sur mobile, l'action « Appeler » doit rester
+// accessible en permanence sans avoir à remonter au header. Deux
+// actions : appel direct (jaune signal) + demande de devis (vert).
+// Masquée en impression et sur desktop. Respecte la safe-area iOS.
+import { site } from '../config/site';
+---
+
+<div class="callbar" role="region" aria-label="Contact rapide">
+  <a
+    href={site.phone.href}
+    class="callbar-btn callbar-call mono"
+    data-call-source="mobile-callbar"
+  >
+    <span class="callbar-icon" aria-hidden="true">☎</span>
+    <span class="callbar-call-text">
+      <span class="callbar-call-kicker">Urgence 24/7</span>
+      <span class="callbar-call-num">{site.phone.display}</span>
+    </span>
+  </a>
+  <a href="/#devis" class="callbar-btn callbar-devis">Devis</a>
+</div>
+
+<style>
+  .callbar {
+    display: none;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 90;
+    gap: 8px;
+    padding: 8px var(--pad-x-mobile);
+    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+    background: rgba(255, 255, 255, 0.94);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--color-border);
+    box-shadow: 0 -4px 20px rgba(26, 25, 15, 0.1);
+  }
+
+  .callbar-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border-radius: var(--radius-lg);
+    font-weight: 700;
+    text-decoration: none;
+    padding: 12px 16px;
+  }
+
+  .callbar-call {
+    flex: 1;
+    background: var(--md-brand-yellow);
+    color: var(--md-brand-black);
+    box-shadow: 0 4px 14px rgba(228, 225, 60, 0.4);
+  }
+  .callbar-icon { font-size: 20px; line-height: 1; }
+  .callbar-call-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.1;
+  }
+  .callbar-call-kicker {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+  .callbar-call-num {
+    font-family: var(--font-mono);
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .callbar-devis {
+    background: var(--color-primary);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(44, 97, 38, 0.35);
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 767px) {
+    .callbar { display: flex; }
+    /* Réserve l'espace en bas pour ne pas masquer le footer / la fin de page. */
+    :global(body) { padding-bottom: 72px; }
+  }
+
+  @media print {
+    .callbar { display: none !important; }
+  }
+</style>

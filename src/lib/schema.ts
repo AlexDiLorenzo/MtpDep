@@ -47,12 +47,21 @@ export function organizationSchema() {
     name: site.name,
     url: site.url,
     logo: `${site.url}/img/logo-mdp.png`,
-    image: `${site.url}/img/logo-mdp.png`,
+    image: `${site.url}/img/hero-comedie.jpg`,
     description:
-      "Remorquage et dépannage 24h/24, 7j/7 à Montpellier et dans l'Hérault et le Gard. Plateaux VL et PL, autoroute A9, transport international. Plus de 30 ans d'expérience.",
+      "Remorquage et dépannage 24h/24, 7j/7 à Montpellier et dans l'Hérault et le Gard. Plateaux VL et PL, autoroute A9, transport international. Entreprise familiale depuis 1956.",
+    slogan: 'Remorquage et dépannage 24/7 depuis 1956.',
+    foundingDate: '1956',
     telephone: site.phone.display,
     email: site.email.display,
     address: postalAddress(agencePrincipale),
+    areaServed: [
+      { '@type': 'AdministrativeArea', name: 'Hérault' },
+      { '@type': 'AdministrativeArea', name: 'Gard' },
+    ],
+    sameAs: agences
+      .map((a) => a.reviewUrl)
+      .filter((url): url is string => Boolean(url)),
     subOrganization: agences.map((a) => ({
       '@type': 'AutomotiveBusiness',
       '@id': `${agenceUrl(a.slug)}#business`,
@@ -72,7 +81,7 @@ export function automotiveBusinessSchema(a: Agence) {
     '@id': `${agenceUrl(a.slug)}#business`,
     name: a.societe,
     url: agenceUrl(a.slug),
-    image: `${site.url}/og-default.jpg`,
+    image: `${site.url}/img/hero-comedie.jpg`,
     telephone: a.phones[0].display,
     address: postalAddress(a),
     ...(a.geo
@@ -108,6 +117,19 @@ export function serviceSchema(s: Service) {
       { '@type': 'AdministrativeArea', name: 'Hérault' },
       { '@type': 'AdministrativeArea', name: 'Gard' },
     ],
+  };
+}
+
+/** Schéma FAQPage à partir d'une liste de questions/réponses. */
+export function faqPageSchema(items: { q: string; a: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: items.map((it) => ({
+      '@type': 'Question',
+      name: it.q,
+      acceptedAnswer: { '@type': 'Answer', text: it.a },
+    })),
   };
 }
 

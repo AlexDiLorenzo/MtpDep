@@ -8,7 +8,7 @@ import Footer from '../../components/Footer.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import { photos } from '../../config/site';
 import { services, type Service } from '../../data/services';
-import { serviceSchema, breadcrumbSchema, serviceUrl } from '../../lib/schema';
+import { serviceSchema, breadcrumbSchema, serviceUrl, faqPageSchema } from '../../lib/schema';
 
 export function getStaticPaths() {
   return services.map((service) => ({
@@ -42,6 +42,7 @@ const jsonLd = [
     { name: 'Services', url: '/services/' },
     { name: service.nom, url: serviceUrl(service.slug) },
   ]),
+  faqPageSchema(service.faq),
 ];
 
 // Autres services (bloc de maillage interne en pied de page).
@@ -72,6 +73,9 @@ const autresServices = services.filter((s) => s.slug !== service.slug);
       <div class="sv-inner">
         <div class="sv-overline">Le service</div>
         <h2 class="sv-h2">{service.nom} avec Montpellier Dépannage.</h2>
+        <div class="sv-prose">
+          {service.intro.map((p) => <p>{p}</p>)}
+        </div>
       </div>
     </section>
 
@@ -80,6 +84,17 @@ const autresServices = services.filter((s) => s.slug !== service.slug);
       <div class="sv-inner">
         <div class="sv-overline">Comment ça se passe</div>
         <h2 class="sv-h2">Le déroulé de l’intervention.</h2>
+        <ol class="sv-steps">
+          {service.deroule.map((etape, i) => (
+            <li class="sv-step">
+              <span class="sv-step-num mono">{String(i + 1).padStart(2, '0')}</span>
+              <span class="sv-step-body">
+                <span class="sv-step-title">{etape.titre}</span>
+                <span class="sv-step-desc">{etape.desc}</span>
+              </span>
+            </li>
+          ))}
+        </ol>
       </div>
     </section>
 
@@ -95,6 +110,24 @@ const autresServices = services.filter((s) => s.slug !== service.slug);
         <a href="/agences/" class="sv-link">
           Voir les 8&nbsp;agences <span aria-hidden="true">→</span>
         </a>
+      </div>
+    </section>
+
+    {/* ====== FAQ ====== */}
+    <section class="sv-section sv-section--alt">
+      <div class="sv-inner">
+        <div class="sv-overline">Questions fréquentes</div>
+        <h2 class="sv-h2">Vos questions sur ce service.</h2>
+        <ul class="sv-faq">
+          {service.faq.map((item) => (
+            <li class="sv-faq-item">
+              <details>
+                <summary class="sv-faq-q">{item.q}</summary>
+                <p class="sv-faq-a">{item.a}</p>
+              </details>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
 
@@ -246,6 +279,110 @@ const autresServices = services.filter((s) => s.slug !== service.slug);
   }
   .sv-link:hover { text-decoration: underline; }
 
+  /* ====== PROSE ====== */
+  .sv-prose {
+    max-width: 720px;
+  }
+  .sv-prose p {
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--color-text-muted);
+    margin: 0 0 16px;
+  }
+  .sv-prose p:last-child { margin-bottom: 0; }
+
+  /* ====== DÉROULÉ (étapes) ====== */
+  .sv-steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    max-width: 900px;
+  }
+  .sv-step {
+    display: flex;
+    gap: 16px;
+    padding: 22px 24px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xs);
+  }
+  .sv-step-num {
+    font-family: var(--font-mono);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--color-primary);
+    background: var(--color-primary-bg);
+    border-radius: var(--radius-md);
+    padding: 6px 10px;
+    height: max-content;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .sv-step-body { display: flex; flex-direction: column; gap: 5px; }
+  .sv-step-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+  .sv-step-desc {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+  }
+
+  /* ====== FAQ ====== */
+  .sv-faq {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-width: 760px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .sv-faq-item {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+  }
+  .sv-faq details { width: 100%; }
+  .sv-faq-q {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 22px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-text);
+    cursor: pointer;
+    list-style: none;
+  }
+  .sv-faq-q::-webkit-details-marker { display: none; }
+  .sv-faq-q::after {
+    content: '+';
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--color-primary);
+    line-height: 1;
+    flex-shrink: 0;
+    transition: transform var(--dur-base) var(--ease-standard);
+  }
+  .sv-faq details[open] .sv-faq-q::after { transform: rotate(45deg); }
+  .sv-faq-a {
+    margin: 0;
+    padding: 0 22px 20px;
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--color-text-muted);
+  }
+
   /* ====== AUTRES SERVICES ====== */
   .sv-others {
     list-style: none;
@@ -333,6 +470,8 @@ const autresServices = services.filter((s) => s.slug !== service.slug);
     .sv-cta { padding: 44px var(--pad-x-mobile); }
     .sv-h2 { font-size: 25px; }
     .sv-others { grid-template-columns: 1fr; }
+    .sv-steps { grid-template-columns: 1fr; }
+    .sv-prose p { font-size: 15px; }
   }
 
   @media (prefers-reduced-motion: reduce) {
