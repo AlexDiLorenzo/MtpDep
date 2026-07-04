@@ -42,6 +42,10 @@ const schemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {/* Active l'état "masqué avant apparition" seulement si JS dispo (anti-FOUC) */}
+    <script is:inline>
+      document.documentElement.classList.add('js-reveal');
+    </script>
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <meta name="description" content={description} />
@@ -81,6 +85,31 @@ const schemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <a href="#main" class="skip-link">Aller au contenu principal</a>
     <slot />
     <MobileCallBar />
+
+    {/* Apparition au scroll — révèle les éléments [data-reveal] à l'entrée en vue */}
+    <script is:inline>
+      (function () {
+        var els = document.querySelectorAll('[data-reveal]');
+        if (!els.length) return;
+        var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reduce || !('IntersectionObserver' in window)) {
+          els.forEach(function (el) { el.classList.add('is-visible'); });
+          return;
+        }
+        var io = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (e) {
+              if (e.isIntersecting) {
+                e.target.classList.add('is-visible');
+                io.unobserve(e.target);
+              }
+            });
+          },
+          { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+        );
+        els.forEach(function (el) { io.observe(el); });
+      })();
+    </script>
 
     {/* Tracking des clics sur les liens Appeler (tel:) */}
     <script is:inline>

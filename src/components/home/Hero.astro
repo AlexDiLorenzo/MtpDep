@@ -30,10 +30,10 @@ const stats = [
     </p>
 
     <div class="hero-cta">
-      <a href={site.phone.href} class="hero-phone">
+      <a href={site.phone.href} class="hero-phone" data-call-source="hero">
         <span class="hero-phone-icon" aria-hidden="true">☎</span>
         <span class="hero-phone-text">
-          <span class="hero-phone-kicker">Urgence</span>
+          <span class="hero-phone-kicker">Urgence 24/7</span>
           <span class="hero-phone-number mono">{site.phone.display}</span>
         </span>
       </a>
@@ -42,6 +42,12 @@ const stats = [
         <span class="hero-quote-arrow" aria-hidden="true">→</span>
       </a>
     </div>
+
+    <ul class="hero-reassure">
+      <li><span class="hero-reassure-check" aria-hidden="true">✓</span> Certifié NF&nbsp;Service</li>
+      <li><span class="hero-reassure-check" aria-hidden="true">✓</span> Agréé autoroutes A9</li>
+      <li><span class="hero-reassure-check" aria-hidden="true">✓</span> Toutes assistances, sans avance de frais</li>
+    </ul>
   </div>
 
   <div class="hero-trust">
@@ -60,18 +66,52 @@ const stats = [
 <style>
   .hero {
     position: relative;
-    min-height: 560px;
+    min-height: 620px;
     background-image:
-      linear-gradient(180deg, rgba(26,25,15,0.55) 0%, rgba(26,25,15,0.75) 100%),
+      radial-gradient(ellipse at 20% 15%, rgba(44,97,38,0.30) 0%, transparent 55%),
+      linear-gradient(90deg, rgba(26,25,15,0.72) 0%, rgba(26,25,15,0.30) 62%, transparent 100%),
+      linear-gradient(180deg, rgba(26,25,15,0.55) 0%, rgba(26,25,15,0.60) 45%, rgba(26,25,15,0.88) 100%),
       var(--hero-bg);
     background-size: cover;
     background-position: center;
     color: #fff;
-    padding: 80px var(--pad-x-desktop) 56px;
+    padding: 92px var(--pad-x-desktop) 60px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 40px;
+    gap: 44px;
+  }
+  /* Voile de grain subtil pour la profondeur */
+  .hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 120%, rgba(228,225,60,0.10) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* ---------- Animations d'entrée (au chargement) ---------- */
+  @keyframes hero-in {
+    from { opacity: 0; transform: translateY(26px); }
+    to   { opacity: 1; transform: none; }
+  }
+  .hero-pill,
+  .hero-title,
+  .hero-lead,
+  .hero-cta,
+  .hero-reassure,
+  .hero-trust {
+    animation: hero-in 0.8s var(--ease-reveal) both;
+  }
+  .hero-title    { animation-delay: 0.08s; }
+  .hero-lead     { animation-delay: 0.16s; }
+  .hero-cta      { animation-delay: 0.24s; }
+  .hero-reassure { animation-delay: 0.32s; }
+  .hero-trust    { animation-delay: 0.40s; }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-pill, .hero-title, .hero-lead, .hero-cta, .hero-reassure, .hero-trust {
+      animation: none;
+    }
   }
 
   .hero-content {
@@ -104,13 +144,14 @@ const stats = [
 
   .hero-title {
     font-family: var(--font-display);
-    font-size: 72px;
-    line-height: 1.02;
+    font-size: 76px;
+    line-height: 1.01;
     font-weight: 700;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.035em;
     margin: 0 0 20px;
     max-width: 900px;
     color: #fff;
+    text-shadow: 0 2px 30px rgba(0,0,0,0.25);
   }
   .hero-title-accent { color: var(--md-brand-yellow); }
 
@@ -126,7 +167,38 @@ const stats = [
     display: flex;
     gap: 14px;
     flex-wrap: wrap;
-    margin-bottom: 48px;
+    margin-bottom: 28px;
+  }
+
+  /* ---------- Ligne de réassurance ---------- */
+  .hero-reassure {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 22px;
+  }
+  .hero-reassure li {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.82);
+  }
+  .hero-reassure-check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(228,225,60,0.9);
+    color: var(--md-brand-black);
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
   }
 
   .hero-phone {
@@ -188,20 +260,36 @@ const stats = [
   .hero-stats {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
+    gap: 14px;
+  }
+  .hero-stat {
+    padding: 18px 20px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: var(--radius-xl);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    transition: background-color var(--dur-base) var(--ease-standard),
+                border-color var(--dur-base) var(--ease-standard),
+                transform var(--dur-base) var(--ease-standard);
+  }
+  .hero-stat:hover {
+    background: rgba(255,255,255,0.11);
+    border-color: rgba(228,225,60,0.4);
+    transform: translateY(-2px);
   }
   .hero-stat-value {
     font-family: var(--font-display);
-    font-size: 38px;
+    font-size: 40px;
     font-weight: 700;
     color: var(--md-brand-yellow);
     letter-spacing: -0.02em;
     line-height: 1;
   }
   .hero-stat-label {
-    font-size: 12px;
-    color: rgba(255,255,255,0.85);
-    margin-top: 6px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.9);
+    margin-top: 8px;
     font-weight: 600;
   }
   .hero-stat-kicker {

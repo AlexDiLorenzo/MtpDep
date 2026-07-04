@@ -13,7 +13,7 @@ const services = [
 
 <section class="services" id="services">
   <div class="services-inner">
-    <header class="services-head">
+    <header class="services-head" data-reveal>
       <div>
         <div class="services-overline">Nos activités</div>
         <h2 class="services-title">
@@ -23,8 +23,8 @@ const services = [
     </header>
 
     <div class="services-grid">
-      {services.map((s) => (
-        <article class="service-card">
+      {services.map((s, i) => (
+        <article class="service-card" data-reveal style={`--reveal-delay:${i * 70}ms`}>
           <div class="service-card-img" style={`--svc-img: url('${s.image}');`}>
             <span class="service-card-tag mono">{s.tag}</span>
           </div>
@@ -137,17 +137,17 @@ const services = [
     flex: 1;
   }
   .service-card-title {
-    font-size: 17px;
+    font-size: 19px;
     font-weight: 700;
     color: var(--color-text);
     margin: 0 0 8px;
     font-family: var(--font-sans);
   }
   .service-card-desc {
-    font-size: 13px;
+    font-size: 15px;
     color: var(--color-text-muted);
     margin: 0;
-    line-height: 1.55;
+    line-height: 1.6;
     flex: 1;
   }
   .service-card-link {

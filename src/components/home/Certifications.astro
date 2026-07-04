@@ -24,7 +24,7 @@ const certs = [
 
 <section class="certs" aria-labelledby="certs-title">
   <div class="certs-inner">
-    <header class="certs-head">
+    <header class="certs-head" data-reveal>
       <div class="certs-overline">Certifications &amp; agréments</div>
       <h2 class="certs-title" id="certs-title">
         Certifiés, agréés, <span class="certs-title-accent">engagés.</span>
@@ -36,8 +36,8 @@ const certs = [
     </header>
 
     <ul class="certs-grid">
-      {certs.map((c) => (
-        <li class="certs-card">
+      {certs.map((c, i) => (
+        <li class="certs-card" data-reveal style={`--reveal-delay:${i * 80}ms`}>
           <div class="certs-card-logo">
             {c.type === 'image' ? (
               <img src={c.src} alt={c.alt} loading="lazy" decoding="async" />
@@ -106,8 +106,8 @@ const certs = [
   }
   .certs-title-accent { color: var(--color-primary); }
   .certs-lead {
-    font-size: 15px;
-    line-height: 1.6;
+    font-size: 17px;
+    line-height: 1.65;
     color: var(--color-text-muted);
     margin: 0;
   }
@@ -188,8 +188,8 @@ const certs = [
     margin: 0 0 6px;
   }
   .certs-card-text {
-    font-size: 13px;
-    line-height: 1.55;
+    font-size: 15px;
+    line-height: 1.6;
     color: var(--color-text-muted);
     margin: 0;
   }

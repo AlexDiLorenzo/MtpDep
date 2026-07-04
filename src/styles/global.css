@@ -8,8 +8,8 @@ html, body {
   margin: 0;
   padding: 0;
   font-family: var(--font-sans);
-  font-size: var(--fs-md);
-  line-height: var(--lh-normal);
+  font-size: 16px;
+  line-height: 1.6;
   color: var(--color-text);
   background: var(--color-bg);
   -webkit-font-smoothing: antialiased;
@@ -68,9 +68,9 @@ ul { list-style: none; padding: 0; margin: 0; }
   display: inline-flex;
   align-items: center;
   gap: var(--sp-2);
-  padding: 14px 22px;
+  padding: 15px 24px;
   border-radius: var(--radius-lg);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: var(--fw-bold);
   text-decoration: none;
   border: 1px solid transparent;
@@ -113,6 +113,26 @@ ul { list-style: none; padding: 0; margin: 0; }
 .btn-ghost-dark:hover {
   background: rgba(255,255,255,0.08);
   border-color: rgba(255,255,255,0.6);
+}
+
+/* ---- Apparition au scroll ----
+   Hidden state appliqué UNIQUEMENT si JS actif (classe .js-reveal ajoutée
+   sur <html> par un script inline). Sans JS, rien n'est masqué : contenu
+   toujours visible. Désactivé si l'utilisateur préfère moins d'animation. */
+@media (prefers-reduced-motion: no-preference) {
+  .js-reveal [data-reveal] {
+    opacity: 0;
+    transform: translateY(20px);
+    transition:
+      opacity var(--dur-reveal) var(--ease-reveal),
+      transform var(--dur-reveal) var(--ease-reveal);
+    transition-delay: var(--reveal-delay, 0ms);
+    will-change: opacity, transform;
+  }
+  .js-reveal [data-reveal].is-visible {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* ---- Responsive scaffolding ---- */

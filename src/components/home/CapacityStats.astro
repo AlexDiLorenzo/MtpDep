@@ -41,7 +41,7 @@ const fmtTarget = (n: number) =>
 
 <section class="cap" id="capacite" aria-labelledby="cap-title">
   <div class="cap-inner">
-    <header class="cap-head">
+    <header class="cap-head" data-reveal>
       <div class="cap-overline">Notre capacité</div>
       <h2 class="cap-title" id="cap-title">
         Une flotte, une équipe,<br />
@@ -55,8 +55,8 @@ const fmtTarget = (n: number) =>
 
     <!-- KPIs -->
     <ul class="cap-kpis">
-      {kpis.map((k) => (
-        <li class="cap-kpi">
+      {kpis.map((k, i) => (
+        <li class="cap-kpi" data-reveal style={`--reveal-delay:${i * 70}ms`}>
           <div class="cap-kpi-value">
             <span class="cap-kpi-prefix">{k.prefix}</span><span
               data-counter
@@ -179,8 +179,8 @@ const fmtTarget = (n: number) =>
   }
   .cap-title-accent { color: var(--color-primary); }
   .cap-lead {
-    font-size: 16px;
-    line-height: 1.6;
+    font-size: 17px;
+    line-height: 1.65;
     color: var(--color-text-muted);
     margin: 0;
   }
@@ -238,13 +238,13 @@ const fmtTarget = (n: number) =>
   }
   .cap-kpi-label {
     margin-top: 10px;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 700;
     color: var(--color-text);
   }
   .cap-kpi-kicker {
-    margin-top: 4px;
-    font-size: 11px;
+    margin-top: 5px;
+    font-size: 12.5px;
     color: var(--color-text-muted);
     line-height: 1.45;
   }
