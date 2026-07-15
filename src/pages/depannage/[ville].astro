@@ -1,0 +1,661 @@
+---
+// Template paramétré des pages « zones d'intervention » : /depannage/{ville}/
+//
+// STRUCTURE UNIFORME, CONTENU DIFFÉRENCIÉ — chaque ville partage ce
+// gabarit ; tout le rédactionnel unique provient de `zones` (data/zones.ts),
+// et tous les libellés d'interface de `zoneLabels` (anti texte-en-dur,
+// prêt pour l'i18n). Le template ne contient aucune chaîne rédactionnelle.
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TopNav from '../../components/TopNav.astro';
+import Footer from '../../components/Footer.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { photos } from '../../config/site';
+import { zones, zoneLabels, getZoneAgence, type Zone } from '../../data/zones';
+import {
+  zoneServiceSchema,
+  breadcrumbSchema,
+  faqPageSchema,
+  zoneUrl,
+  agenceUrl,
+} from '../../lib/schema';
+
+export function getStaticPaths() {
+  return zones.map((zone) => ({
+    params: { ville: zone.slug },
+    props: { zone },
+  }));
+}
+
+interface Props {
+  zone: Zone;
+}
+
+const { zone } = Astro.props;
+const agence = getZoneAgence(zone);
+const phonePrincipal = agence.phones[0];
+
+// --- SEO ---------------------------------------------------------
+const pageTitle = `Dépannage à ${zone.ville} (${zone.codePostal}) · Remorquage 24/7 — Montpellier Dépannage`;
+const pageDescription = zone.accroche;
+
+// --- Fil d'Ariane ------------------------------------------------
+const crumbs = [
+  { name: 'Accueil', href: '/' },
+  { name: zoneLabels.breadcrumbRoot, href: '/agences/' },
+  { name: zone.ville },
+];
+const crumbSchemaItems = [
+  { name: 'Accueil', url: '/' },
+  { name: zoneLabels.breadcrumbRoot, url: '/agences/' },
+  { name: zone.ville, url: zoneUrl(zone.slug) },
+];
+
+// --- JSON-LD -----------------------------------------------------
+const jsonLd = [
+  zoneServiceSchema(zone, agence),
+  breadcrumbSchema(crumbSchemaItems),
+  faqPageSchema(zone.faq),
+];
+
+// --- Itinéraire Google Maps (agence → ville) ---------------------
+const mapsHref =
+  agence.geo && zone.geo
+    ? `https://www.google.com/maps/dir/?api=1&origin=${agence.geo.lat},${agence.geo.lng}&destination=${zone.geo.lat},${zone.geo.lng}`
+    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+        `${zone.ville} ${zone.codePostal}`,
+      )}`;
+---
+
+<BaseLayout title={pageTitle} description={pageDescription} jsonLd={jsonLd}>
+  <TopNav />
+  <Breadcrumbs items={crumbs} />
+
+  <main id="main">
+    {/* ============ HERO ============ */}
+    <section class="zn-hero" style={`--zn-hero-bg: url('${photos.flotteCamions}');`}>
+      <div class="zn-hero-inner">
+        <div class="zn-hero-pill">
+          <span class="zn-hero-pill-dot" aria-hidden="true"></span>
+          {zoneLabels.heroPill(zone.departement)}
+        </div>
+
+        <h1 class="zn-hero-title">
+          {zoneLabels.heroTitleLead}<br />
+          <span class="zn-hero-title-accent">{zoneLabels.heroTitleCity(zone.ville)}</span>
+        </h1>
+
+        <p class="zn-hero-lead">{zone.accroche}</p>
+
+        <a
+          href={phonePrincipal.href}
+          class="zn-hero-cta"
+          data-call-source={`zone-${zone.slug}`}
+        >
+          <span aria-hidden="true">☎</span>
+          <span class="mono">{phonePrincipal.display}</span>
+          <span class="zn-hero-cta-kicker">{zoneLabels.heroPhoneLabel}</span>
+        </a>
+
+        <p class="zn-hero-network">{zoneLabels.heroNetwork(agence.nomCourt)}</p>
+      </div>
+    </section>
+
+    {/* ============ PRÉSENTATION ============ */}
+    <section class="zn-section">
+      <div class="zn-inner">
+        <div class="zn-overline">{zoneLabels.introOverline(zone.ville)}</div>
+        <h2 class="zn-h2">{zoneLabels.introHeading}</h2>
+        <div class="zn-prose">
+          {zone.intro.map((p) => <p>{p}</p>)}
+        </div>
+
+        <div class="zn-reperes">
+          <span class="zn-reperes-label">{zoneLabels.reperesLabel}</span>
+          <ul class="zn-reperes-list">
+            {zone.reperes.map((r) => <li>{r}</li>)}
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    {/* ============ AGENCE DE RATTACHEMENT ============ */}
+    <section class="zn-section zn-section--alt">
+      <div class="zn-inner">
+        <div class="zn-overline">{zoneLabels.accesOverline}</div>
+        <h2 class="zn-h2">{zoneLabels.accesHeading(zone.ville)}</h2>
+
+        <div class="zn-coords">
+          <div class="zn-card">
+            <span class="zn-card-distance">
+              {zoneLabels.accesDistance(zone.distanceMin, agence.nomCourt)}
+            </span>
+            <h3 class="zn-card-title">{agence.societe}</h3>
+            <address class="zn-card-address">
+              {agence.adresse.rue}<br />
+              {agence.adresse.codePostal}&nbsp;{agence.adresse.ville}
+              <span class="zn-card-dept"> · {agence.departement}</span>
+            </address>
+
+            <dl class="zn-card-list">
+              <div class="zn-card-row">
+                <dt>{phonePrincipal.label ?? zoneLabels.heroPhoneLabel}</dt>
+                <dd>
+                  <a
+                    href={phonePrincipal.href}
+                    class="zn-card-phone mono"
+                    data-call-source={`zone-${zone.slug}-card`}
+                  >
+                    {phonePrincipal.display}
+                  </a>
+                </dd>
+              </div>
+              <div class="zn-card-row">
+                <dt>{zoneLabels.accesHoursLabel}</dt>
+                <dd>{zoneLabels.accesHoursValue}</dd>
+              </div>
+            </dl>
+
+            <div class="zn-card-links">
+              <a href={agenceUrl(agence.slug)} class="zn-card-link">
+                {zoneLabels.accesAgenceLink}
+                <span aria-hidden="true">→</span>
+              </a>
+              <a href={mapsHref} class="zn-card-link" target="_blank" rel="noopener">
+                {zoneLabels.accesMapsLink}
+                <span aria-hidden="true">↗</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="zn-access">
+            <div class="zn-prose">
+              <p>{zone.acces}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {/* ============ PRESTATIONS ============ */}
+    <section class="zn-section">
+      <div class="zn-inner">
+        <div class="zn-overline">{zoneLabels.prestationsOverline}</div>
+        <h2 class="zn-h2">{zoneLabels.prestationsHeading(zone.ville)}</h2>
+
+        <ul class="zn-services">
+          {zone.prestations.map((s, i) => (
+            <li class="zn-service">
+              <span class="zn-service-tag mono">{String(i + 1).padStart(2, '0')}</span>
+              <span class="zn-service-body">
+                <span class="zn-service-name">{s.nom}</span>
+                <span class="zn-service-desc">{s.description}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    {/* ============ ALENTOURS ============ */}
+    <section class="zn-section zn-section--alt">
+      <div class="zn-inner">
+        <div class="zn-overline">{zoneLabels.alentoursOverline}</div>
+        <h2 class="zn-h2">{zoneLabels.alentoursHeading(zone.ville)}</h2>
+        <p class="zn-zone-lead">{zoneLabels.alentoursLead(zone.ville)}</p>
+        <ul class="zn-communes">
+          {zone.alentours.map((c) => <li>{c}</li>)}
+        </ul>
+      </div>
+    </section>
+
+    {/* ============ FAQ ============ */}
+    <section class="zn-section">
+      <div class="zn-inner">
+        <div class="zn-overline">{zoneLabels.faqOverline}</div>
+        <h2 class="zn-h2">{zoneLabels.faqHeading(zone.ville)}</h2>
+        <ul class="zn-faq">
+          {zone.faq.map((item) => (
+            <li class="zn-faq-item">
+              <details>
+                <summary class="zn-faq-q">{item.q}</summary>
+                <p class="zn-faq-a">{item.a}</p>
+              </details>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    {/* ============ CTA FINAL ============ */}
+    <section class="zn-cta">
+      <div class="zn-cta-inner">
+        <h2 class="zn-cta-title">{zoneLabels.ctaTitle(zone.ville)}</h2>
+        <p class="zn-cta-lead">{zoneLabels.ctaLead}</p>
+        <a
+          href={phonePrincipal.href}
+          class="zn-cta-phone"
+          data-call-source={`zone-${zone.slug}-cta`}
+        >
+          <span aria-hidden="true">☎</span>
+          <span class="mono">{phonePrincipal.display}</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  /* ============ HERO ============ */
+  .zn-hero {
+    position: relative;
+    background-image:
+      linear-gradient(180deg, rgba(26,25,15,0.62) 0%, rgba(26,25,15,0.82) 100%),
+      var(--zn-hero-bg);
+    background-size: cover;
+    background-position: center;
+    color: #fff;
+    padding: 72px var(--pad-x-desktop) 64px;
+  }
+  .zn-hero-inner { max-width: var(--container-max); margin: 0 auto; }
+  .zn-hero-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    background: rgba(228,225,60,0.95);
+    border-radius: var(--radius-pill);
+    color: var(--md-brand-black);
+    margin-bottom: 24px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .zn-hero-pill-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--md-brand-green);
+    box-shadow: 0 0 0 3px rgba(44,97,38,0.25);
+  }
+  .zn-hero-title {
+    font-family: var(--font-display);
+    font-size: 56px;
+    line-height: 1.04;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin: 0 0 16px;
+  }
+  .zn-hero-title-accent { color: var(--md-brand-yellow); }
+  .zn-hero-lead {
+    font-size: 17px;
+    line-height: 1.55;
+    color: rgba(255,255,255,0.88);
+    max-width: 640px;
+    margin: 0 0 28px;
+  }
+  .zn-hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 24px;
+    background: var(--md-brand-yellow);
+    color: var(--md-brand-black);
+    border-radius: var(--radius-lg);
+    font-size: 18px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+    transition: transform var(--dur-base) var(--ease-standard);
+  }
+  .zn-hero-cta:hover { transform: translateY(-2px); }
+  .zn-hero-cta-kicker {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.65;
+    font-weight: 700;
+  }
+  .zn-hero-network {
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+    margin: 22px 0 0;
+    max-width: 560px;
+  }
+
+  /* ============ SECTIONS ============ */
+  .zn-section {
+    padding: 72px var(--pad-x-desktop);
+    background: var(--color-bg);
+  }
+  .zn-section--alt {
+    background: var(--color-bg-subtle);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .zn-inner { max-width: var(--container-max); margin: 0 auto; }
+  .zn-overline {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    background: var(--color-primary-bg);
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    margin-bottom: 14px;
+  }
+  .zn-h2 {
+    font-family: var(--font-display);
+    font-size: 32px;
+    line-height: 1.12;
+    letter-spacing: var(--tr-display);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 24px;
+  }
+
+  /* ============ PROSE ============ */
+  .zn-prose p {
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--color-text-muted);
+    margin: 0 0 16px;
+    max-width: 70ch;
+  }
+  .zn-prose p:last-child { margin-bottom: 0; }
+
+  /* ============ REPÈRES ============ */
+  .zn-reperes {
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid var(--color-border);
+  }
+  .zn-reperes-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+  .zn-reperes-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .zn-reperes-list li {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    padding: 7px 14px;
+  }
+
+  /* ============ AGENCE DE RATTACHEMENT ============ */
+  .zn-coords {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  .zn-card {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-2xl);
+    padding: 28px 26px;
+    box-shadow: var(--shadow-sm);
+  }
+  .zn-card-distance {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-primary);
+    background: var(--color-primary-bg);
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    margin-bottom: 16px;
+  }
+  .zn-card-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 12px;
+    color: var(--color-text);
+  }
+  .zn-card-address {
+    font-style: normal;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    margin-bottom: 18px;
+  }
+  .zn-card-dept {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+  .zn-card-list {
+    margin: 0 0 18px;
+    border-top: 1px solid var(--color-border);
+  }
+  .zn-card-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .zn-card-row dt {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    font-weight: 600;
+  }
+  .zn-card-row dd {
+    margin: 0;
+    font-size: 13px;
+    text-align: right;
+    color: var(--color-text);
+  }
+  .zn-card-phone {
+    color: var(--color-primary);
+    font-weight: 700;
+    font-size: 15px;
+    text-decoration: none;
+  }
+  .zn-card-phone:hover { text-decoration: underline; }
+  .zn-card-links { display: flex; flex-direction: column; gap: 10px; }
+  .zn-card-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+  .zn-card-link:hover { text-decoration: underline; }
+  .zn-access { display: flex; flex-direction: column; gap: 14px; }
+
+  /* ============ PRESTATIONS ============ */
+  .zn-services {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .zn-service {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px 18px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xs);
+  }
+  .zn-service-tag {
+    flex-shrink: 0;
+    background: var(--md-brand-yellow);
+    color: var(--md-brand-black);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: var(--radius-xs);
+  }
+  .zn-service-body { display: flex; flex-direction: column; gap: 3px; flex: 1; }
+  .zn-service-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+  .zn-service-desc {
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--color-text-muted);
+  }
+
+  /* ============ ALENTOURS ============ */
+  .zn-zone-lead {
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--color-text-muted);
+    margin: 0 0 20px;
+    max-width: 70ch;
+  }
+  .zn-communes {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .zn-communes li {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    padding: 8px 14px;
+  }
+
+  /* ============ FAQ ============ */
+  .zn-faq {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-width: 760px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .zn-faq-item {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+  }
+  .zn-faq details { width: 100%; }
+  .zn-faq-q {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 22px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-text);
+    cursor: pointer;
+    list-style: none;
+  }
+  .zn-faq-q::-webkit-details-marker { display: none; }
+  .zn-faq-q::after {
+    content: '+';
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--color-primary);
+    line-height: 1;
+    flex-shrink: 0;
+    transition: transform var(--dur-base) var(--ease-standard);
+  }
+  .zn-faq details[open] .zn-faq-q::after { transform: rotate(45deg); }
+  .zn-faq-a {
+    margin: 0;
+    padding: 0 22px 20px;
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--color-text-muted);
+  }
+
+  /* ============ CTA ============ */
+  .zn-cta {
+    padding: 64px var(--pad-x-desktop);
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(228,225,60,0.12) 0%, transparent 60%),
+      var(--md-brand-green);
+    text-align: center;
+  }
+  .zn-cta-inner { max-width: var(--container-max); margin: 0 auto; }
+  .zn-cta-title {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 8px;
+  }
+  .zn-cta-lead { font-size: 15px; color: rgba(255,255,255,0.8); margin: 0 0 24px; }
+  .zn-cta-phone {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 28px;
+    background: var(--md-brand-yellow);
+    color: var(--md-brand-black);
+    border-radius: var(--radius-lg);
+    font-size: 20px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+    transition: transform var(--dur-base) var(--ease-standard);
+  }
+  .zn-cta-phone:hover { transform: translateY(-2px); }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 1023px) {
+    .zn-hero { padding: 56px var(--pad-x-tablet) 52px; }
+    .zn-hero-title { font-size: 42px; }
+    .zn-section { padding: 56px var(--pad-x-tablet); }
+    .zn-cta { padding: 52px var(--pad-x-tablet); }
+    .zn-h2 { font-size: 28px; }
+  }
+  @media (max-width: 767px) {
+    .zn-hero { padding: 44px var(--pad-x-mobile) 40px; }
+    .zn-hero-title { font-size: 32px; }
+    .zn-section { padding: 48px var(--pad-x-mobile); }
+    .zn-cta { padding: 44px var(--pad-x-mobile); }
+    .zn-coords { grid-template-columns: 1fr; }
+    .zn-services { grid-template-columns: 1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .zn-hero-cta, .zn-cta-phone, .zn-faq-q::after { transition: none; }
+  }
+</style>

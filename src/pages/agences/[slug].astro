@@ -11,6 +11,7 @@ import Footer from '../../components/Footer.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import { photos } from '../../config/site';
 import { agences, type Agence } from '../../data/agences';
+import { zonesByAgence } from '../../data/zones';
 import { automotiveBusinessSchema, breadcrumbSchema, agenceUrl } from '../../lib/schema';
 
 export function getStaticPaths() {
@@ -27,6 +28,10 @@ interface Props {
 const { agence } = Astro.props;
 const { adresse, phones } = agence;
 const phonePrincipal = phones[0];
+
+// Villes rattachées à cette agence (pages « zones d'intervention »).
+// Maillage interne agence → villes ; vide pour les agences sans zone.
+const villesRattachees = zonesByAgence(agence.slug);
 
 // --- SEO ---------------------------------------------------------
 const pageTitle = `Dépannage à ${adresse.ville} (${adresse.codePostal}) · Remorquage 24/7 — Montpellier Dépannage`;
@@ -221,6 +226,33 @@ const mapsHref = agence.geo
         </ul>
       </div>
     </section>
+
+    {/* ============ ZONES D'INTERVENTION (villes rattachées) ============ */}
+    {villesRattachees.length > 0 && (
+      <section class="ag-section">
+        <div class="ag-inner">
+          <div class="ag-overline">Villes desservies</div>
+          <h2 class="ag-h2">Zones d'intervention depuis {agence.nomCourt}.</h2>
+          <p class="ag-zone-lead">
+            Au-delà de son secteur immédiat, l'agence de {agence.nomCourt} intervient
+            dans plusieurs villes voisines. Découvrez le détail par ville&nbsp;:
+          </p>
+          <ul class="ag-zones">
+            {villesRattachees.map((z) => (
+              <li>
+                <a href={`/depannage/${z.slug}/`} class="ag-zone-card">
+                  <span class="ag-zone-name">{z.ville}</span>
+                  <span class="ag-zone-meta">
+                    {z.codePostal} · {z.departement} · ~{z.distanceMin}&nbsp;min
+                  </span>
+                  <span class="ag-zone-arrow" aria-hidden="true">→</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )}
 
     {/* ============ CTA FINAL ============ */}
     <section class="ag-cta">
@@ -539,6 +571,46 @@ const mapsHref = agence.geo
     padding: 8px 14px;
   }
 
+  /* ============ ZONES D'INTERVENTION (villes rattachées) ============ */
+  .ag-zones {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .ag-zone-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px 18px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    text-decoration: none;
+    box-shadow: var(--shadow-xs);
+    transition: transform var(--dur-base) var(--ease-standard),
+                box-shadow var(--dur-base) var(--ease-standard);
+  }
+  .ag-zone-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .ag-zone-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+  .ag-zone-meta {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    font-weight: 600;
+  }
+  .ag-zone-arrow {
+    margin-top: 4px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+
   /* ============ CTA ============ */
   .ag-cta {
     padding: 64px var(--pad-x-desktop);
@@ -587,6 +659,7 @@ const mapsHref = agence.geo
     .ag-section { padding: 56px var(--pad-x-tablet); }
     .ag-cta { padding: 52px var(--pad-x-tablet); }
     .ag-h2 { font-size: 28px; }
+    .ag-zones { grid-template-columns: repeat(2, 1fr); }
   }
   @media (max-width: 767px) {
     .ag-hero { padding: 44px var(--pad-x-mobile) 40px; }
@@ -595,6 +668,7 @@ const mapsHref = agence.geo
     .ag-cta { padding: 44px var(--pad-x-mobile); }
     .ag-coords { grid-template-columns: 1fr; }
     .ag-services { grid-template-columns: 1fr; }
+    .ag-zones { grid-template-columns: 1fr; }
     .ag-phone { flex: 1; justify-content: center; }
   }
 

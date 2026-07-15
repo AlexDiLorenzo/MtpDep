@@ -8,6 +8,7 @@
 import { site } from '../config/site';
 import { agences, agencePrincipale, type Agence } from '../data/agences';
 import type { Service } from '../data/services';
+import type { Zone } from '../data/zones';
 
 /** Spécification d'ouverture 24h/24, 7j/7. */
 const opening24_7 = {
@@ -22,6 +23,9 @@ export const agenceUrl = (slug: string): string => `${site.url}/agences/${slug}/
 
 /** URL absolue d'une page service. */
 export const serviceUrl = (slug: string): string => `${site.url}/services/${slug}/`;
+
+/** URL absolue d'une page zone d'intervention. */
+export const zoneUrl = (slug: string): string => `${site.url}/depannage/${slug}/`;
 
 /** PostalAddress schema.org d'une agence. */
 function postalAddress(a: Agence) {
@@ -116,6 +120,47 @@ export function serviceSchema(s: Service) {
       { '@type': 'AdministrativeArea', name: 'Hérault' },
       { '@type': 'AdministrativeArea', name: 'Gard' },
     ],
+  };
+}
+
+/**
+ * Schéma Service d'une page « zone d'intervention ».
+ *
+ * Modélise un service de dépannage/remorquage COUVRANT la ville, fourni
+ * par l'agence de rattachement. `areaServed` = la ville ; le prestataire
+ * est l'agence (AutomotiveBusiness). On ne revendique AUCUNE adresse dans
+ * la ville : la page ne prétend pas à un établissement local (honnête, et
+ * conforme aux consignes Google sur les pages de zone desservie).
+ */
+export function zoneServiceSchema(zone: Zone, agence: Agence) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: `Dépannage et remorquage à ${zone.ville}`,
+    serviceType: 'Dépannage et remorquage automobile',
+    url: zoneUrl(zone.slug),
+    provider: {
+      '@type': 'AutomotiveBusiness',
+      '@id': `${agenceUrl(agence.slug)}#business`,
+      name: agence.societe,
+      url: agenceUrl(agence.slug),
+      telephone: agence.phones[0].display,
+      address: postalAddress(agence),
+    },
+    areaServed: {
+      '@type': 'City',
+      name: zone.ville,
+      ...(zone.geo
+        ? { geo: { '@type': 'GeoCoordinates', latitude: zone.geo.lat, longitude: zone.geo.lng } }
+        : {}),
+    },
+    hoursAvailable: [opening24_7],
+    parentOrganization: {
+      '@type': 'Organization',
+      '@id': `${site.url}/#organization`,
+      name: site.name,
+      url: site.url,
+    },
   };
 }
 

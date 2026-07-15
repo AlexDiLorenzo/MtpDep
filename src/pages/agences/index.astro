@@ -8,7 +8,13 @@ import Footer from '../../components/Footer.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import CoverageMap from '../../components/CoverageMap.astro';
 import { agences } from '../../data/agences';
+import { zonesByAgence } from '../../data/zones';
 import { organizationSchema, breadcrumbSchema } from '../../lib/schema';
+
+// Agences ayant des villes rattachées → bloc « zones d'intervention ».
+const agencesAvecZones = agences
+  .map((a) => ({ agence: a, villes: zonesByAgence(a.slug) }))
+  .filter((g) => g.villes.length > 0);
 
 const pageTitle = 'Nos 8 agences · Montpellier Dépannage — Hérault & Gard';
 const pageDescription =
@@ -93,6 +99,40 @@ const jsonLd = [
         </p>
       </div>
     </section>
+
+    {/* ====== Zones d'intervention (villes sans agence) ====== */}
+    {agencesAvecZones.length > 0 && (
+      <section class="ax-zones-section">
+        <div class="ax-zones-inner">
+          <div class="ax-overline">Zones d'intervention</div>
+          <h2 class="ax-zones-title">Villes desservies sans agence sur place.</h2>
+          <p class="ax-zones-lead">
+            Au-delà de nos 8&nbsp;agences, nous intervenons dans de nombreuses villes
+            de l'Hérault et du Gard, rattachées à l'agence la plus proche. Chaque ville
+            dispose de sa page dédiée&nbsp;:
+          </p>
+          <div class="ax-zones-groups">
+            {agencesAvecZones.map((g) => (
+              <div class="ax-zones-group">
+                <h3 class="ax-zones-group-title">
+                  Depuis <a href={`/agences/${g.agence.slug}/`}>{g.agence.nomCourt}</a>
+                </h3>
+                <ul class="ax-zones-list">
+                  {g.villes.map((z) => (
+                    <li>
+                      <a href={`/depannage/${z.slug}/`}>
+                        {z.ville}
+                        <span class="ax-zones-cp">{z.codePostal}</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
 
     {/* ====== CTA ====== */}
     <section class="ax-cta">
@@ -280,6 +320,80 @@ const jsonLd = [
     border-radius: var(--radius-lg);
   }
 
+  /* ====== Zones d'intervention ====== */
+  .ax-zones-section {
+    padding: 8px var(--pad-x-desktop) 72px;
+    background: var(--color-bg);
+  }
+  .ax-zones-inner { max-width: var(--container-max); margin: 0 auto; }
+  .ax-zones-title {
+    font-family: var(--font-display);
+    font-size: 28px;
+    line-height: 1.12;
+    letter-spacing: var(--tr-display);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 12px;
+  }
+  .ax-zones-lead {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    margin: 0 0 28px;
+    max-width: 720px;
+  }
+  .ax-zones-groups {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .ax-zones-group {
+    background: var(--color-bg-subtle);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: 20px 22px;
+  }
+  .ax-zones-group-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-muted);
+    margin: 0 0 14px;
+  }
+  .ax-zones-group-title a {
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+  .ax-zones-group-title a:hover { text-decoration: underline; }
+  .ax-zones-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .ax-zones-list a {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-text);
+    text-decoration: none;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .ax-zones-list a:hover { color: var(--color-primary); }
+  .ax-zones-cp {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+
   /* ====== CTA ====== */
   .ax-cta {
     padding: 56px var(--pad-x-desktop);
@@ -320,6 +434,8 @@ const jsonLd = [
     .ax-list-section { padding: 48px var(--pad-x-tablet) 56px; }
     .ax-cta { padding: 48px var(--pad-x-tablet); }
     .ax-grid { grid-template-columns: repeat(2, 1fr); }
+    .ax-zones-section { padding: 8px var(--pad-x-tablet) 56px; }
+    .ax-zones-groups { grid-template-columns: repeat(2, 1fr); }
   }
   @media (max-width: 639px) {
     .ax-head { padding: 40px var(--pad-x-mobile) 28px; }
@@ -328,6 +444,8 @@ const jsonLd = [
     .ax-list-section { padding: 40px var(--pad-x-mobile) 48px; }
     .ax-cta { padding: 40px var(--pad-x-mobile); }
     .ax-grid { grid-template-columns: 1fr; }
+    .ax-zones-section { padding: 8px var(--pad-x-mobile) 48px; }
+    .ax-zones-groups { grid-template-columns: 1fr; }
     .ax-map-badge { font-size: 10px; padding: 6px 10px; top: 12px; left: 12px; }
   }
 
