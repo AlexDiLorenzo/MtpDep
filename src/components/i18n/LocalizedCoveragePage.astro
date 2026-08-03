@@ -1,0 +1,380 @@
+---
+// Page couverture traduite (EN / ES) : /en/coverage/, /es/zonas/
+//
+// Page UNIQUE, là où le français a un hub plus 15 fiches villes. Un
+// visiteur étranger cherche « est-ce qu'ils viennent jusqu'à moi ? »,
+// pas un texte local par commune — et 15 pages traduites peu recherchées
+// diluent le site sans rien capter. Les fiches détaillées FR restent
+// accessibles depuis chaque ligne.
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import LocalizedNav from './LocalizedNav.astro';
+import LocalizedFooter from './LocalizedFooter.astro';
+import { site } from '../../config/site';
+import { agences } from '../../data/agences';
+import { zones, getZoneAgence } from '../../data/zones';
+import { getContent, localeMeta, pathFor, type TranslatedLocale } from '../../i18n';
+import { breadcrumbSchema, faqPageSchema } from '../../lib/schema';
+
+interface Props {
+  locale: TranslatedLocale;
+}
+
+const { locale } = Astro.props;
+const { ui, coverage } = getContent(locale);
+const lang = localeMeta[locale].lang;
+const coveragePath = pathFor('coverage', locale)!;
+
+const villes = zones.map((z) => ({ zone: z, agence: getZoneAgence(z) }));
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: coverage.heading,
+    serviceType: 'Vehicle towing and roadside recovery',
+    url: `${site.url}${coveragePath}`,
+    inLanguage: lang,
+    provider: {
+      '@type': 'Organization',
+      '@id': `${site.url}/#organization`,
+      name: site.name,
+      url: site.url,
+      telephone: site.phone.display,
+    },
+    areaServed: [
+      { '@type': 'AdministrativeArea', name: 'Hérault' },
+      { '@type': 'AdministrativeArea', name: 'Gard' },
+      ...zones.map((z) => ({ '@type': 'City', name: z.ville })),
+    ],
+  },
+  breadcrumbSchema([
+    { name: ui.navHome, url: pathFor('home', locale)! },
+    { name: ui.navCoverage, url: coveragePath },
+  ]),
+  faqPageSchema(coverage.faq),
+];
+---
+
+<BaseLayout
+  title={coverage.title}
+  description={coverage.description}
+  locale={locale}
+  routeKey="coverage"
+  skipLabel={ui.skipToContent}
+  jsonLd={jsonLd}
+>
+  <LocalizedNav locale={locale} routeKey="coverage" />
+
+  <main id="main">
+    <section class="lcv-head">
+      <div class="lcv-inner">
+        <nav class="lcv-crumbs" aria-label={ui.breadcrumbLabel}>
+          <a href={pathFor('home', locale)!}>{ui.navHome}</a>
+          <span aria-hidden="true">/</span>
+          <span>{ui.navCoverage}</span>
+        </nav>
+        <div class="lcv-overline">{coverage.overline}</div>
+        <h1 class="lcv-title">{coverage.heading}</h1>
+        <div class="lcv-prose">
+          {coverage.lead.map((p) => <p>{p}</p>)}
+        </div>
+      </div>
+    </section>
+
+    {/* ====== Bases ====== */}
+    <section class="lcv-section">
+      <div class="lcv-inner">
+        <h2 class="lcv-h2">{coverage.agencesHeading}</h2>
+        <p class="lcv-lead">{coverage.agencesLead}</p>
+        <ul class="lcv-depots">
+          {agences.map((a) => (
+            <li class="lcv-depot">
+              <h3 class="lcv-depot-name">{a.nomCourt}</h3>
+              <address class="lcv-depot-addr">
+                {a.adresse.rue}<br />
+                {a.adresse.codePostal} {a.adresse.ville}
+              </address>
+              <a href={a.phones[0].href} class="lcv-depot-phone mono" data-call-source={`${locale}-coverage-${a.slug}`}>
+                {a.phones[0].display}
+              </a>
+              <a href={`/agences/${a.slug}/`} class="lcv-depot-link" hreflang="fr" lang="fr">
+                {ui.footerFrenchSite} <span aria-hidden="true">→</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    {/* ====== Villes ====== */}
+    <section class="lcv-section lcv-section-alt">
+      <div class="lcv-inner">
+        <h2 class="lcv-h2">{coverage.villesHeading}</h2>
+        <p class="lcv-lead">{coverage.villesLead}</p>
+        <ul class="lcv-villes">
+          {villes.map(({ zone, agence }) => (
+            <li class="lcv-ville">
+              {/* Lien vers la fiche FR détaillée : signalée lang=fr pour
+                  qu'aucun moteur ne la prenne pour du contenu traduit. */}
+              <a href={`/depannage/${zone.slug}/`} hreflang="fr" lang="fr" class="lcv-ville-name">
+                {zone.ville}
+              </a>
+              <span class="lcv-ville-cp mono">{zone.codePostal}</span>
+              <span class="lcv-ville-meta">
+                {zone.distanceMin}&nbsp;min {coverage.fromAgency} {agence.nomCourt}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    {/* ====== FAQ ====== */}
+    <section class="lcv-section">
+      <div class="lcv-inner">
+        <h2 class="lcv-h2">{ui.faqHeading}</h2>
+        <div class="lcv-faq">
+          {coverage.faq.map((f) => (
+            <details class="lcv-faq-item">
+              <summary>{f.q}</summary>
+              <p>{f.a}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {/* ====== CTA ====== */}
+    <section class="lcv-cta">
+      <div class="lcv-inner">
+        <h2 class="lcv-cta-title">{coverage.ctaTitle}</h2>
+        <p class="lcv-cta-lead">{coverage.ctaLead}</p>
+        <a href={site.phone.href} class="lcv-cta-phone" data-call-source={`${locale}-coverage-cta`}>
+          <span aria-hidden="true">☎</span>
+          <span class="mono">{site.phone.display}</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <LocalizedFooter locale={locale} routeKey="coverage" />
+</BaseLayout>
+
+<style>
+  .lcv-inner { max-width: var(--container-max); margin: 0 auto; }
+  .lcv-head { padding: 48px var(--pad-x-desktop) 36px; background: var(--color-bg); }
+  .lcv-crumbs {
+    display: flex;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin-bottom: 20px;
+  }
+  .lcv-crumbs a { color: var(--color-primary); text-decoration: none; }
+  .lcv-crumbs a:hover { text-decoration: underline; }
+  .lcv-overline {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    background: var(--color-primary-bg);
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    margin-bottom: 16px;
+  }
+  .lcv-title {
+    font-family: var(--font-display);
+    font-size: 44px;
+    line-height: 1.08;
+    letter-spacing: var(--tr-display);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 18px;
+    max-width: 760px;
+  }
+  .lcv-prose { max-width: 760px; }
+  .lcv-prose p {
+    font-size: 16px;
+    line-height: 1.75;
+    color: var(--color-text-muted);
+    margin: 0 0 16px;
+  }
+
+  .lcv-section { padding: 52px var(--pad-x-desktop); background: var(--color-bg); }
+  .lcv-section-alt { background: var(--color-bg-subtle); }
+  .lcv-h2 {
+    font-family: var(--font-display);
+    font-size: 28px;
+    line-height: 1.12;
+    letter-spacing: var(--tr-display);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 12px;
+  }
+  .lcv-lead {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--color-text-muted);
+    margin: 0 0 26px;
+    max-width: 720px;
+  }
+
+  /* ====== Bases ====== */
+  .lcv-depots {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+  .lcv-depot {
+    display: flex;
+    flex-direction: column;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: 20px;
+  }
+  .lcv-depot-name {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 8px;
+  }
+  .lcv-depot-addr {
+    font-style: normal;
+    font-size: 12px;
+    line-height: 1.55;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+  }
+  .lcv-depot-phone {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-primary);
+    text-decoration: none;
+    margin-bottom: 10px;
+  }
+  .lcv-depot-phone:hover { text-decoration: underline; }
+  .lcv-depot-link {
+    margin-top: auto;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--color-text-muted);
+    text-decoration: none;
+  }
+  .lcv-depot-link:hover { color: var(--color-primary); }
+
+  /* ====== Villes ====== */
+  .lcv-villes {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .lcv-ville {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 14px 16px;
+  }
+  .lcv-ville-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-text);
+    text-decoration: none;
+  }
+  .lcv-ville-name:hover { color: var(--color-primary); text-decoration: underline; }
+  .lcv-ville-cp { font-size: 11px; color: var(--color-text-muted); }
+  .lcv-ville-meta {
+    width: 100%;
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+
+  /* ====== FAQ ====== */
+  .lcv-faq { max-width: 820px; }
+  .lcv-faq-item { border-bottom: 1px solid var(--color-border); padding: 16px 0; }
+  .lcv-faq-item summary {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--color-text);
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .lcv-faq-item summary::-webkit-details-marker { display: none; }
+  .lcv-faq-item summary::after {
+    content: '+';
+    color: var(--color-primary);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .lcv-faq-item[open] summary::after { content: '−'; }
+  .lcv-faq-item p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--color-text-muted);
+    margin: 12px 0 0;
+  }
+
+  /* ====== CTA ====== */
+  .lcv-cta {
+    padding: 56px var(--pad-x-desktop);
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(228,225,60,0.12) 0%, transparent 60%),
+      var(--md-brand-green);
+    text-align: center;
+  }
+  .lcv-cta-title {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 8px;
+  }
+  .lcv-cta-lead { font-size: 15px; color: rgba(255,255,255,0.82); margin: 0 0 22px; }
+  .lcv-cta-phone {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 28px;
+    background: var(--md-brand-yellow);
+    color: var(--md-brand-black);
+    border-radius: var(--radius-lg);
+    font-size: 20px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+  }
+
+  /* ====== Responsive ====== */
+  @media (max-width: 1023px) {
+    .lcv-head { padding: 40px var(--pad-x-tablet) 28px; }
+    .lcv-title { font-size: 34px; }
+    .lcv-section { padding: 44px var(--pad-x-tablet); }
+    .lcv-cta { padding: 48px var(--pad-x-tablet); }
+    .lcv-depots { grid-template-columns: repeat(2, 1fr); }
+    .lcv-villes { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 639px) {
+    .lcv-head { padding: 32px var(--pad-x-mobile) 24px; }
+    .lcv-title { font-size: 27px; }
+    .lcv-section { padding: 36px var(--pad-x-mobile); }
+    .lcv-cta { padding: 40px var(--pad-x-mobile); }
+    .lcv-depots, .lcv-villes { grid-template-columns: 1fr; }
+  }
+</style>

@@ -1,0 +1,235 @@
+---
+// Index des services traduit (EN / ES) : /en/services/, /es/servicios/
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import LocalizedNav from './LocalizedNav.astro';
+import LocalizedFooter from './LocalizedFooter.astro';
+import { site, photos } from '../../config/site';
+import { services as servicesFr } from '../../data/services';
+import { getContent, localeMeta, pathFor, type TranslatedLocale } from '../../i18n';
+import { organizationSchema, breadcrumbSchema } from '../../lib/schema';
+
+interface Props {
+  locale: TranslatedLocale;
+}
+
+const { locale } = Astro.props;
+const { ui, serviceIndex, services } = getContent(locale);
+const lang = localeMeta[locale].lang;
+const servicesPath = pathFor('services', locale)!;
+
+// Les visuels sont partagés avec le FR : ils vivent dans data/services.ts,
+// indexés par slug français.
+const photoFor = (slugFr: string) => {
+  const fr = servicesFr.find((s) => s.slug === slugFr);
+  return fr ? photos[fr.photo] : photos.flotteCamions;
+};
+
+const jsonLd = [
+  { ...organizationSchema(), inLanguage: lang },
+  breadcrumbSchema([
+    { name: ui.navHome, url: pathFor('home', locale)! },
+    { name: ui.navServices, url: servicesPath },
+  ]),
+];
+---
+
+<BaseLayout
+  title={serviceIndex.title}
+  description={serviceIndex.description}
+  locale={locale}
+  routeKey="services"
+  skipLabel={ui.skipToContent}
+  jsonLd={jsonLd}
+>
+  <LocalizedNav locale={locale} routeKey="services" />
+
+  <main id="main">
+    <section class="lsx-head">
+      <div class="lsx-inner">
+        <nav class="lsx-crumbs" aria-label={ui.breadcrumbLabel}>
+          <a href={pathFor('home', locale)!}>{ui.navHome}</a>
+          <span aria-hidden="true">/</span>
+          <span>{ui.navServices}</span>
+        </nav>
+        <div class="lsx-overline">{serviceIndex.overline}</div>
+        <h1 class="lsx-title">{serviceIndex.heading}</h1>
+        <p class="lsx-lead">{serviceIndex.lead}</p>
+      </div>
+    </section>
+
+    <section class="lsx-grid-section">
+      <div class="lsx-inner">
+        <ul class="lsx-grid">
+          {services.map((s) => (
+            <li>
+              <a href={`${servicesPath}${s.slug}/`} class="lsx-card">
+                <div class="lsx-card-img" style={`--lsx-img: url('${photoFor(s.slugFr)}');`}>
+                  <span class="lsx-card-tag mono">{s.tag}</span>
+                </div>
+                <div class="lsx-card-body">
+                  <h2 class="lsx-card-title">{s.titre}</h2>
+                  <p class="lsx-card-desc">{s.resume}</p>
+                </div>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <section class="lsx-cta">
+      <div class="lsx-inner">
+        <h2 class="lsx-cta-title">{ui.emergency}</h2>
+        <a href={site.phone.href} class="lsx-cta-phone" data-call-source={`${locale}-services-cta`}>
+          <span aria-hidden="true">☎</span>
+          <span class="mono">{site.phone.display}</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <LocalizedFooter locale={locale} routeKey="services" />
+</BaseLayout>
+
+<style>
+  .lsx-head { padding: 48px var(--pad-x-desktop) 36px; background: var(--color-bg); }
+  .lsx-inner { max-width: var(--container-max); margin: 0 auto; }
+  .lsx-crumbs {
+    display: flex;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin-bottom: 20px;
+  }
+  .lsx-crumbs a { color: var(--color-primary); text-decoration: none; }
+  .lsx-crumbs a:hover { text-decoration: underline; }
+  .lsx-overline {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    background: var(--color-primary-bg);
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    margin-bottom: 16px;
+  }
+  .lsx-title {
+    font-family: var(--font-display);
+    font-size: 44px;
+    line-height: 1.08;
+    letter-spacing: var(--tr-display);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 16px;
+    max-width: 760px;
+  }
+  .lsx-lead {
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--color-text-muted);
+    margin: 0;
+    max-width: 700px;
+  }
+
+  .lsx-grid-section { padding: 24px var(--pad-x-desktop) 72px; background: var(--color-bg); }
+  .lsx-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .lsx-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    text-decoration: none;
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--dur-base) var(--ease-standard),
+                box-shadow var(--dur-base) var(--ease-standard);
+  }
+  .lsx-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .lsx-card-img {
+    height: 168px;
+    background-image:
+      linear-gradient(180deg, rgba(26,25,15,0) 40%, rgba(26,25,15,0.7) 100%),
+      var(--lsx-img);
+    background-size: cover;
+    background-position: center;
+    position: relative;
+  }
+  .lsx-card-tag {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 4px 8px;
+    background: var(--md-brand-yellow);
+    color: var(--md-brand-black);
+    border-radius: var(--radius-xs);
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .lsx-card-body { padding: 20px 22px 22px; display: flex; flex-direction: column; flex: 1; }
+  .lsx-card-title { font-size: 17px; font-weight: 700; color: var(--color-text); margin: 0 0 8px; }
+  .lsx-card-desc {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  .lsx-cta {
+    padding: 56px var(--pad-x-desktop);
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(228,225,60,0.12) 0%, transparent 60%),
+      var(--md-brand-green);
+    text-align: center;
+  }
+  .lsx-cta-title {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 20px;
+  }
+  .lsx-cta-phone {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 28px;
+    background: var(--md-brand-yellow);
+    color: var(--md-brand-black);
+    border-radius: var(--radius-lg);
+    font-size: 20px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+  }
+
+  @media (max-width: 1023px) {
+    .lsx-head { padding: 40px var(--pad-x-tablet) 28px; }
+    .lsx-title { font-size: 34px; }
+    .lsx-grid-section { padding: 24px var(--pad-x-tablet) 56px; }
+    .lsx-cta { padding: 48px var(--pad-x-tablet); }
+    .lsx-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 639px) {
+    .lsx-head { padding: 32px var(--pad-x-mobile) 24px; }
+    .lsx-title { font-size: 28px; }
+    .lsx-grid-section { padding: 20px var(--pad-x-mobile) 48px; }
+    .lsx-cta { padding: 40px var(--pad-x-mobile); }
+    .lsx-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lsx-card { transition: none; }
+  }
+</style>

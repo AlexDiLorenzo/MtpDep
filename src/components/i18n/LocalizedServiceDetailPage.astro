@@ -1,0 +1,418 @@
+---
+// Fiche service traduite (EN / ES).
+// URL : /en/services/{slug}/ · /es/servicios/{slug}/
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import LocalizedNav from './LocalizedNav.astro';
+import LocalizedFooter from './LocalizedFooter.astro';
+import { site, photos } from '../../config/site';
+import { services as servicesFr } from '../../data/services';
+import {
+  getContent,
+  localeMeta,
+  pathFor,
+  serviceRouteKey,
+  type LocalizedService,
+  type TranslatedLocale,
+} from '../../i18n';
+import { breadcrumbSchema, faqPageSchema } from '../../lib/schema';
+
+interface Props {
+  locale: TranslatedLocale;
+  service: LocalizedService;
+}
+
+const { locale, service } = Astro.props;
+const { ui, services } = getContent(locale);
+const lang = localeMeta[locale].lang;
+
+const servicesPath = pathFor('services', locale)!;
+const routeKey = serviceRouteKey(service.slugFr);
+
+// Visuel partagé avec la fiche FR équivalente.
+const fr = servicesFr.find((s) => s.slug === service.slugFr);
+const photo = fr ? photos[fr.photo] : photos.flotteCamions;
+
+const others = services.filter((s) => s.slug !== service.slug).slice(0, 3);
+
+const pageTitle = `${service.titre} · Montpellier Dépannage`;
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: service.titre,
+    serviceType: service.nom,
+    description: service.resume,
+    url: `${site.url}${servicesPath}${service.slug}/`,
+    inLanguage: lang,
+    provider: {
+      '@type': 'Organization',
+      '@id': `${site.url}/#organization`,
+      name: site.name,
+      url: site.url,
+      telephone: site.phone.display,
+    },
+    areaServed: [
+      { '@type': 'AdministrativeArea', name: 'Hérault' },
+      { '@type': 'AdministrativeArea', name: 'Gard' },
+    ],
+  },
+  breadcrumbSchema([
+    { name: ui.navHome, url: pathFor('home', locale)! },
+    { name: ui.navServices, url: servicesPath },
+    { name: service.nom, url: `${servicesPath}${service.slug}/` },
+  ]),
+  faqPageSchema(service.faq),
+];
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={service.resume}
+  locale={locale}
+  routeKey={routeKey}
+  skipLabel={ui.skipToContent}
+  ogImage={photo}
+  jsonLd={jsonLd}
+>
+  <LocalizedNav locale={locale} routeKey={routeKey} />
+
+  <main id="main">
+    {/* ====== Hero ====== */}
+    <section class="lsd-hero" style={`--lsd-bg: url('${photo}');`}>
+      <div class="lsd-inner">
+        <nav class="lsd-crumbs" aria-label={ui.breadcrumbLabel}>
+          <a href={pathFor('home', locale)!}>{ui.navHome}</a>
+          <span aria-hidden="true">/</span>
+          <a href={servicesPath}>{ui.navServices}</a>
+          <span aria-hidden="true">/</span>
+          <span>{service.nom}</span>
+        </nav>
+
+        <span class="lsd-tag mono">{service.tag}</span>
+        <h1 class="lsd-title">{service.titre}</h1>
+        <p class="lsd-resume">{service.resume}</p>
+
+        <a href={site.phone.href} class="lsd-phone" data-call-source={`${locale}-service-${service.slug}`}>
+          <span aria-hidden="true">☎</span>
+          <span class="mono">{site.phone.display}</span>
+          <span class="lsd-phone-kicker">{ui.emergency}</span>
+        </a>
+      </div>
+    </section>
+
+    {/* ====== Présentation ====== */}
+    <section class="lsd-section">
+      <div class="lsd-inner lsd-prose">
+        {service.intro.map((p) => <p>{p}</p>)}
+      </div>
+    </section>
+
+    {/* ====== Déroulé ====== */}
+    <section class="lsd-section lsd-section-alt">
+      <div class="lsd-inner">
+        <h2 class="lsd-h2">{ui.stepsHeading}</h2>
+        <ol class="lsd-steps">
+          {service.deroule.map((e, i) => (
+            <li class="lsd-step">
+              <span class="lsd-step-num mono">{String(i + 1).padStart(2, '0')}</span>
+              <h3 class="lsd-step-title">{e.titre}</h3>
+              <p class="lsd-step-desc">{e.desc}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+
+    {/* ====== FAQ ====== */}
+    <section class="lsd-section">
+      <div class="lsd-inner">
+        <h2 class="lsd-h2">{ui.faqHeading}</h2>
+        <div class="lsd-faq">
+          {service.faq.map((f) => (
+            <details class="lsd-faq-item">
+              <summary>{f.q}</summary>
+              <p>{f.a}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {/* ====== Autres services ====== */}
+    <section class="lsd-section lsd-section-alt">
+      <div class="lsd-inner">
+        <h2 class="lsd-h2">{ui.otherServices}</h2>
+        <ul class="lsd-others">
+          {others.map((s) => (
+            <li>
+              <a href={`${servicesPath}${s.slug}/`} class="lsd-other">
+                <span class="lsd-other-tag mono">{s.tag}</span>
+                <span class="lsd-other-title">{s.titre}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+        <a href={servicesPath} class="lsd-back">
+          {ui.backToServices} <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </section>
+
+    {/* ====== CTA ====== */}
+    <section class="lsd-cta">
+      <div class="lsd-inner">
+        <h2 class="lsd-cta-title">{ui.callNow}</h2>
+        <a href={site.phone.href} class="lsd-cta-phone" data-call-source={`${locale}-service-cta`}>
+          <span aria-hidden="true">☎</span>
+          <span class="mono">{site.phone.display}</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <LocalizedFooter locale={locale} routeKey={routeKey} />
+</BaseLayout>
+
+<style>
+  .lsd-inner { max-width: var(--container-max); margin: 0 auto; }
+
+  /* ====== Hero ====== */
+  .lsd-hero {
+    background-image:
+      linear-gradient(180deg, rgba(26,25,15,0.7) 0%, rgba(26,25,15,0.86) 100%),
+      var(--lsd-bg);
+    background-size: cover;
+    background-position: center;
+    padding: 40px var(--pad-x-desktop) 56px;
+  }
+  .lsd-crumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.65);
+    margin-bottom: 24px;
+  }
+  .lsd-crumbs a { color: var(--md-brand-yellow); text-decoration: none; }
+  .lsd-crumbs a:hover { text-decoration: underline; }
+  .lsd-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    background: var(--md-brand-yellow);
+    color: var(--md-brand-black);
+    padding: 4px 9px;
+    border-radius: var(--radius-xs);
+    margin-bottom: 14px;
+  }
+  .lsd-title {
+    font-family: var(--font-display);
+    font-size: 42px;
+    line-height: 1.08;
+    letter-spacing: var(--tr-display);
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 14px;
+    max-width: 800px;
+  }
+  .lsd-resume {
+    font-size: 16px;
+    line-height: 1.65;
+    color: rgba(255,255,255,0.88);
+    margin: 0 0 26px;
+    max-width: 660px;
+  }
+  .lsd-phone {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 22px;
+    background: var(--md-brand-yellow);
+    color: var(--md-brand-black);
+    border-radius: var(--radius-lg);
+    font-size: 20px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+    transition: transform var(--dur-base) var(--ease-standard);
+  }
+  .lsd-phone:hover { transform: translateY(-2px); }
+  .lsd-phone-kicker {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.7;
+    padding-left: 12px;
+    border-left: 1px solid rgba(26,25,15,0.25);
+  }
+
+  /* ====== Sections ====== */
+  .lsd-section { padding: 56px var(--pad-x-desktop); background: var(--color-bg); }
+  .lsd-section-alt { background: var(--color-bg-subtle); }
+  .lsd-h2 {
+    font-family: var(--font-display);
+    font-size: 28px;
+    line-height: 1.12;
+    letter-spacing: var(--tr-display);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 24px;
+  }
+  .lsd-prose { max-width: 760px; }
+  .lsd-prose p {
+    font-size: 16px;
+    line-height: 1.75;
+    color: var(--color-text-muted);
+    margin: 0 0 18px;
+  }
+  .lsd-prose p:last-child { margin-bottom: 0; }
+
+  /* ====== Déroulé ====== */
+  .lsd-steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  .lsd-step {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: 22px;
+  }
+  .lsd-step-num {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--color-primary);
+    background: var(--color-primary-bg);
+    padding: 4px 9px;
+    border-radius: var(--radius-xs);
+    margin-bottom: 12px;
+  }
+  .lsd-step-title { font-size: 15px; font-weight: 700; color: var(--color-text); margin: 0 0 8px; }
+  .lsd-step-desc {
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  /* ====== FAQ ====== */
+  .lsd-faq { max-width: 820px; }
+  .lsd-faq-item { border-bottom: 1px solid var(--color-border); padding: 16px 0; }
+  .lsd-faq-item summary {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--color-text);
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .lsd-faq-item summary::-webkit-details-marker { display: none; }
+  .lsd-faq-item summary::after {
+    content: '+';
+    color: var(--color-primary);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .lsd-faq-item[open] summary::after { content: '−'; }
+  .lsd-faq-item p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--color-text-muted);
+    margin: 12px 0 0;
+  }
+
+  /* ====== Autres services ====== */
+  .lsd-others {
+    list-style: none;
+    margin: 0 0 24px;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .lsd-other {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 18px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    transition: border-color var(--dur-base) var(--ease-standard);
+  }
+  .lsd-other:hover { border-color: var(--color-primary); }
+  .lsd-other-tag {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--color-primary);
+    background: var(--color-primary-bg);
+    padding: 4px 8px;
+    border-radius: var(--radius-xs);
+    flex-shrink: 0;
+  }
+  .lsd-other-title { font-size: 14px; font-weight: 700; color: var(--color-text); }
+  .lsd-back { font-size: 14px; font-weight: 700; color: var(--color-primary); text-decoration: none; }
+  .lsd-back:hover { text-decoration: underline; }
+
+  /* ====== CTA ====== */
+  .lsd-cta {
+    padding: 56px var(--pad-x-desktop);
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(228,225,60,0.12) 0%, transparent 60%),
+      var(--md-brand-green);
+    text-align: center;
+  }
+  .lsd-cta-title {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 20px;
+  }
+  .lsd-cta-phone {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 28px;
+    background: var(--md-brand-yellow);
+    color: var(--md-brand-black);
+    border-radius: var(--radius-lg);
+    font-size: 20px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+  }
+
+  /* ====== Responsive ====== */
+  @media (max-width: 1023px) {
+    .lsd-hero { padding: 32px var(--pad-x-tablet) 48px; }
+    .lsd-title { font-size: 32px; }
+    .lsd-section { padding: 48px var(--pad-x-tablet); }
+    .lsd-cta { padding: 48px var(--pad-x-tablet); }
+    .lsd-steps { grid-template-columns: repeat(2, 1fr); }
+    .lsd-others { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 639px) {
+    .lsd-hero { padding: 28px var(--pad-x-mobile) 40px; }
+    .lsd-title { font-size: 26px; }
+    .lsd-section { padding: 40px var(--pad-x-mobile); }
+    .lsd-cta { padding: 40px var(--pad-x-mobile); }
+    .lsd-steps { grid-template-columns: 1fr; }
+    .lsd-phone { font-size: 17px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lsd-phone, .lsd-other { transition: none; }
+  }
+</style>

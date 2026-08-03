@@ -80,6 +80,22 @@ export type Agence = {
   reviewUrl?: string;
   /** Site principal du réseau (Montpellier Garosud). */
   principal?: boolean;
+  /**
+   * Surcharge du `<title>` et de la meta description.
+   *
+   * Le gabarit générique (« Dépannage à {ville} ({CP}) · Remorquage 24/7 »)
+   * suffit à la plupart des agences. Il est surchargé quand la Search Console
+   * montre un problème mesuré : soit la page double la home sur les mêmes
+   * requêtes et perd le clic, soit elle se positionne sur une intention que
+   * le titre générique n'adresse pas (« garage », « aéroport », « A75 »).
+   *
+   * Toute surcharge doit rester VRAIE au regard de `contenu` ci-dessous :
+   * on ne promet un atelier que là où il y en a un.
+   */
+  seo?: {
+    title: string;
+    description: string;
+  };
 };
 
 /** Construit un AgencePhone à partir d'un numéro français affiché. */
@@ -101,6 +117,18 @@ export const agences: Agence[] = [
     carte: { x: 556.3, y: 395.4 },
     geo: { lat: 43.583382, lng: 3.872376 },
     principal: true,
+    // GSC (6 mois) : 2 607 impressions → 14 clics (0,54 %), position 5,25.
+    // La page doublait la home sur « dépannage Montpellier », où la home est
+    // en position 1,2 : elle apparaissait plus bas avec le même titre et ne
+    // prenait aucun clic. On la repositionne sur ce que la home ne couvre pas
+    // — l'atelier (« garage montpellier » : 779 impressions, position 3,05,
+    // 1 % de CTR) et l'adresse du siège (« 2501 avenue de maurin »).
+    seo: {
+      title:
+        'Garage & dépannage Montpellier Garosud — Atelier et remorquage 24/7',
+      description:
+        'Siège du réseau, ZAC de Garosud : atelier mécanique, GPL et climatisation, remorquage VL et poids lourds. Sortie A709 Montpellier-Sud. Ouvert 24h/24 — 04 67 42 14 31.',
+    },
     contenu: {
       intro: [
         "Installée dans la ZAC de Garosud, au sud de Montpellier, notre agence est le siège historique du réseau Montpellier Dépannage. Depuis plus de 30 ans, nos équipes interviennent jour et nuit sur l'ensemble de l'agglomération, du cœur de ville aux grands axes qui la traversent.",
@@ -156,6 +184,16 @@ export const agences: Agence[] = [
     ],
     carte: { x: 578.3, y: 419.7 },
     geo: { lat: 43.575945, lng: 3.946692 },
+    // GSC : 1 256 impressions → 50 clics (3,98 %), position 4,86. Le titre
+    // générique ne disait rien des deux vraies accroches du secteur —
+    // l'aéroport Montpellier-Méditerranée et les stations du littoral —,
+    // alors que la page se positionne dessus.
+    seo: {
+      title:
+        'Dépannage Pérols & aéroport Montpellier · Remorquage 24/7',
+      description:
+        'Dépannage, remorquage et atelier mécanique à Pérols, près de l’aéroport Montpellier-Méditerranée. Carnon, Palavas, La Grande-Motte. 24h/24 — 04 67 71 07 20.',
+    },
     contenu: {
       intro: [
         "L'agence de Pérols dessert la frange littorale de l'agglomération montpelliéraine, entre les étangs et les stations balnéaires. Idéalement placée entre Montpellier et l'aéroport, elle répond aux pannes et accidents sur un secteur à forte circulation tout au long de l'année.",
@@ -346,6 +384,16 @@ export const agences: Agence[] = [
     // TODO Phase 2 : géocodage précis de la ZAC de la Salamane.
     // Valeur actuelle = centre-ville de Clermont-l'Hérault (approximatif).
     geo: { lat: 43.626318, lng: 3.430241 },
+    // GSC : 1 915 impressions → 42 clics (2,19 %) en position 3,82 — bien
+    // classée, mal cliquée. Le secteur cherche « garage clermont l'hérault »
+    // (236 impressions cumulées, 0 clic) et l'A75 n'apparaissait pas dans le
+    // titre alors qu'elle est l'axe structurant de l'agence.
+    seo: {
+      title:
+        'Dépannage & garage Clermont-l’Hérault · Remorquage A75 24/7',
+      description:
+        'Remorquage VL et poids lourds dans le Clermontais et sur l’A75, du Salagou à la vallée de l’Hérault. ZAC de la Salamane, sortie A75. 24h/24 — 04 67 42 14 31.',
+    },
     contenu: {
       intro: [
         "Au cœur du Clermontais, l'agence de Clermont-l'Hérault dessert un vaste bassin rural organisé autour du lac du Salagou et de la vallée de l'Hérault. Sa position sur l'A75 en fait un relais essentiel pour les automobilistes et les transporteurs qui empruntent cet axe nord-sud.",

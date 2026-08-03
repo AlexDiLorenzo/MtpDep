@@ -7,20 +7,23 @@ import CapacityStats from '../components/home/CapacityStats.astro';
 import ServicesGrid from '../components/home/ServicesGrid.astro';
 import CoverageBand from '../components/home/CoverageBand.astro';
 import Certifications from '../components/home/Certifications.astro';
-import AssistanceCTA from '../components/home/AssistanceCTA.astro';
+import DevisForm from '../components/home/DevisForm.astro';
 import { organizationSchema, automotiveBusinessSchema } from '../lib/schema';
 import { agencePrincipale } from '../data/agences';
 ---
 
-<BaseLayout jsonLd={[organizationSchema(), automotiveBusinessSchema(agencePrincipale)]}>
-  <TopNav />
+<BaseLayout
+  routeKey="home"
+  jsonLd={[organizationSchema(), automotiveBusinessSchema(agencePrincipale)]}
+>
+  <TopNav routeKey="home" />
   <main id="main">
     <Hero />
     <CapacityStats />
     <ServicesGrid />
     <CoverageBand />
     <Certifications />
-    <AssistanceCTA />
+    <DevisForm />
   </main>
   <Footer />
 </BaseLayout>

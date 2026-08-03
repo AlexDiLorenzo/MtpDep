@@ -1,0 +1,169 @@
+---
+// Pied de page des pages traduites (EN / ES).
+//
+// Porte le lien explicite vers le site français complet : les pages
+// agences, villes et mentions légales n'existent qu'en français, et un
+// visiteur étranger doit pouvoir y accéder sans passer par la home.
+
+import LogoMark from '../LogoMark.astro';
+import LanguageSwitcher from '../LanguageSwitcher.astro';
+import { site } from '../../config/site';
+import { getContent, pathFor, type RouteKey, type TranslatedLocale } from '../../i18n';
+
+interface Props {
+  locale: TranslatedLocale;
+  routeKey: RouteKey;
+}
+
+const { locale, routeKey } = Astro.props;
+const { ui, services } = getContent(locale);
+const year = new Date().getFullYear();
+---
+
+<footer class="lfooter">
+  <div class="lfooter-inner">
+    <div class="lfooter-grid">
+      <div class="lfooter-brand">
+        <LogoMark size={42} class="lfooter-logo" />
+        <address class="lfooter-address">
+          {site.address.street}<br />
+          {site.address.postalCode} {site.address.city} · France<br />
+          <a href={site.phone.href} class="lfooter-phone mono" data-call-source={`${locale}-footer`}>
+            {site.phone.display}
+          </a><br />
+          <a href={site.email.href} class="lfooter-email">{site.email.display}</a>
+        </address>
+        <p class="lfooter-hours">{ui.available}</p>
+      </div>
+
+      <div class="lfooter-col">
+        <div class="lfooter-col-title">{ui.footerServices}</div>
+        <ul>
+          {services.map((s) => (
+            <li>
+              <a href={`${pathFor('services', locale)}${s.slug}/`}>{s.nom}</a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="lfooter-col">
+        <div class="lfooter-col-title">{ui.footerNetwork}</div>
+        <ul>
+          <li><a href={pathFor('coverage', locale)!}>{ui.navCoverage}</a></li>
+          <li><a href="/agences/" hreflang="fr" lang="fr">Agences · Depots</a></li>
+          <li><a href="/mentions-legales/" hreflang="fr" lang="fr">{ui.footerLegal}</a></li>
+          <li><a href="/" hreflang="fr" lang="fr">{ui.footerFrenchSite}</a></li>
+        </ul>
+      </div>
+    </div>
+
+    {/* Le contenu FR est plus riche : on l'assume et on y renvoie. */}
+    <p class="lfooter-notice">
+      {ui.fullSiteNotice}{' '}
+      <a href="/" hreflang="fr" lang="fr">{ui.fullSiteLink}</a>
+    </p>
+
+    <div class="lfooter-meta">
+      <span>© {year} {site.name} · {ui.footerRights}</span>
+      <LanguageSwitcher current={locale} routeKey={routeKey} tone="dark" />
+    </div>
+  </div>
+</footer>
+
+<style>
+  .lfooter {
+    background: var(--md-brand-black);
+    color: var(--md-stone-50);
+    padding: 60px var(--pad-x-desktop) 24px;
+    font-family: var(--font-sans);
+  }
+  .lfooter-inner { max-width: var(--container-max); margin: 0 auto; }
+  .lfooter-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 32px;
+  }
+  .lfooter-brand :global(.lfooter-logo) {
+    background: var(--md-stone-50);
+    border-radius: 12px;
+    padding: 6px 10px;
+    margin-bottom: 18px;
+  }
+  .lfooter-address {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--md-stone-300);
+    font-style: normal;
+  }
+  .lfooter-phone {
+    color: var(--md-brand-yellow);
+    text-decoration: none;
+    font-weight: 700;
+  }
+  .lfooter-phone:hover { text-decoration: underline; }
+  .lfooter-email { color: var(--md-stone-50); text-decoration: none; }
+  .lfooter-email:hover { text-decoration: underline; }
+  .lfooter-hours {
+    margin: 12px 0 0;
+    font-size: 12px;
+    color: var(--md-stone-400);
+  }
+
+  .lfooter-col-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--md-stone-400);
+    margin-bottom: 14px;
+  }
+  .lfooter-col ul {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .lfooter-col a {
+    color: var(--md-stone-200);
+    font-size: 13px;
+    text-decoration: none;
+    transition: color var(--dur-fast) var(--ease-standard);
+  }
+  .lfooter-col a:hover { color: var(--md-brand-yellow); }
+
+  .lfooter-notice {
+    font-size: 12px;
+    line-height: 1.65;
+    color: var(--md-stone-400);
+    padding: 16px 18px;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: var(--radius-lg);
+    margin: 0 0 20px;
+  }
+  .lfooter-notice a { color: var(--md-brand-yellow); }
+
+  .lfooter-meta {
+    border-top: 1px solid var(--md-stone-600);
+    padding-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    font-size: 12px;
+    color: var(--md-stone-400);
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 1023px) {
+    .lfooter { padding: 56px var(--pad-x-tablet) 24px; }
+    .lfooter-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+  }
+  @media (max-width: 639px) {
+    .lfooter { padding: 48px var(--pad-x-mobile) 24px; }
+    .lfooter-grid { grid-template-columns: 1fr; gap: 28px; }
+  }
+</style>

@@ -1,0 +1,113 @@
+---
+// En-tête des pages traduites (EN / ES).
+//
+// Distinct de TopNav.astro, dont les libellés et les liens sont français
+// et dont la pill « MDP recrute » ne concerne qu'un public local.
+// Ici on garde l'essentiel : marque, deux rubriques, langue, téléphone.
+
+import LogoMark from '../LogoMark.astro';
+import LanguageSwitcher from '../LanguageSwitcher.astro';
+import { site } from '../../config/site';
+import { getContent, pathFor, type RouteKey, type TranslatedLocale } from '../../i18n';
+
+interface Props {
+  locale: TranslatedLocale;
+  routeKey: RouteKey;
+}
+
+const { locale, routeKey } = Astro.props;
+const { ui } = getContent(locale);
+
+const links = [
+  { label: ui.navServices, href: pathFor('services', locale)! },
+  { label: ui.navCoverage, href: pathFor('coverage', locale)! },
+];
+---
+
+<nav class="lnav">
+  <div class="lnav-inner">
+    <a href={pathFor('home', locale)!} class="lnav-brand" aria-label={`${site.name} — ${ui.navHome}`}>
+      <LogoMark size={32} />
+    </a>
+
+    <ul class="lnav-links">
+      {links.map((l) => (
+        <li><a href={l.href}>{l.label}</a></li>
+      ))}
+    </ul>
+
+    <div class="lnav-cta">
+      <LanguageSwitcher current={locale} routeKey={routeKey} />
+      <a href={site.phone.href} class="lnav-phone mono" data-call-source={`${locale}-nav`}>
+        <span aria-hidden="true">☎</span> {site.phone.display}
+      </a>
+    </div>
+  </div>
+</nav>
+
+<style>
+  .lnav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .lnav-inner {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: 14px var(--pad-x-desktop);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .lnav-brand { display: flex; align-items: center; flex-shrink: 0; }
+
+  .lnav-links {
+    display: flex;
+    align-items: center;
+    gap: 26px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .lnav-links a {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text);
+    text-decoration: none;
+    padding: 4px 0;
+    border-bottom: 2px solid transparent;
+    transition: color var(--dur-fast) var(--ease-standard),
+                border-color var(--dur-fast) var(--ease-standard);
+  }
+  .lnav-links a:hover { color: var(--color-primary); border-color: var(--color-primary); }
+
+  .lnav-cta { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .lnav-phone {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: var(--md-brand-green);
+    color: #fff;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+  .lnav-phone:hover { background: var(--md-forest-700, #234f1e); }
+
+  @media (max-width: 767px) {
+    .lnav-inner { padding: 12px var(--pad-x-mobile); gap: 12px; flex-wrap: wrap; }
+    .lnav-links { order: 3; width: 100%; gap: 18px; }
+    .lnav-phone { font-size: 13px; padding: 9px 13px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lnav-links a { transition: none; }
+  }
+</style>

@@ -9,6 +9,7 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import { photos } from '../../config/site';
 import { services, type Service } from '../../data/services';
 import { serviceSchema, breadcrumbSchema, serviceUrl, faqPageSchema } from '../../lib/schema';
+import { serviceRouteKey } from '../../i18n';
 
 export function getStaticPaths() {
   return services.map((service) => ({
@@ -49,8 +50,13 @@ const jsonLd = [
 const autresServices = services.filter((s) => s.slug !== service.slug);
 ---
 
-<BaseLayout title={pageTitle} description={pageDescription} jsonLd={jsonLd}>
-  <TopNav />
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  jsonLd={jsonLd}
+  routeKey={serviceRouteKey(service.slug)}
+>
+  <TopNav routeKey={serviceRouteKey(service.slug)} />
   <Breadcrumbs items={crumbs} />
 
   <main id="main">

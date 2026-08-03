@@ -1,0 +1,447 @@
+---
+// Hub des zones d'intervention : /depannage/
+//
+// Page parent des 15 pages /depannage/{ville}/. Sans ce hub, les pages
+// villes n'étaient atteignables que depuis /agences/ : profondeur de clic
+// élevée, aucun signal de regroupement thématique pour Google.
+//
+// Le hub porte le maillage : nav globale → hub → villes, et villes → hub
+// via le fil d'Ariane. Tout le rédactionnel des villes reste dans
+// data/zones.ts ; cette page n'agrège que des données existantes.
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TopNav from '../../components/TopNav.astro';
+import Footer from '../../components/Footer.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { site } from '../../config/site';
+import { agences } from '../../data/agences';
+import { zones, zonesByAgence } from '../../data/zones';
+import { breadcrumbSchema, zoneUrl, agenceUrl } from '../../lib/schema';
+
+// Regroupement par agence de rattachement — ordre de data/agences.ts.
+const groupes = agences
+  .map((a) => ({ agence: a, villes: zonesByAgence(a.slug) }))
+  .filter((g) => g.villes.length > 0);
+
+// Communes voisines citées dans les fiches villes, dédoublonnées : elles
+// prouvent l'étendue réelle de la couverture sans créer de page vide.
+const alentours = [...new Set(zones.flatMap((z) => z.alentours))]
+  .filter((v) => !zones.some((z) => z.ville === v))
+  .sort((a, b) => a.localeCompare(b, 'fr'));
+
+const departements = [...new Set(zones.map((z) => z.departement))];
+
+const pageTitle =
+  'Zones d’intervention · Dépannage et remorquage 24/7 — Hérault & Gard';
+const pageDescription = `Dépannage et remorquage 24h/24 dans ${zones.length} villes de l'Hérault et du Gard : Sète, Nîmes, Lodève, La Grande-Motte, Uzès… Chaque ville est rattachée à l'agence Montpellier Dépannage la plus proche.`;
+
+const crumbs = [
+  { name: 'Accueil', href: '/' },
+  { name: 'Zones d’intervention' },
+];
+
+// ItemList : signale à Google la collection de pages villes et son ordre.
+const itemListSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'Zones d’intervention Montpellier Dépannage',
+  numberOfItems: zones.length,
+  itemListElement: zones.map((z, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: `Dépannage à ${z.ville}`,
+    url: zoneUrl(z.slug),
+  })),
+};
+
+const jsonLd = [
+  itemListSchema,
+  breadcrumbSchema([
+    { name: 'Accueil', url: '/' },
+    { name: 'Zones d’intervention', url: '/depannage/' },
+  ]),
+];
+---
+
+<BaseLayout title={pageTitle} description={pageDescription} jsonLd={jsonLd} routeKey="coverage">
+  <TopNav routeKey="coverage" />
+  <Breadcrumbs items={crumbs} />
+
+  <main id="main">
+    {/* ====== En-tête ====== */}
+    <section class="zx-head">
+      <div class="zx-head-inner">
+        <div class="zx-overline">Zones d’intervention</div>
+        <h1 class="zx-title">
+          Où intervenons-nous&nbsp;?<br />
+          <span class="zx-title-accent">{zones.length}&nbsp;villes, 24&nbsp;h/24.</span>
+        </h1>
+        <p class="zx-lead">
+          Au-delà de nos {agences.length}&nbsp;agences, nos équipes couvrent
+          {' '}{zones.length}&nbsp;villes de {departements.join(' et du ')} depuis
+          l’agence la plus proche. Chaque ville a sa page&nbsp;: délai de route,
+          repères locaux, prestations disponibles et agence de rattachement.
+        </p>
+
+        <div class="zx-head-cta">
+          <a href={site.phone.href} class="zx-phone" data-call-source="zones-hub-head">
+            <span aria-hidden="true">☎</span>
+            <span class="mono">{site.phone.display}</span>
+            <span class="zx-phone-kicker">Urgence 24/7</span>
+          </a>
+          <a href="/agences/" class="zx-secondary">
+            Voir nos {agences.length}&nbsp;agences
+            <span aria-hidden="true">→</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    {/* ====== Villes par agence de rattachement ====== */}
+    <section class="zx-groups-section">
+      <div class="zx-inner">
+        {groupes.map((g) => (
+          <div class="zx-group">
+            <div class="zx-group-head">
+              <h2 class="zx-group-title">Depuis {g.agence.nomCourt}</h2>
+              <a href={agenceUrl(g.agence.slug)} class="zx-group-link">
+                L’agence <span aria-hidden="true">→</span>
+              </a>
+            </div>
+            <ul class="zx-grid">
+              {g.villes.map((z) => (
+                <li>
+                  <a href={`/depannage/${z.slug}/`} class="zx-card">
+                    <div class="zx-card-top">
+                      <h3 class="zx-card-ville">{z.ville}</h3>
+                      <span class="zx-card-cp mono">{z.codePostal}</span>
+                    </div>
+                    <p class="zx-card-accroche">{z.accroche}</p>
+                    <div class="zx-card-meta mono">
+                      {z.distanceMin}&nbsp;min · {z.distanceKm}&nbsp;km · {z.departement}
+                    </div>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    {/* ====== Communes voisines également desservies ====== */}
+    {alentours.length > 0 && (
+      <section class="zx-around">
+        <div class="zx-inner">
+          <div class="zx-overline">Également desservies</div>
+          <h2 class="zx-around-title">Les communes voisines.</h2>
+          <p class="zx-around-lead">
+            Nos interventions ne s’arrêtent pas aux villes listées ci-dessus.
+            Ces communes sont couvertes par la même astreinte, depuis l’agence
+            la plus proche&nbsp;:
+          </p>
+          <ul class="zx-around-list">
+            {alentours.map((v) => <li>{v}</li>)}
+          </ul>
+          <p class="zx-around-note">
+            Votre commune n’apparaît pas&nbsp;? Appelez-nous&nbsp;: notre zone
+            réelle dépasse cette liste, et un dépanneur est d’astreinte à toute heure.
+          </p>
+        </div>
+      </section>
+    )}
+
+    {/* ====== CTA ====== */}
+    <section class="zx-cta">
+      <div class="zx-cta-inner">
+        <h2 class="zx-cta-title">En panne&nbsp;? Un dépanneur part maintenant.</h2>
+        <p class="zx-cta-lead">Astreinte permanente, 24&nbsp;h/24 et 7&nbsp;j/7.</p>
+        <a href={site.phone.href} class="zx-cta-phone" data-call-source="zones-hub-cta">
+          <span aria-hidden="true">☎</span>
+          <span class="mono">{site.phone.display}</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  /* ====== En-tête ====== */
+  .zx-head {
+    padding: 64px var(--pad-x-desktop) 44px;
+    background: var(--color-bg);
+  }
+  .zx-head-inner { max-width: var(--container-max); margin: 0 auto; }
+  .zx-overline {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    background: var(--color-primary-bg);
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    margin-bottom: 16px;
+  }
+  .zx-title {
+    font-family: var(--font-display);
+    font-size: 44px;
+    line-height: 1.08;
+    letter-spacing: var(--tr-display);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 16px;
+    max-width: 760px;
+  }
+  .zx-title-accent { color: var(--color-primary); }
+  .zx-lead {
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--color-text-muted);
+    margin: 0 0 26px;
+    max-width: 700px;
+  }
+
+  .zx-head-cta { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .zx-phone {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 22px;
+    background: var(--md-brand-green);
+    color: #fff;
+    border-radius: var(--radius-lg);
+    font-size: 19px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--dur-base) var(--ease-standard);
+  }
+  .zx-phone:hover { transform: translateY(-2px); }
+  .zx-phone-kicker {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--md-brand-yellow);
+    padding-left: 10px;
+    border-left: 1px solid rgba(255,255,255,0.28);
+  }
+  .zx-secondary {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-text);
+    text-decoration: none;
+    padding: 13px 18px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    transition: border-color var(--dur-base) var(--ease-standard),
+                color var(--dur-base) var(--ease-standard);
+  }
+  .zx-secondary:hover { border-color: var(--color-primary); color: var(--color-primary); }
+
+  /* ====== Groupes par agence ====== */
+  .zx-groups-section { padding: 8px var(--pad-x-desktop) 64px; }
+  .zx-inner { max-width: var(--container-max); margin: 0 auto; }
+  .zx-group { margin-bottom: 44px; }
+  .zx-group:last-child { margin-bottom: 0; }
+  .zx-group-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 12px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .zx-group-title {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: var(--tr-display);
+    color: var(--color-text);
+    margin: 0;
+  }
+  .zx-group-link {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-primary);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .zx-group-link:hover { text-decoration: underline; }
+
+  .zx-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .zx-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: 22px;
+    text-decoration: none;
+    box-shadow: var(--shadow-xs);
+    transition: transform var(--dur-base) var(--ease-standard),
+                box-shadow var(--dur-base) var(--ease-standard),
+                border-color var(--dur-base) var(--ease-standard);
+  }
+  .zx-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--md-forest-200);
+  }
+  .zx-card-top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .zx-card-ville {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0;
+  }
+  .zx-card-cp {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+  .zx-card-accroche {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    margin: 0 0 16px;
+  }
+  .zx-card-meta {
+    margin-top: auto;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--color-primary);
+    background: var(--color-primary-bg);
+    padding: 6px 10px;
+    border-radius: var(--radius-xs);
+    align-self: flex-start;
+  }
+
+  /* ====== Communes voisines ====== */
+  .zx-around {
+    padding: 56px var(--pad-x-desktop);
+    background: var(--color-bg-subtle);
+    border-top: 1px solid var(--color-border);
+  }
+  .zx-around-title {
+    font-family: var(--font-display);
+    font-size: 28px;
+    line-height: 1.12;
+    letter-spacing: var(--tr-display);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 12px;
+  }
+  .zx-around-lead {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    margin: 0 0 22px;
+    max-width: 720px;
+  }
+  .zx-around-list {
+    list-style: none;
+    margin: 0 0 22px;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .zx-around-list li {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    padding: 7px 14px;
+  }
+  .zx-around-note {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    margin: 0;
+    max-width: 720px;
+  }
+
+  /* ====== CTA ====== */
+  .zx-cta {
+    padding: 56px var(--pad-x-desktop);
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(228,225,60,0.12) 0%, transparent 60%),
+      var(--md-brand-green);
+    text-align: center;
+  }
+  .zx-cta-inner { max-width: var(--container-max); margin: 0 auto; }
+  .zx-cta-title {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 8px;
+  }
+  .zx-cta-lead {
+    font-size: 15px;
+    color: rgba(255,255,255,0.82);
+    margin: 0 0 22px;
+  }
+  .zx-cta-phone {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 28px;
+    background: var(--md-brand-yellow);
+    color: var(--md-brand-black);
+    border-radius: var(--radius-lg);
+    font-size: 20px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+    transition: transform var(--dur-base) var(--ease-standard);
+  }
+  .zx-cta-phone:hover { transform: translateY(-2px); }
+
+  /* ====== Responsive ====== */
+  @media (max-width: 1023px) {
+    .zx-head { padding: 48px var(--pad-x-tablet) 36px; }
+    .zx-title { font-size: 34px; }
+    .zx-groups-section { padding: 8px var(--pad-x-tablet) 56px; }
+    .zx-around { padding: 48px var(--pad-x-tablet); }
+    .zx-cta { padding: 48px var(--pad-x-tablet); }
+    .zx-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 639px) {
+    .zx-head { padding: 40px var(--pad-x-mobile) 30px; }
+    .zx-title { font-size: 28px; }
+    .zx-groups-section { padding: 8px var(--pad-x-mobile) 48px; }
+    .zx-around { padding: 40px var(--pad-x-mobile); }
+    .zx-cta { padding: 40px var(--pad-x-mobile); }
+    .zx-grid { grid-template-columns: 1fr; }
+    .zx-phone { font-size: 17px; padding: 13px 18px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .zx-card, .zx-phone, .zx-cta-phone { transition: none; }
+  }
+</style>

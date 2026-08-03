@@ -2,6 +2,13 @@
 import '../styles/global.css';
 import { site } from '../config/site';
 import MobileCallBar from '../components/MobileCallBar.astro';
+import {
+  alternatesFor,
+  localeMeta,
+  defaultLocale,
+  type Locale,
+  type RouteKey,
+} from '../i18n';
 
 interface Props {
   title?: string;
@@ -14,6 +21,17 @@ interface Props {
   noindex?: boolean;
   /** Schéma(s) JSON-LD à injecter dans le <head>. */
   jsonLd?: object | object[];
+  /** Langue de la page — pilote `lang`, `og:locale` et les hreflang. */
+  locale?: Locale;
+  /**
+   * Clé de route i18n. Renseignée uniquement sur les pages qui existent
+   * en plusieurs langues : elle déclenche les `<link rel="alternate">`.
+   * Absente = page monolingue, donc aucun groupe hreflang (correct : un
+   * groupe incomplet ou non réciproque est ignoré par Google).
+   */
+  routeKey?: RouteKey;
+  /** Libellé du lien d'évitement, traduit sur les pages localisées. */
+  skipLabel?: string;
 }
 
 const {
@@ -22,7 +40,21 @@ const {
   ogImage = `${site.url}/img/hero-comedie.jpg`,
   noindex = false,
   jsonLd,
+  locale = defaultLocale,
+  routeKey,
+  skipLabel = 'Aller au contenu principal',
 } = Astro.props;
+
+// Alternates linguistiques. Déclarées en HTML plutôt que dans le sitemap :
+// Google accepte l'une OU l'autre méthode, et le balisage HTML reste
+// vérifiable page par page dans le navigateur comme dans la Search Console.
+const alternates = routeKey ? alternatesFor(routeKey) : [];
+
+// og:locale:alternate — les autres langues réellement disponibles.
+const ogAlternates = alternates
+  .filter((a) => a.hreflang !== 'x-default' && a.hreflang !== locale)
+  .map((a) => localeMeta[a.hreflang as Locale]?.ogLocale)
+  .filter(Boolean);
 
 // URL canonique : dérivée du chemin courant, normalisée avec slash final.
 const pathname = Astro.url.pathname;
@@ -38,7 +70,7 @@ const schemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 ---
 
 <!doctype html>
-<html lang="fr">
+<html lang={localeMeta[locale].lang}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -51,13 +83,21 @@ const schemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    {/* Alternatives linguistiques (auto-référence + x-default inclus) */}
+    {alternates.map((alt) => (
+      <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />
+    ))}
     <link rel="icon" type="image/png" href="/img/logo-mdp.png" />
     <link rel="apple-touch-icon" href="/img/logo-mdp.png" />
 
     {/* Open Graph */}
     <meta property="og:site_name" content={site.name} />
     <meta property="og:type" content="website" />
-    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:locale" content={localeMeta[locale].ogLocale} />
+    {ogAlternates.map((l) => (
+      <meta property="og:locale:alternate" content={l} />
+    ))}
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
@@ -82,7 +122,7 @@ const schemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     ))}
   </head>
   <body>
-    <a href="#main" class="skip-link">Aller au contenu principal</a>
+    <a href="#main" class="skip-link">{skipLabel}</a>
     <slot />
     <MobileCallBar />
 

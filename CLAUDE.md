@@ -10,11 +10,18 @@ Toujours lire/modifier ces données ici, jamais en dur dans les composants.
 
 ## Arborescence
 
-- `src/pages/index.astro` — homepage, ordre des sections : Hero → CapacityStats → ServicesGrid → CoverageBand → Certifications → AssistanceCTA
+- `src/pages/index.astro` — homepage, ordre des sections : Hero → CapacityStats → ServicesGrid → CoverageBand → Certifications → DevisForm
 - `src/components/home/` — sections de la home (un fichier par section)
-- `src/components/{TopNav,Footer,LogoMark}.astro` — chrome global
-- `src/layouts/BaseLayout.astro` — head, fonts, meta
+- `src/components/{TopNav,Footer,LogoMark,LanguageSwitcher}.astro` — chrome global
+- `src/components/i18n/` — chrome et gabarits des pages traduites (EN/ES)
+- `src/i18n/` — routage multilingue et contenus traduits
+- `src/layouts/BaseLayout.astro` — head, fonts, meta, hreflang
 - `src/styles/{tokens.css,global.css}` — design tokens + reset
+
+Pages « zones d'intervention » : `/depannage/` est le **hub** (page index générée
+depuis `data/zones.ts`), `/depannage/{ville}/` les 15 fiches. Le hub est lié
+depuis la nav, le hero et le footer — ne pas le déconnecter du maillage, c'est
+la seule chose qui donne de la profondeur aux pages villes.
 
 ## Design tokens
 
@@ -51,15 +58,45 @@ Le composant `LogoMark.astro` force la hauteur via inline style — le ratio lar
 - Compteurs animés via `IntersectionObserver` (cf. `CapacityStats.astro`).
 - Pas de bibliothèque d'animation — CSS keyframes + JS minimal seulement.
 
-## Section AssistanceCTA — carte qui se retourne
+## Multilingue (FR / EN / ES)
 
-La carte recto reproduit le **Certificat d'Assurance** français (vert sauge, watermark "CA", titre serif, champs noirs).
-Le verso met en évidence le numéro d'assistance (jaune signal).
-Si on touche au design de la carte, garder la cohérence avec le visuel officiel français — référence : `public/img/carte-verte-ref.jpg`.
+Le **français reste à la racine** (`/`, `/services/…`) : aucune URL FR indexée ne
+doit bouger. L'anglais et l'espagnol vivent sous `/en/` et `/es/`, avec des
+segments traduits (`/es/servicios/`, `/es/zonas/`).
+
+Périmètre traduit, volontairement resserré : accueil, index services, 6 fiches
+services, page couverture. **Pas** les fiches agences, les 15 fiches villes, le
+recrutement ni les pages légales — 30 pages étrangères peu recherchées
+diluent le site sans rien capter. Les pages traduites renvoient vers le FR.
+
+- `src/i18n/config.ts` — routes localisées, `pathFor()`, `alternatesFor()`.
+  Les URL alternatives ne sont **jamais devinées** : une page déclare sa
+  `RouteKey`, le routeur résout les URL qui existent réellement.
+- `src/i18n/content/{en,es}.ts` — tout le texte traduit, un fichier par langue.
+- Toujours importer depuis `src/i18n` (le barrel), jamais depuis `content/en`
+  directement : c'est lui qui garantit que les slugs des deux langues sont
+  enregistrés avant la résolution des hreflang.
+
+Règles à ne pas casser :
+- Une page multilingue passe `routeKey` à **`BaseLayout` ET à `TopNav`** — le
+  premier émet les `hreflang`, le second le sélecteur de langue (c'est par ces
+  liens que Google découvre les traductions).
+- Les hreflang doivent rester **réciproques** : si `/en/x/` pointe vers `/x/`,
+  `/x/` doit pointer vers `/en/x/`. `alternatesFor()` s'en charge tant qu'on
+  déclare la même `RouteKey` des deux côtés.
+- **Jamais de redirection automatique** par IP ou `Accept-Language` : Google
+  documente que cela empêche l'exploration des versions localisées.
+- Un lien depuis une page EN/ES vers une page FR porte `hreflang="fr" lang="fr"`.
 
 ## Backend — Pages Functions + D1
 
 Le site est statique mais utilise **Cloudflare Pages Functions** (dossier `functions/`) pour le formulaire de devis, le dashboard admin, et le cron.
+
+Le formulaire vit dans `src/components/home/DevisForm.astro`, section autonome de la
+home portant l'ancre **`id="devis"`**. Ne pas retirer cette ancre : la barre d'appel
+mobile (`MobileCallBar`) et la redirection 301 `/devis` de `public/_redirects`
+pointent dessus. Toute la chaîne commerciale en dépend (D1 → Resend → relance
+WhatsApp → `/admin` et `/pilotage`).
 
 Endpoints :
 - `POST /api/devis` — création d'une demande (insert D1 + email Resend avec lien signé)
