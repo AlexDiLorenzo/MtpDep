@@ -2,11 +2,16 @@
 # Cloudflare Pages : premier match gagnant, motifs specifiques avant wildcards.
 
 # --- Pages exactes ---
-/devis                /#devis  301
-/embed                /        301
-/photos               /        301
-/videos               /        301
-/paiement-remorquage  /        301
+# Cibles choisies pour l'HERITAGE THEMATIQUE, pas par facilite : une 301
+# vers la home dilue l'autorite de l'ancienne page. On envoie vers la page
+# qui traite reellement le meme sujet quand elle existe.
+/devis                /#devis                          301
+/demande-de-devis     /#devis                          301
+/vinci-autoroute      /services/depannage-autoroute-a9/ 301
+/embed                /                                301
+/photos               /                                301
+/videos               /                                301
+/paiement-remorquage  /                                301
 
 # --- Familles WordPress (archives, medias, admin) ---
 /category/*           /        301
