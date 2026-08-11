@@ -108,7 +108,7 @@ const tel = (display: string, label?: string): AgencePhone => ({
 export const agences: Agence[] = [
   {
     slug: 'montpellier-garosud',
-    reviewUrl: 'https://maps.app.goo.gl/bsSnb6yBAg5UhT7r5',
+    reviewUrl: 'https://share.google/XV2Qg46B2w2fOaLh5',
     societe: 'MONTPELLIER DÉPANNAGE',
     nomCourt: 'Montpellier Garosud',
     adresse: { rue: '2501 Av de Maurin, ZAC Garosud', codePostal: '34070', ville: 'Montpellier' },
@@ -173,7 +173,7 @@ export const agences: Agence[] = [
   },
   {
     slug: 'perols',
-    reviewUrl: 'https://maps.app.goo.gl/eWBoGdKXRKibPzw97',
+    reviewUrl: 'https://share.google/5Del2fZp4WmMjx6cs',
     societe: 'PÉROLS DÉPANNAGE',
     nomCourt: 'Pérols',
     adresse: { rue: '25 Rue Louis Lépine', codePostal: '34470', ville: 'Pérols' },
@@ -225,7 +225,7 @@ export const agences: Agence[] = [
   },
   {
     slug: 'laroque',
-    reviewUrl: 'https://maps.app.goo.gl/EVbEdJxcWhGxLzkVA',
+    reviewUrl: 'https://share.google/2RTzuTPrYhFpm7cNm',
     societe: 'MONTPELLIER DÉPANNAGE LAROQUE',
     nomCourt: 'Laroque',
     adresse: { rue: "620 Avenue de l'Europe", codePostal: '34190', ville: 'Laroque' },
@@ -374,7 +374,7 @@ export const agences: Agence[] = [
   },
   {
     slug: 'clermont-l-herault',
-    reviewUrl: 'https://maps.app.goo.gl/BZWjviTi3J5TpmF69',
+    reviewUrl: 'https://share.google/MD2iGyaSAN3lTLVqR',
     societe: "CLERMONT L'HÉRAULT DÉPANNAGE",
     nomCourt: "Clermont-l'Hérault",
     adresse: { rue: '1790 ZAC de la Salamane', codePostal: '34800', ville: "Clermont-l'Hérault" },
@@ -424,6 +424,7 @@ export const agences: Agence[] = [
   },
   {
     slug: 'saint-jean-de-vedas-a9',
+    reviewUrl: 'https://share.google/P6s2aD7s0YzYo3SVZ',
     societe: 'AGENCE A9 — ST JEAN DE VÉDAS',
     nomCourt: 'St-Jean-de-Védas (A9)',
     adresse: { rue: 'Lieu-dit Les Jasses', codePostal: '34430', ville: 'Saint-Jean-de-Védas' },
