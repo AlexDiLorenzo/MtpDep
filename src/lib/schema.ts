@@ -39,6 +39,14 @@ function postalAddress(a: Agence) {
   };
 }
 
+/** Lien de carte stable, fondé sur les coordonnées de l'établissement. */
+function mapUrl(a: Agence): string {
+  const query = a.geo
+    ? `${a.geo.lat},${a.geo.lng}`
+    : `${a.societe}, ${a.adresse.rue}, ${a.adresse.codePostal} ${a.adresse.ville}`;
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+}
+
 /**
  * Schéma Organization global, listant les 8 agences en subOrganization.
  * À placer sur la home et sur /agences/.
@@ -62,9 +70,6 @@ export function organizationSchema() {
       { '@type': 'AdministrativeArea', name: 'Hérault' },
       { '@type': 'AdministrativeArea', name: 'Gard' },
     ],
-    sameAs: agences
-      .map((a) => a.reviewUrl)
-      .filter((url): url is string => Boolean(url)),
     subOrganization: agences.map((a) => ({
       '@type': 'AutomotiveBusiness',
       '@id': `${agenceUrl(a.slug)}#business`,
@@ -72,6 +77,7 @@ export function organizationSchema() {
       url: agenceUrl(a.slug),
       telephone: a.phones[0].display,
       address: postalAddress(a),
+      hasMap: mapUrl(a),
     })),
   };
 }
@@ -90,6 +96,7 @@ export function automotiveBusinessSchema(a: Agence) {
     ...(a.geo
       ? { geo: { '@type': 'GeoCoordinates', latitude: a.geo.lat, longitude: a.geo.lng } }
       : {}),
+    hasMap: mapUrl(a),
     openingHoursSpecification: [opening24_7],
     priceRange: '€€',
     areaServed: { '@type': 'City', name: a.adresse.ville },

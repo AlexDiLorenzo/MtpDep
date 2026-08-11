@@ -176,7 +176,7 @@ export const agences: Agence[] = [
     reviewUrl: 'https://maps.app.goo.gl/eWBoGdKXRKibPzw97',
     societe: 'PÉROLS DÉPANNAGE',
     nomCourt: 'Pérols',
-    adresse: { rue: 'Rue Louis Lépine', codePostal: '34470', ville: 'Pérols' },
+    adresse: { rue: '25 Rue Louis Lépine', codePostal: '34470', ville: 'Pérols' },
     departement: 'Hérault',
     phones: [
       tel('04 67 71 07 20', 'Ligne agence Pérols'),

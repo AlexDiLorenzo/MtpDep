@@ -10,10 +10,12 @@ import Certifications from '../components/home/Certifications.astro';
 import DevisForm from '../components/home/DevisForm.astro';
 import { organizationSchema, automotiveBusinessSchema } from '../lib/schema';
 import { agencePrincipale } from '../data/agences';
+import { photos } from '../config/site';
 ---
 
 <BaseLayout
   routeKey="home"
+  preloadImage={photos.heroComedie}
   jsonLd={[organizationSchema(), automotiveBusinessSchema(agencePrincipale)]}
 >
   <TopNav routeKey="home" />

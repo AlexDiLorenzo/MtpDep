@@ -2,14 +2,18 @@
 const certs = [
   {
     type: 'image',
-    src: '/img/cert-nf-afnor.jpg',
+    src: '/img/cert-nf-afnor.webp',
+    width: 900,
+    height: 520,
     alt: 'NF Service, certifié AFNOR',
     title: 'NF Service',
     body: 'Dépannage VL & PL certifié par AFNOR Certification. Engagement qualité audité chaque année.',
   },
   {
     type: 'image',
-    src: '/img/cert-envol.png',
+    src: '/img/cert-envol.webp',
+    width: 300,
+    height: 300,
     alt: 'Envol, engagement environnemental',
     title: 'Envol',
     body: "Engagement volontaire de l'entreprise pour l'environnement. Démarche RSE reconnue.",
@@ -40,7 +44,7 @@ const certs = [
         <li class="certs-card" data-reveal style={`--reveal-delay:${i * 80}ms`}>
           <div class="certs-card-logo">
             {c.type === 'image' ? (
-              <img src={c.src} alt={c.alt} loading="lazy" decoding="async" />
+              <img src={c.src} alt={c.alt} width={c.width} height={c.height} loading="lazy" decoding="async" />
             ) : (
               <div class="certs-badge" aria-hidden="true">
                 <svg viewBox="0 0 64 64" width="56" height="56">

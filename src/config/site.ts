@@ -38,24 +38,23 @@ export const nav = [
 // Photos locales fournies par le client (dossier public/img/).
 export const photos = {
   // Iconiques Montpellier
-  heroComedie: '/img/hero-comedie.jpg',           // Aston Martin Place de la Comédie
-  flotteCamions: '/img/flotte-camions.jpg',       // Flotte alignée vue de face
-  peyrou: '/img/peyrou-vertical.jpg',             // Camion devant l'Arc du Peyrou (vertical)
-  astonAntigone: '/img/aston-antigone.png',       // Aston Martin quartier Antigone
-  porscheCayman: '/img/porsche-cayman.jpg',       // Porsche Cayman + plateau MDP
-  flotteElectrique: '/img/flotte-electrique.jpg', // Petite voiture + scooters électriques MDP
+  heroComedie: '/img/hero-comedie.webp',           // Aston Martin Place de la Comédie
+  flotteCamions: '/img/flotte-camions.webp',       // Flotte alignée vue de face
+  peyrou: '/img/peyrou-vertical.webp',             // Camion devant l'Arc du Peyrou (vertical)
+  astonAntigone: '/img/aston-antigone.webp',       // Aston Martin quartier Antigone
+  porscheCayman: '/img/porsche-cayman.webp',       // Porsche Cayman + plateau MDP
+  flotteElectrique: '/img/flotte-electrique.webp', // Petite voiture + scooters électriques MDP
 
   // Interventions terrain
-  interventionA9: '/img/intervention-a9.jpg',     // Autoroute A9
-  plRecuperation: '/img/pl-recuperation.jpg',     // Poids lourd dans le fossé
-  transportInternational: '/img/transport-international.jpg', // Transport international / rapatriement
+  interventionA9: '/img/intervention-a9.webp',     // Autoroute A9
+  plRecuperation: '/img/pl-recuperation.webp',     // Poids lourd dans le fossé
+  transportInternational: '/img/transport-international.webp', // Transport international / rapatriement
 
   // Photos d'agences (fournies par le client, optimisées en JPEG)
-  agencePerols: '/img/agence-perols.jpg',                       // Site de Pérols
-  agenceVilletelle: '/img/agence-villetelle.jpg',               // Site de Villetelle
-  agenceVilletelleDepanneuse: '/img/agence-villetelle-depanneuse.jpg', // Dépanneuse à Villetelle
+  agencePerols: '/img/agence-perols.webp',                       // Site de Pérols
+  agenceVilletelle: '/img/agence-villetelle.webp',               // Site de Villetelle
+  agenceVilletelleDepanneuse: '/img/agence-villetelle-depanneuse.webp', // Dépanneuse à Villetelle
 
   // Raccourci avis (page d'accueil)
   qrAvis: '/img/qr-avis.png',                     // QR code avis Google
 } as const;
-

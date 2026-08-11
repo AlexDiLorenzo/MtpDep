@@ -17,6 +17,8 @@ interface Props {
   canonical?: string;
   /** Image Open Graph (URL absolue ou chemin racine). */
   ogImage?: string;
+  /** Image critique à précharger (utilisée pour le LCP, notamment le hero). */
+  preloadImage?: string;
   /** Empêche l'indexation (pages internes). */
   noindex?: boolean;
   /** Schéma(s) JSON-LD à injecter dans le <head>. */
@@ -38,6 +40,7 @@ const {
   title = `${site.name} · Remorquage et dépannage 24/7 · Hérault · A9`,
   description = "Remorquage et dépannage 24h/24, 7j/7 à Montpellier et dans l'Hérault. Plateaux VL et PL, autoroute A9, transport international. Certifié NF Service, plus de 30 ans d'expérience.",
   ogImage = `${site.url}/img/hero-comedie.jpg`,
+  preloadImage,
   noindex = false,
   jsonLd,
   locale = defaultLocale,
@@ -64,6 +67,9 @@ const canonical = Astro.props.canonical ?? new URL(canonicalPath, site.url).href
 
 // Image OG : absolue telle quelle, sinon préfixée par l'origine du site.
 const ogImageUrl = ogImage.startsWith('http') ? ogImage : `${site.url}${ogImage}`;
+const preloadImageUrl = preloadImage
+  ? (preloadImage.startsWith('http') ? preloadImage : `${site.url}${preloadImage}`)
+  : undefined;
 
 // Normalise les schémas en tableau pour itération.
 const schemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
@@ -81,7 +87,9 @@ const schemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <meta name="description" content={description} />
+    {!noindex && <meta name="robots" content="index, follow, max-image-preview:large" />}
     <link rel="canonical" href={canonical} />
+    {preloadImageUrl && <link rel="preload" as="image" href={preloadImageUrl} fetchpriority="high" />}
     {noindex && <meta name="robots" content="noindex, nofollow" />}
 
     {/* Alternatives linguistiques (auto-référence + x-default inclus) */}
@@ -102,12 +110,14 @@ const schemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:alt" content={`${site.name} · Dépannage et remorquage 24/7`} />
 
     {/* Twitter */}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageUrl} />
+    <meta name="twitter:image:alt" content={`${site.name} · Dépannage et remorquage 24/7`} />
 
     {/* Theme */}
     <meta name="theme-color" content="#2C6126" />
