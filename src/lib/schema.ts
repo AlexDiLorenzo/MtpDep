@@ -57,14 +57,31 @@ export function organizationSchema() {
     '@type': 'Organization',
     '@id': `${site.url}/#organization`,
     name: site.name,
+    legalName: site.legal.companyName,
+    alternateName: site.shortName,
     url: site.url,
-    logo: `${site.url}/img/logo-mdp.png`,
-    image: `${site.url}/img/hero-comedie.jpg`,
+    logo: `${site.url}/img/logo-mdp.webp`,
+    image: `${site.url}/img/hero-comedie.webp`,
     description:
       "Remorquage et dépannage 24h/24, 7j/7 à Montpellier et dans l'Hérault et le Gard. Plateaux VL et PL, autoroute A9, transport international. Plus de 30 ans d'expérience.",
     slogan: "Remorquage et dépannage 24/7 dans l'Hérault et le Gard.",
     telephone: site.phone.display,
     email: site.email.display,
+    foundingDate: '1991',
+    taxID: site.legal.siren,
+    vatID: site.legal.vat.replace(/\s/g, ''),
+    identifier: {
+      '@type': 'PropertyValue',
+      propertyID: 'SIRET',
+      value: site.legal.siret.replace(/\s/g, ''),
+    },
+    contactPoint: {
+      '@type': 'ContactPoint',
+      telephone: site.phone.display,
+      contactType: 'roadside assistance',
+      availableLanguage: ['French', 'English', 'Spanish'],
+      areaServed: ['FR', 'BE', 'ES', 'IT'],
+    },
     address: postalAddress(agencePrincipale),
     areaServed: [
       { '@type': 'AdministrativeArea', name: 'Hérault' },
@@ -90,7 +107,9 @@ export function automotiveBusinessSchema(a: Agence) {
     '@id': `${agenceUrl(a.slug)}#business`,
     name: a.societe,
     url: agenceUrl(a.slug),
-    image: `${site.url}/img/hero-comedie.jpg`,
+    image: a.contenu.images[0]?.src
+      ? `${site.url}${a.contenu.images[0].src}`
+      : `${site.url}/img/hero-comedie.webp`,
     telephone: a.phones[0].display,
     address: postalAddress(a),
     ...(a.geo
@@ -99,13 +118,28 @@ export function automotiveBusinessSchema(a: Agence) {
     hasMap: mapUrl(a),
     openingHoursSpecification: [opening24_7],
     priceRange: '€€',
-    areaServed: { '@type': 'City', name: a.adresse.ville },
+    areaServed: [a.adresse.ville, ...a.contenu.communes].map((name) => ({ '@type': 'City', name })),
+    ...(a.reviewUrl ? { sameAs: [a.reviewUrl] } : {}),
     parentOrganization: {
       '@type': 'Organization',
       '@id': `${site.url}/#organization`,
       name: site.name,
       url: site.url,
     },
+  };
+}
+
+/** Identité du site et nom de marque affichable par les moteurs. */
+export function websiteSchema() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${site.url}/#website`,
+    url: site.url,
+    name: site.name,
+    alternateName: site.shortName,
+    inLanguage: ['fr-FR', 'en-GB', 'es-ES'],
+    publisher: { '@id': `${site.url}/#organization` },
   };
 }
 

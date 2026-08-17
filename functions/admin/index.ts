@@ -4,6 +4,7 @@
 
 import type { Env, DevisRow } from '../_lib/env';
 import { htmlResponse, escapeHtml, jsonResponse } from '../_lib/html';
+import { isSameOrigin, makeAuthCookie } from '../_lib/auth';
 
 const COOKIE_NAME = 'mdp_admin';
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 jours
@@ -18,7 +19,22 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
   const cookieToken = parseCookie(request.headers.get('cookie'))[COOKIE_NAME];
   const expected = env.ADMIN_TOKEN;
 
-  const provided = queryToken || cookieToken;
+  // Compatibilité avec les anciens favoris ?token=… : le secret est validé,
+  // converti en cookie httpOnly, puis immédiatement retiré de l'URL.
+  if (queryToken) {
+    if (!expected || !timingSafeEqual(queryToken, expected)) {
+      return renderLogin('Token invalide.');
+    }
+    url.searchParams.delete('token');
+    const headers = new Headers({
+      location: `${url.pathname}${url.search}`,
+      'cache-control': 'no-store',
+      'set-cookie': makeAuthCookie(COOKIE_NAME, queryToken, COOKIE_MAX_AGE),
+    });
+    return new Response(null, { status: 303, headers });
+  }
+
+  const provided = cookieToken;
   if (!expected || !provided || !timingSafeEqual(provided, expected)) {
     return renderLogin(provided ? 'Token invalide.' : null);
   }
@@ -117,34 +133,40 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
     calls: { today: callsToday, d7: calls7d, d30: calls30d, total: callsTotal },
   });
 
-  // Set cookie au passage si le token est passé en query
   const headers = new Headers({ 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' });
-  if (queryToken) {
-    headers.append(
-      'set-cookie',
-      `${COOKIE_NAME}=${encodeURIComponent(queryToken)}; Path=/; Max-Age=${COOKIE_MAX_AGE}; HttpOnly; Secure; SameSite=Lax`
-    );
-  }
   return new Response(html, { headers });
 };
 
 // POST /admin (form login)
 export const onRequestPost: PagesFunction<Env> = async (ctx) => {
+  if (!isSameOrigin(ctx.request)) {
+    return jsonResponse({ ok: false, error: 'forbidden_origin' }, 403);
+  }
   const formData = await ctx.request.formData();
   const token = String(formData.get('token') || '');
-  const url = new URL(ctx.request.url);
-  url.searchParams.set('token', token);
-  return new Response(null, { status: 302, headers: { location: url.pathname + url.search } });
+  if (!ctx.env.ADMIN_TOKEN || !token || !timingSafeEqual(token, ctx.env.ADMIN_TOKEN)) {
+    return renderLogin('Token invalide.');
+  }
+  return new Response(null, {
+    status: 303,
+    headers: {
+      location: '/admin',
+      'cache-control': 'no-store',
+      'set-cookie': makeAuthCookie(COOKIE_NAME, token, COOKIE_MAX_AGE),
+    },
+  });
 };
 
 // DELETE /admin?id=<uuid> — supprime un devis (utile pour purger les tests)
 export const onRequestDelete: PagesFunction<Env> = async (ctx) => {
   const { request, env } = ctx;
+  if (!isSameOrigin(request)) {
+    return jsonResponse({ ok: false, error: 'forbidden_origin' }, 403);
+  }
   const url = new URL(request.url);
-  const queryToken = url.searchParams.get('token');
   const cookieToken = parseCookie(request.headers.get('cookie'))[COOKIE_NAME];
   const expected = env.ADMIN_TOKEN;
-  const provided = queryToken || cookieToken;
+  const provided = cookieToken;
   if (!expected || !provided || !timingSafeEqual(provided, expected)) {
     return jsonResponse({ ok: false, error: 'unauthorized' }, 401);
   }
@@ -161,7 +183,8 @@ export const onRequestDelete: PagesFunction<Env> = async (ctx) => {
     return jsonResponse({ ok: true, deleted: res.meta?.changes ?? 0 });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    return jsonResponse({ ok: false, error: 'db_error', debug: msg.slice(0, 300) }, 500);
+    console.error('Admin delete D1 error', msg);
+    return jsonResponse({ ok: false, error: 'db_error' }, 500);
   }
 };
 
@@ -421,7 +444,7 @@ function renderDashboard(data: {
       const res = await fetch('/admin?id=' + encodeURIComponent(id), { method: 'DELETE' });
       const json = await res.json().catch(() => ({}));
       if (!res.ok || !json.ok) {
-        alert('Échec de la suppression : ' + (json.debug || json.error || res.status));
+        alert('Échec de la suppression : ' + (json.error || res.status));
         btn.removeAttribute('disabled');
         btn.textContent = 'Supprimer';
         return;

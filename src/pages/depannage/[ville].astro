@@ -36,7 +36,8 @@ const agence = getZoneAgence(zone);
 const phonePrincipal = agence.phones[0];
 
 // --- SEO ---------------------------------------------------------
-const pageTitle = `Dépannage à ${zone.ville} (${zone.codePostal}) · Remorquage 24/7 — Montpellier Dépannage`;
+const fullTitle = `Dépannage auto ${zone.ville} 24/7 | Montpellier Dépannage`;
+const pageTitle = fullTitle.length <= 62 ? fullTitle : `Dépannage auto ${zone.ville} 24/7`;
 const pageDescription = zone.accroche;
 
 // --- Fil d'Ariane ------------------------------------------------

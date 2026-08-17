@@ -8,7 +8,7 @@ import ServicesGrid from '../components/home/ServicesGrid.astro';
 import CoverageBand from '../components/home/CoverageBand.astro';
 import Certifications from '../components/home/Certifications.astro';
 import DevisForm from '../components/home/DevisForm.astro';
-import { organizationSchema, automotiveBusinessSchema } from '../lib/schema';
+import { organizationSchema, automotiveBusinessSchema, websiteSchema } from '../lib/schema';
 import { agencePrincipale } from '../data/agences';
 import { photos } from '../config/site';
 ---
@@ -16,7 +16,7 @@ import { photos } from '../config/site';
 <BaseLayout
   routeKey="home"
   preloadImage={photos.heroComedie}
-  jsonLd={[organizationSchema(), automotiveBusinessSchema(agencePrincipale)]}
+  jsonLd={[organizationSchema(), automotiveBusinessSchema(agencePrincipale), websiteSchema()]}
 >
   <TopNav routeKey="home" />
   <main id="main">

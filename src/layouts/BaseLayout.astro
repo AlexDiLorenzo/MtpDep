@@ -37,9 +37,9 @@ interface Props {
 }
 
 const {
-  title = `${site.name} · Remorquage et dépannage 24/7 · Hérault · A9`,
-  description = "Remorquage et dépannage 24h/24, 7j/7 à Montpellier et dans l'Hérault. Plateaux VL et PL, autoroute A9, transport international. Certifié NF Service, plus de 30 ans d'expérience.",
-  ogImage = `${site.url}/img/hero-comedie.jpg`,
+  title = `Dépannage auto Montpellier 24/7 | ${site.name}`,
+  description = "Dépannage et remorquage auto 24h/24 à Montpellier, dans l'Hérault et le Gard. VL, poids lourds, A9 et transport international. 8 agences.",
+  ogImage = `${site.url}/img/hero-comedie.webp`,
   preloadImage,
   noindex = false,
   jsonLd,
@@ -80,6 +80,7 @@ const schemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
     {/* Active l'état "masqué avant apparition" seulement si JS dispo (anti-FOUC) */}
     <script is:inline>
       document.documentElement.classList.add('js-reveal');
@@ -96,8 +97,8 @@ const schemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     {alternates.map((alt) => (
       <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />
     ))}
-    <link rel="icon" type="image/png" href="/img/logo-mdp.png" />
-    <link rel="apple-touch-icon" href="/img/logo-mdp.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png" />
 
     {/* Open Graph */}
     <meta property="og:site_name" content={site.name} />
@@ -121,10 +122,6 @@ const schemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 
     {/* Theme */}
     <meta name="theme-color" content="#2C6126" />
-
-    {/* Fonts preconnect */}
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
     {/* Données structurées JSON-LD */}
     {schemas.map((schema) => (

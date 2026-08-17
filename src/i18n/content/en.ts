@@ -44,10 +44,9 @@ export const en: LocalizedContent = {
   },
 
   home: {
-    title:
-      'Montpellier Dépannage · 24/7 Towing & Vehicle Recovery · Montpellier, Hérault & A9',
+    title: '24/7 Towing in Montpellier & on the A9 | English help',
     description:
-      'Broken down near Montpellier or on the A9 motorway? English-speaking towing and vehicle recovery, 24 hours a day. Cars, motorhomes, heavy goods vehicles. Over 30 years of experience, 8 depots across the Hérault and the Gard.',
+      'Broken down near Montpellier or on the A9? English-speaking towing for cars, motorhomes and lorries, 24/7. Eight depots across Hérault and Gard.',
     heroPill: '24 hours a day · 7 days a week',
     heroTitle: 'Broken down in the south of France?',
     heroTitleAccent: 'We tow, day and night.',
@@ -154,9 +153,9 @@ export const en: LocalizedContent = {
   },
 
   serviceIndex: {
-    title: 'Our services · Towing, recovery and vehicle transport — Montpellier Dépannage',
+    title: 'Towing & vehicle recovery services | Montpellier',
     description:
-      'Car and heavy vehicle towing, A9 motorway recovery, city-centre electric fleet, international vehicle transport and mechanical workshops around Montpellier. Available 24/7.',
+      'Car and lorry towing, A9 motorway recovery, international vehicle transport and workshops around Montpellier. Emergency recovery available 24/7.',
     overline: 'Services',
     heading: 'Six services, one phone number.',
     lead:
@@ -400,7 +399,7 @@ export const en: LocalizedContent = {
       titre: 'Mechanical repairs, LPG conversion and air conditioning',
       tag: '06',
       resume:
-        'Vehicle servicing, LPG system installation, air conditioning service and regas.',
+        'Vehicle servicing, LPG system installation, air conditioning service and regas at our workshops near Montpellier.',
       intro: [
         'Beyond recovery, Montpellier Dépannage runs its own mechanical workshops, notably at the Garosud and Pérols sites. Our teams handle routine servicing and repairs, along with two specialities the company is known for locally: fitting LPG systems and servicing air conditioning.',
         'Having your servicing done by a recovery network means one point of contact: the same people who know your vehicle can service it and come out to it when it fails. Clear diagnosis, transparent quote, careful work — we hold the workshop to the same standard as the road.',
@@ -441,9 +440,9 @@ export const en: LocalizedContent = {
   ],
 
   coverage: {
-    title: 'Coverage area · Montpellier, Hérault, Gard and the A9 — Montpellier Dépannage',
+    title: 'Towing coverage | Montpellier, Hérault, Gard & A9',
     description:
-      '8 depots and 15 towns covered 24/7 around Montpellier: Sète, Nîmes, La Grande-Motte, Lodève, Uzès, Le Grau-du-Roi and more. Towing and recovery across the Hérault, the Gard and the A9 motorway.',
+      'Eight depots cover Montpellier, Hérault, Gard and the A9 motorway 24/7, including Sète, Nîmes, La Grande-Motte, Lodève and Uzès.',
     overline: 'Coverage',
     heading: 'Where we come out to.',
     lead: [

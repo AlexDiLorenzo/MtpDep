@@ -6,6 +6,7 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
 import PageHero from '../components/PageHero.astro';
 import ContentSection from '../components/ContentSection.astro';
 import { breadcrumbSchema } from '../lib/schema';
+import { site } from '../config/site';
 
 const pageTitle = 'Mentions légales · Montpellier Dépannage';
 const pageDescription =
@@ -24,7 +25,85 @@ const jsonLd = breadcrumbSchema([
   <main id="main">
     <PageHero overline="Informations légales" title="Mentions légales." />
 
-    <ContentSection titre="Éditeur, hébergeur & données personnelles.">
+    <ContentSection overline="Éditeur" titre="Identification de l’entreprise.">
+      <p>
+        Le site <strong>{site.url}</strong> est édité par {site.legal.companyName},
+        {site.legal.legalForm} au capital de {site.legal.capital}, dont le siège est situé
+        {site.address.street}, {site.address.postalCode}&nbsp;{site.address.city}, France.
+      </p>
+      <ul>
+        <li>SIREN&nbsp;: {site.legal.siren}</li>
+        <li>SIRET du siège&nbsp;: {site.legal.siret}</li>
+        <li>RCS&nbsp;: {site.legal.rcs}</li>
+        <li>TVA intracommunautaire&nbsp;: {site.legal.vat}</li>
+        <li>Téléphone&nbsp;: <a href={site.phone.href}>{site.phone.display}</a></li>
+        <li>Email&nbsp;: <a href={site.email.href}>{site.email.display}</a></li>
+      </ul>
+      <p>Directeur de la publication&nbsp;: {site.legal.publicationDirector}.</p>
+    </ContentSection>
+
+    <ContentSection overline="Hébergement" titre="Cloudflare Pages." alt>
+      <p>
+        Ce site est hébergé par Cloudflare, Inc., 101 Townsend Street,
+        San Francisco, CA&nbsp;94107, États-Unis. Le trafic est servi par le réseau
+        mondial Cloudflare, notamment depuis des centres de données situés dans
+        l’Union européenne.
+      </p>
+      <p>
+        Contact de l’hébergeur&nbsp;:
+        <a href="https://www.cloudflare.com/fr-fr/contact/" target="_blank" rel="noopener noreferrer">cloudflare.com</a>.
+      </p>
+    </ContentSection>
+
+    <ContentSection overline="Confidentialité" titre="Données personnelles.">
+      <div id="donnees-personnelles">
+        <p>
+          {site.legal.companyName} est responsable des traitements réalisés depuis ce site.
+          Le formulaire de devis collecte les informations que vous saisissez (identité,
+          coordonnées, véhicule, lieux et description de la demande) afin de répondre à votre
+          demande et d’organiser, le cas échéant, une intervention. La base légale est
+          l’exécution de mesures précontractuelles prises à votre demande.
+        </p>
+        <p>
+          Les données sont accessibles aux équipes habilitées de Montpellier Dépannage et à
+          ses prestataires techniques agissant pour son compte&nbsp;: hébergement Cloudflare,
+          envoi des notifications par Resend et système interne d’alerte. Elles ne sont ni
+          vendues ni utilisées à des fins de prospection par des tiers.
+        </p>
+        <p>
+          Les demandes sont conservées au maximum trois ans après leur réception, sauf durée
+          différente imposée par une obligation légale ou par la transformation de la demande
+          en relation contractuelle. La mesure agrégée des clics sur les boutons d’appel est
+          purgée après treize mois et ne conserve ni adresse IP complète, ni adresse de page
+          référente, ni agent utilisateur.
+        </p>
+        <p>
+          Vous pouvez demander l’accès, la rectification ou l’effacement de vos données, la
+          limitation du traitement ou exercer votre droit d’opposition en écrivant à
+          <a href={site.email.href}>{site.email.display}</a>. Une preuve d’identité peut être
+          demandée en cas de doute raisonnable. Vous pouvez également saisir la
+          <a href="https://www.cnil.fr/fr/plaintes" target="_blank" rel="noopener noreferrer">CNIL</a>.
+        </p>
+      </div>
+    </ContentSection>
+
+    <ContentSection overline="Traceurs" titre="Cookies et mesure d’audience." alt>
+      <p>
+        Le site public ne dépose pas de cookie publicitaire. Cloudflare Web Analytics fournit
+        des statistiques techniques agrégées sans cookie de suivi. Les espaces internes
+        protégés utilisent uniquement un cookie d’authentification indispensable, sécurisé,
+        inaccessible au JavaScript et non utilisé à des fins publicitaires.
+      </p>
+    </ContentSection>
+
+    <ContentSection overline="Contenus" titre="Propriété intellectuelle.">
+      <p>
+        Les textes, photographies, éléments graphiques, logos et composants du site sont
+        protégés par le droit de la propriété intellectuelle. Toute reproduction ou
+        réutilisation substantielle sans autorisation écrite préalable est interdite, hors
+        exceptions prévues par la loi.
+      </p>
+      <p>Dernière mise à jour&nbsp;: 17 août 2026.</p>
     </ContentSection>
   </main>
 

@@ -1,12 +1,13 @@
 // POST /api/devis — création d'une demande de devis.
 // 1. valide les champs
 // 2. insère en D1
-// 3. envoie un email à EMAIL_TO via Resend, avec un lien signé pour marquer traité
+// 3. envoie un email aux destinataires (EMAIL_TO + ALWAYS_TO) via Resend, avec un lien signé pour marquer traité
 // 4. répond { ok: true, id } au front
 
 import type { Env } from '../_lib/env';
 import { signId, uuidv4 } from '../_lib/crypto';
 import { jsonResponse, escapeHtml } from '../_lib/html';
+import { isSameOrigin } from '../_lib/auth';
 
 const VEHICLE_TYPES = new Set(['VL', 'UTILITAIRE', 'PL']);
 const MAX_LEN = { name: 120, phone: 30, email: 160, location: 200, destination: 200, details: 2000 };
@@ -27,6 +28,20 @@ const ALLOWED_COUNTRIES = new Set([
 
 // URL dans les détails → typique des spams "we offer SEO services". On refuse.
 const URL_REGEX = /https?:\/\/|www\./i;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const MAX_BODY_BYTES = 12_000;
+
+// Destinataires toujours en copie, en plus de EMAIL_TO (qui accepte une liste
+// séparée par des virgules). Codé ici pour ne pas dépendre du dashboard Cloudflare.
+const ALWAYS_TO = ['alexandre.dilorenzo.pro@gmail.com'];
+
+// EMAIL_TO peut contenir une ou plusieurs adresses séparées par des virgules.
+function recipients(emailTo: string): string[] {
+  const list = [...emailTo.split(','), ...ALWAYS_TO]
+    .map((a) => a.trim())
+    .filter(Boolean);
+  return [...new Set(list.map((a) => a.toLowerCase()))];
+}
 
 interface FormPayload {
   name?: string;
@@ -51,24 +66,25 @@ function clean(s: unknown, max: number): string | null {
 export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   const { request, env } = ctx;
 
+  if (!isSameOrigin(request)) {
+    return jsonResponse({ ok: false, error: 'forbidden_origin' }, 403);
+  }
+  if (!(request.headers.get('content-type') || '').toLowerCase().startsWith('application/json')) {
+    return jsonResponse({ ok: false, error: 'unsupported_media_type' }, 415);
+  }
+  const contentLength = Number(request.headers.get('content-length') || 0);
+  if (contentLength > MAX_BODY_BYTES) {
+    return jsonResponse({ ok: false, error: 'payload_too_large' }, 413);
+  }
+
   // Vérifie d'abord la conf : on préfère échouer fort qu'enregistrer une demande qui n'enverra jamais d'email
   const envBag = env as unknown as Record<string, unknown>;
   const missing = ['EMAIL_TO', 'RESEND_API_KEY', 'RESEND_FROM', 'DEVIS_SECRET', 'SITE_URL'].filter(
     (k) => !envBag[k]
   );
   if (missing.length) {
-    // Log exhaustif pour diagnostiquer les pièges Cloudflare (Plaintext qui ne propage pas, etc.)
-    const visibleKeys = Object.keys(envBag).sort();
     console.error('Missing env vars:', missing.join(', '));
-    console.error('Env keys visible in runtime:', visibleKeys.join(', '));
-    return jsonResponse(
-      {
-        ok: false,
-        error: `config_missing: ${missing.join(', ')}`,
-        debug_keys_visible: visibleKeys,
-      },
-      500
-    );
+    return jsonResponse({ ok: false, error: 'temporarily_unavailable' }, 503);
   }
 
   let body: FormPayload;
@@ -88,6 +104,10 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   if (!phone) {
     return jsonResponse({ ok: false, error: 'phone_required' }, 400);
   }
+  const phoneDigits = phone.replace(/\D/g, '');
+  if (phoneDigits.length < 8 || phoneDigits.length > 15) {
+    return jsonResponse({ ok: false, error: 'phone_invalid' }, 400);
+  }
   if (!body.consent_rgpd) {
     return jsonResponse({ ok: false, error: 'consent_required' }, 400);
   }
@@ -99,24 +119,27 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   const destination = clean(body.destination, MAX_LEN.destination);
   const details = clean(body.details, MAX_LEN.details);
 
+  if (email && !EMAIL_REGEX.test(email)) {
+    return jsonResponse({ ok: false, error: 'email_invalid' }, 400);
+  }
+
   const vt = vehicle_type && VEHICLE_TYPES.has(vehicle_type) ? vehicle_type : null;
 
   const id = uuidv4();
   const created_at = Date.now();
 
   const ip_country = request.headers.get('cf-ipcountry') || null;
-  const user_agent = (request.headers.get('user-agent') || '').slice(0, 200) || null;
 
   // ── Anti-spam : rejets silencieux ──────────────────────────────
   // 1) Pays hors zone d'intervention → rejet silencieux (réponse ok pour ne pas
   //    indiquer au scammer que le filtre existe)
   if (ip_country && !ALLOWED_COUNTRIES.has(ip_country)) {
-    console.warn(`Devis rejected: geo (${ip_country}) phone=${phone} name=${name}`);
+    console.warn(`Devis rejected: geo (${ip_country})`);
     return jsonResponse({ ok: true, id: 'ignored' });
   }
   // 2) URL dans les détails → SEO spam typique
   if (details && URL_REGEX.test(details)) {
-    console.warn(`Devis rejected: url in details, country=${ip_country} phone=${phone}`);
+    console.warn(`Devis rejected: url in details, country=${ip_country}`);
     return jsonResponse({ ok: true, id: 'ignored' });
   }
   // 3) URL dans le nom → autre pattern fréquent
@@ -128,18 +151,15 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   try {
     await env.DB.prepare(
       `INSERT INTO devis
-       (id, created_at, name, phone, email, vehicle_type, location, destination, details, consent_rgpd, status, user_agent, ip_country)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 'open', ?, ?)`
+       (id, created_at, name, phone, email, vehicle_type, location, destination, details, consent_rgpd, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 'open')`
     )
-      .bind(id, created_at, name, phone, email, vt, location, destination, details, user_agent, ip_country)
+      .bind(id, created_at, name, phone, email, vt, location, destination, details)
       .run();
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     console.error('D1 insert error', msg);
-    // Expose le message D1 dans la réponse pour diagnostiquer en prod :
-    // "no such column" → migration manquante ; "no such table" → schéma non appliqué ;
-    // "Cannot read properties of undefined (reading 'prepare')" → binding DB non configuré.
-    return jsonResponse({ ok: false, error: 'db_error', debug: msg.slice(0, 300) }, 500);
+    return jsonResponse({ ok: false, error: 'db_error' }, 500);
   }
 
   // Lien signé pour marquer la demande comme traitée
@@ -159,7 +179,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
       },
       body: JSON.stringify({
         from: env.RESEND_FROM,
-        to: env.EMAIL_TO, // string, pas tableau — Resend accepte les deux mais string évite les pièges null
+        to: recipients(env.EMAIL_TO), // liste dédupliquée : EMAIL_TO (mono ou multi) + ALWAYS_TO
         subject,
         html,
         reply_to: email || undefined,

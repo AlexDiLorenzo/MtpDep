@@ -16,9 +16,9 @@ const agencesAvecZones = agences
   .map((a) => ({ agence: a, villes: zonesByAgence(a.slug) }))
   .filter((g) => g.villes.length > 0);
 
-const pageTitle = 'Nos 8 agences · Montpellier Dépannage — Hérault & Gard';
+const pageTitle = '8 agences de dépannage | Hérault & Gard';
 const pageDescription =
-  "Les 8 agences du réseau Montpellier Dépannage dans l'Hérault et le Gard. Trouvez l'agence de dépannage et de remorquage la plus proche — intervention 24h/24, 7j/7.";
+  "Trouvez l'agence Montpellier Dépannage la plus proche parmi 8 sites dans l'Hérault et le Gard. Dépannage et remorquage 24h/24.";
 
 const crumbs = [
   { name: 'Accueil', href: '/' },

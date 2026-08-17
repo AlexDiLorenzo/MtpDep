@@ -6,6 +6,7 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
 import PageHero from '../components/PageHero.astro';
 import ContentSection from '../components/ContentSection.astro';
 import { breadcrumbSchema } from '../lib/schema';
+import { site } from '../config/site';
 
 const pageTitle = 'Conditions générales de vente · Montpellier Dépannage';
 const pageDescription =
@@ -24,7 +25,77 @@ const jsonLd = breadcrumbSchema([
   <main id="main">
     <PageHero overline="Conditions générales" title="Conditions générales de vente." />
 
-    <ContentSection titre="Prestations, tarifs & responsabilités.">
+    <ContentSection overline="Champ d’application" titre="Des conditions claires avant intervention.">
+      <p>
+        Les présentes conditions encadrent les prestations proposées par
+        <strong>{site.legal.companyName}</strong>&nbsp;: dépannage, remorquage, relevage,
+        transport de véhicules et travaux d’atelier. Les conditions particulières figurant
+        sur le devis, l’ordre de réparation ou la facture prévalent en cas de contradiction.
+      </p>
+      <p>
+        Une demande envoyée depuis le site ne vaut pas commande. Le contrat est formé après
+        information sur la prestation et son prix, puis accord du client, oral en situation
+        d’urgence ou écrit pour une intervention programmée.
+      </p>
+    </ContentSection>
+
+    <ContentSection overline="Prix" titre="Devis, tarifs et règlement." alt>
+      <p>
+        Le prix dépend notamment du véhicule, du lieu, de la distance, de l’horaire, des moyens
+        engagés et des difficultés d’accès. Il est communiqué avant l’intervention dès que la
+        situation le permet. Les opérations supplémentaires nécessitent l’accord du client.
+      </p>
+      <p>
+        Sur autoroute, les forfaits de dépannage et leurs majorations sont réglementés par les
+        pouvoirs publics. Hors autoroute, le tarif accepté ou le devis signé s’applique. Une
+        facture est remise au client. Sauf prise en charge confirmée par une assistance ou un
+        assureur, le règlement est dû à l’issue de la prestation selon les moyens indiqués par
+        l’agence.
+      </p>
+    </ContentSection>
+
+    <ContentSection overline="Intervention" titre="Obligations du client et sécurité.">
+      <p>
+        Le client communique des informations exactes sur la localisation, le véhicule, sa
+        charge, son état et les risques connus. Il doit retirer ses objets de valeur et signaler
+        toute particularité susceptible d’affecter le chargement. Sur autoroute, il suit les
+        consignes des services de sécurité et se place derrière la glissière lorsqu’il peut le
+        faire sans danger.
+      </p>
+      <p>
+        Montpellier Dépannage choisit les moyens adaptés et peut interrompre ou différer une
+        opération si les conditions mettent en danger les personnes, le véhicule ou les tiers.
+        Les délais annoncés sont estimatifs et peuvent varier selon le trafic, la météo, les
+        réquisitions prioritaires et les contraintes de sécurité.
+      </p>
+    </ContentSection>
+
+    <ContentSection overline="Consommateurs" titre="Rétractation et intervention urgente." alt>
+      <p>
+        Lorsqu’un contrat à distance ouvre un droit de rétractation, le consommateur dispose en
+        principe de quatorze jours. S’il demande expressément que la prestation commence avant
+        la fin de ce délai, il reste redevable du service exécuté jusqu’à sa demande éventuelle
+        de rétractation. Les travaux d’entretien ou de réparation à réaliser en urgence au
+        domicile du consommateur et expressément sollicités sont soumis aux exceptions prévues
+        par le Code de la consommation&nbsp;; toute prestation additionnelle demeure soumise aux
+        règles ordinaires.
+      </p>
+    </ContentSection>
+
+    <ContentSection overline="Réclamations" titre="Nous contacter en priorité.">
+      <p>
+        Toute réclamation doit être adressée avec les références de l’intervention à
+        <a href={site.email.href}>{site.email.display}</a> ou par courrier au
+        {site.address.street}, {site.address.postalCode}&nbsp;{site.address.city}. Nous nous
+        engageons à examiner la demande et à rechercher une solution amiable.
+      </p>
+      <p>
+        Si le litige de consommation persiste après une réclamation écrite, le consommateur peut
+        recourir gratuitement au médiateur de la consommation compétent dont les coordonnées lui
+        sont communiquées sur les documents contractuels de l’agence concernée, puis saisir les
+        juridictions compétentes dans les conditions prévues par la loi.
+      </p>
+      <p>Dernière mise à jour&nbsp;: 17 août 2026.</p>
     </ContentSection>
   </main>
 

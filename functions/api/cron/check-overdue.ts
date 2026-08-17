@@ -11,6 +11,8 @@ import type { Env, DevisRow } from '../../_lib/env';
 import { jsonResponse } from '../../_lib/html';
 
 const TWO_HOURS_MS = 2 * 60 * 60 * 1000;
+const THREE_YEARS_MS = 3 * 365 * 24 * 60 * 60 * 1000;
+const THIRTEEN_MONTHS_MS = 395 * 24 * 60 * 60 * 1000;
 
 export const onRequest: PagesFunction<Env> = async (ctx) => {
   const { request, env } = ctx;
@@ -51,6 +53,13 @@ export const onRequest: PagesFunction<Env> = async (ctx) => {
     }
   }
 
+  // Minimisation RGPD : les demandes de prospects et la mesure agrégée des
+  // clics ne doivent pas rester indéfiniment en base.
+  const [purgedDevis, purgedCallClicks] = await Promise.all([
+    purgeOldRows(env, 'devis', Date.now() - THREE_YEARS_MS),
+    purgeOldRows(env, 'call_clicks', Date.now() - THIRTEEN_MONTHS_MS),
+  ]);
+
   return jsonResponse({
     ok: true,
     checked_at: new Date().toISOString(),
@@ -58,8 +67,22 @@ export const onRequest: PagesFunction<Env> = async (ctx) => {
     sent_count: sent.length,
     failed_count: failed.length,
     failed,
+    purged_devis: purgedDevis,
+    purged_call_clicks: purgedCallClicks,
   });
 };
+
+async function purgeOldRows(env: Env, table: 'devis' | 'call_clicks', cutoff: number): Promise<number> {
+  try {
+    const result = await env.DB.prepare(`DELETE FROM ${table} WHERE created_at < ?`).bind(cutoff).run();
+    return result.meta?.changes ?? 0;
+  } catch (error) {
+    // Une ancienne installation peut ne pas encore posséder call_clicks :
+    // la purge ne doit jamais empêcher l'envoi des alertes prioritaires.
+    console.error(`Retention purge failed for ${table}`, error);
+    return 0;
+  }
+}
 
 async function sendWhatsApp(env: Env, row: DevisRow): Promise<void> {
   const created = new Date(row.created_at).toLocaleString('fr-FR', { timeZone: 'Europe/Paris' });

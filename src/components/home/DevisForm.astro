@@ -40,7 +40,7 @@ import { site } from '../../config/site';
         </p>
       </div>
 
-      <form class="devis-form" id="devis-form" novalidate>
+      <form class="devis-form" id="devis-form" data-phone={site.phone.display}>
         <div class="devis-grid">
           <label class="devis-field">
             <span class="devis-label">Nom &amp; prénom</span>
@@ -53,8 +53,10 @@ import { site } from '../../config/site';
               type="tel"
               name="phone"
               autocomplete="tel"
+              inputmode="tel"
               required
               maxlength="30"
+              pattern="[+0-9 () .-]{8,30}"
               placeholder="06 12 34 56 78"
             />
           </label>
@@ -100,7 +102,8 @@ import { site } from '../../config/site';
           <input type="checkbox" name="consent_rgpd" required />
           <span>
             J’accepte que mes informations soient utilisées pour traiter ma demande de devis.
-            Données conservées le temps du suivi commercial, jamais transmises à un tiers.
+            Elles sont accessibles uniquement à Montpellier Dépannage et à ses prestataires
+            techniques. <a href="/mentions-legales/#donnees-personnelles">En savoir plus sur vos données.</a>
           </span>
         </label>
 
@@ -162,17 +165,22 @@ import { site } from '../../config/site';
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify(payload),
         });
-        const json = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string; debug?: string };
+        const json = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
         if (!res.ok || !json.ok) {
-          const detail = json.debug ? ` — ${json.debug}` : '';
-          throw new Error(`${json.error || `HTTP ${res.status}`}${detail}`);
+          const messages: Record<string, string> = {
+            phone_invalid: 'Le numéro de téléphone semble incomplet.',
+            email_invalid: 'L’adresse email semble invalide.',
+            payload_too_large: 'La demande est trop longue.',
+            temporarily_unavailable: 'Le service est momentanément indisponible.',
+          };
+          throw new Error(messages[json.error || ''] || 'La demande n’a pas pu être envoyée.');
         }
         result.textContent = 'Demande envoyée. Nous vous rappelons sous 2 heures.';
         result.classList.add('devis-result-ok');
         form.reset();
       } catch (err) {
-        const msg = err instanceof Error ? err.message : 'erreur';
-        result.textContent = `Échec de l’envoi (${msg}). Vous pouvez aussi appeler directement.`;
+        const msg = err instanceof Error ? err.message : 'La demande n’a pas pu être envoyée.';
+        result.textContent = `${msg} Vous pouvez aussi appeler directement le ${form.dataset.phone || ''}.`;
         result.classList.add('devis-result-err');
       } finally {
         submit.disabled = false;
@@ -408,6 +416,12 @@ import { site } from '../../config/site';
     height: 16px;
     accent-color: var(--color-primary);
     flex-shrink: 0;
+  }
+  .devis-consent a {
+    color: var(--color-primary);
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 2px;
   }
 
   .devis-submit-row {

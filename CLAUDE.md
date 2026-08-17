@@ -19,7 +19,7 @@ Toujours lire/modifier ces données ici, jamais en dur dans les composants.
 - `src/styles/{tokens.css,global.css}` — design tokens + reset
 
 Pages « zones d'intervention » : `/depannage/` est le **hub** (page index générée
-depuis `data/zones.ts`), `/depannage/{ville}/` les 15 fiches. Le hub est lié
+depuis `data/zones.ts`), `/depannage/{ville}/` les 25 fiches. Le hub est lié
 depuis la nav, le hero et le footer — ne pas le déconnecter du maillage, c'est
 la seule chose qui donne de la profondeur aux pages villes.
 
@@ -65,7 +65,7 @@ doit bouger. L'anglais et l'espagnol vivent sous `/en/` et `/es/`, avec des
 segments traduits (`/es/servicios/`, `/es/zonas/`).
 
 Périmètre traduit, volontairement resserré : accueil, index services, 6 fiches
-services, page couverture. **Pas** les fiches agences, les 15 fiches villes, le
+services, page couverture. **Pas** les fiches agences, les 25 fiches villes, le
 recrutement ni les pages légales — 30 pages étrangères peu recherchées
 diluent le site sans rien capter. Les pages traduites renvoient vers le FR.
 
@@ -130,7 +130,7 @@ Type-check des Functions : `npx tsc -p functions/tsconfig.json --noEmit` (les Fu
 - Repo GitHub : `AlexDiLorenzo/MtpDep`
 - Hébergement : **Cloudflare Pages** (auto-deploy sur push `main`)
 - Build : `npm run build` → `dist/`
-- Variable d'env Cloudflare : `NODE_VERSION=20`
+- Variable d'env Cloudflare : `NODE_VERSION=22.16.0` (Astro 7 requiert Node.js 22.12+)
 
 ### Setup initial Cloudflare (une seule fois)
 
@@ -153,7 +153,7 @@ Type-check des Functions : `npx tsc -p functions/tsconfig.json --noEmit` (les Fu
    |---|---|
    | `RESEND_API_KEY` | Console Resend → API Keys |
    | `RESEND_FROM` | `Montpellier Dépannage <devis@<domaine-vérifié>>` ou `onboarding@resend.dev` en test |
-   | `EMAIL_TO` | `alexandre.dlrz@gmail.com` (à changer plus tard) |
+   | `EMAIL_TO` | destinataire(s) des devis — accepte une liste séparée par des virgules. `ALWAYS_TO` dans `functions/api/devis.ts` ajoute des adresses fixes en plus (dédup automatique). |
    | `DEVIS_SECRET` | random 32+ chars (`openssl rand -base64 32`) |
    | `ADMIN_TOKEN` | random 32+ chars |
    | `CRON_SECRET` | random 32+ chars |

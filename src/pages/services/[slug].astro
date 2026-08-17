@@ -26,8 +26,18 @@ const { service } = Astro.props;
 const heroImage = photos[service.photo];
 
 // --- SEO ---------------------------------------------------------
-const pageTitle = `${service.titre} · Montpellier Dépannage — Hérault & Gard`;
-const pageDescription = `${service.resume} Intervention 24h/24, 7j/7 dans l'Hérault et le Gard avec Montpellier Dépannage.`;
+const seoTitles: Record<string, string> = {
+  'remorquage-vehicules-legers': 'Remorquage auto & véhicules de luxe | Montpellier',
+  'remorquage-poids-lourds': 'Remorquage poids lourds Montpellier | 24/7',
+  'depannage-autoroute-a9': 'Dépannage autoroute A9 Montpellier | Agréé 24/7',
+  'transport-international': 'Transport de véhicules France & Europe | Montpellier',
+  'centre-ville-zones-pietonnes': 'Dépannage centre-ville Montpellier | 24/7',
+  'mecanique-gpl-climatisation': 'Garage GPL & climatisation Montpellier',
+};
+const pageTitle = seoTitles[service.slug] ?? `${service.nom} | Montpellier Dépannage`;
+const pageDescription = service.resume.length < 120
+  ? `${service.resume} Service Montpellier Dépannage dans l'Hérault et le Gard.`
+  : service.resume;
 
 // --- Fil d'Ariane ------------------------------------------------
 const crumbs = [

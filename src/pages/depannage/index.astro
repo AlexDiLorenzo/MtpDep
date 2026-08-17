@@ -1,7 +1,7 @@
 ---
 // Hub des zones d'intervention : /depannage/
 //
-// Page parent des 15 pages /depannage/{ville}/. Sans ce hub, les pages
+// Page parent des pages /depannage/{ville}/. Sans ce hub, les pages
 // villes n'étaient atteignables que depuis /agences/ : profondeur de clic
 // élevée, aucun signal de regroupement thématique pour Google.
 //
@@ -32,8 +32,8 @@ const alentours = [...new Set(zones.flatMap((z) => z.alentours))]
 const departements = [...new Set(zones.map((z) => z.departement))];
 
 const pageTitle =
-  'Zones d’intervention · Dépannage et remorquage 24/7 — Hérault & Gard';
-const pageDescription = `Dépannage et remorquage 24h/24 dans ${zones.length} villes de l'Hérault et du Gard : Sète, Nîmes, Lodève, La Grande-Motte, Uzès… Chaque ville est rattachée à l'agence Montpellier Dépannage la plus proche.`;
+  'Dépannage 24/7 dans l’Hérault & le Gard | Nos zones';
+const pageDescription = `Dépannage et remorquage 24h/24 dans ${zones.length} villes de l'Hérault et du Gard. Trouvez l'agence Montpellier Dépannage la plus proche.`;
 
 const crumbs = [
   { name: 'Accueil', href: '/' },

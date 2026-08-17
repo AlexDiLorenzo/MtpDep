@@ -125,9 +125,9 @@ export const agences: Agence[] = [
     // 1 % de CTR) et l'adresse du siège (« 2501 avenue de maurin »).
     seo: {
       title:
-        'Garage & dépannage Montpellier Garosud — Atelier et remorquage 24/7',
+        'Garage Montpellier Garosud | Dépannage auto 24/7',
       description:
-        'Siège du réseau, ZAC de Garosud : atelier mécanique, GPL et climatisation, remorquage VL et poids lourds. Sortie A709 Montpellier-Sud. Ouvert 24h/24 — 04 67 42 14 31.',
+        'À Garosud : atelier mécanique, GPL et climatisation, dépannage VL et poids lourds près de l’A709. Remorquage 24h/24 — 04 67 42 14 31.',
     },
     contenu: {
       intro: [
@@ -190,7 +190,7 @@ export const agences: Agence[] = [
     // alors que la page se positionne dessus.
     seo: {
       title:
-        'Dépannage Pérols & aéroport Montpellier · Remorquage 24/7',
+        'Dépannage Pérols & aéroport Montpellier 24/7',
       description:
         'Dépannage, remorquage et atelier mécanique à Pérols, près de l’aéroport Montpellier-Méditerranée. Carnon, Palavas, La Grande-Motte. 24h/24 — 04 67 71 07 20.',
     },
@@ -390,7 +390,7 @@ export const agences: Agence[] = [
     // titre alors qu'elle est l'axe structurant de l'agence.
     seo: {
       title:
-        'Dépannage & garage Clermont-l’Hérault · Remorquage A75 24/7',
+        'Dépannage Clermont-l’Hérault & A75 24/7',
       description:
         'Remorquage VL et poids lourds dans le Clermontais et sur l’A75, du Salagou à la vallée de l’Hérault. ZAC de la Salamane, sortie A75. 24h/24 — 04 67 42 14 31.',
     },

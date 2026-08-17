@@ -38,10 +38,12 @@ const villesRattachees = zonesByAgence(agence.slug);
 // Console a montré un CTR anormalement bas (cf. commentaires dans agences.ts).
 const pageTitle =
   agence.seo?.title ??
-  `Dépannage à ${adresse.ville} (${adresse.codePostal}) · Remorquage 24/7 — Montpellier Dépannage`;
+  (`Dépannage auto ${adresse.ville} 24/7 | Montpellier Dépannage`.length <= 62
+    ? `Dépannage auto ${adresse.ville} 24/7 | Montpellier Dépannage`
+    : `Dépannage auto ${adresse.ville} 24/7`);
 const pageDescription =
   agence.seo?.description ??
-  `Dépannage et remorquage 24h/24, 7j/7 à ${adresse.ville} et alentours. ${agence.societe}, agence du réseau Montpellier Dépannage. Plateaux VL et PL, intervention rapide. Appelez le ${phonePrincipal.display}.`;
+  `Dépannage et remorquage 24h/24 à ${adresse.ville} et alentours. Plateaux VL et PL du réseau Montpellier Dépannage. Appelez le ${phonePrincipal.display}.`;
 
 // --- Fil d'Ariane ------------------------------------------------
 const crumbs = [

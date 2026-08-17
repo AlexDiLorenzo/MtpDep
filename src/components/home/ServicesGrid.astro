@@ -1,14 +1,16 @@
 ---
-import { photos } from '../../config/site';
+import { services } from '../../data/services';
 
-const services = [
-  { tag: '01', title: 'Remorquage VL & véhicules de luxe', desc: 'Voitures en panne ou accidentées, accès sous-sols, plateaux rabaissés adaptés aux véhicules de prestige.', image: photos.porscheCayman },
-  { tag: '02', title: 'Remorquage poids lourds', desc: 'Flotte 4×4 avec bras, plateaux PL. Récupération de tout gabarit, jour et nuit.', image: photos.plRecuperation },
-  { tag: '03', title: 'Autoroute A9', desc: 'Agréés autoroutes, partenaires Vinci. Intervention rapide sur le réseau Hérault.', image: photos.interventionA9 },
-  { tag: '04', title: 'Transport international', desc: 'France, Belgique, Italie, Espagne. Rapatriement de véhicules accidentés.', image: photos.transportInternational },
-  { tag: '05', title: 'Centre-ville & places piétonnes', desc: 'Flotte électrique zéro émission : véhicule compact et scooters pour intervenir dans le cœur historique : Comédie, Antigone, Peyrou.', image: photos.flotteElectrique },
-  { tag: '06', title: 'Mécanique · GPL · Clim', desc: 'Entretien véhicules, installation systèmes GPL, révision climatisation.', image: photos.peyrou },
-];
+const cardImages: Record<string, string> = {
+  porscheCayman: '/img/porsche-cayman-card.webp',
+  plRecuperation: '/img/pl-recuperation-card.webp',
+  interventionA9: '/img/intervention-a9-card.webp',
+  transportInternational: '/img/transport-international-card.webp',
+  flotteElectrique: '/img/flotte-electrique-card.webp',
+  peyrou: '/img/peyrou-vertical-card.webp',
+};
+
+const cardImage = (photo: string) => cardImages[photo] ?? '/img/flotte-camions.webp';
 ---
 
 <section class="services" id="services">
@@ -25,13 +27,24 @@ const services = [
     <div class="services-grid">
       {services.map((s, i) => (
         <article class="service-card" data-reveal style={`--reveal-delay:${i * 70}ms`}>
-          <div class="service-card-img" style={`--svc-img: url('${s.image}');`}>
+          <a class="service-card-link-wrap" href={`/services/${s.slug}/`} aria-label={`${s.titre} — en savoir plus`}>
+          <div class="service-card-img">
+            <img
+              src={cardImage(s.photo)}
+              alt=""
+              width="720"
+              height="360"
+              loading="lazy"
+              decoding="async"
+            />
             <span class="service-card-tag mono">{s.tag}</span>
           </div>
           <div class="service-card-body">
-            <h3 class="service-card-title">{s.title}</h3>
-            <p class="service-card-desc">{s.desc}</p>
+            <h3 class="service-card-title">{s.titre}</h3>
+            <p class="service-card-desc">{s.resume}</p>
+            <span class="service-card-more">Découvrir <span aria-hidden="true">→</span></span>
           </div>
+          </a>
         </article>
       ))}
     </div>
@@ -104,19 +117,37 @@ const services = [
     box-shadow: var(--shadow-sm);
     transition: transform var(--dur-base) var(--ease-standard), box-shadow var(--dur-base) var(--ease-standard);
   }
+  .service-card-link-wrap {
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    text-decoration: none;
+  }
   .service-card:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
   }
   .service-card-img {
     height: 160px;
-    background-image: linear-gradient(180deg, rgba(26,25,15,0) 40%, rgba(26,25,15,0.7) 100%), var(--svc-img);
-    background-size: cover;
-    background-position: center;
     position: relative;
+    overflow: hidden;
     transition: transform var(--dur-base) var(--ease-standard);
   }
-  .service-card:hover .service-card-img { transform: scale(1.03); }
+  .service-card-img::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 40%, rgba(26,25,15,0.7) 100%);
+    pointer-events: none;
+  }
+  .service-card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--dur-base) var(--ease-standard);
+  }
+  .service-card:hover .service-card-img img { transform: scale(1.03); }
   .service-card-tag {
     position: absolute;
     top: 12px;
@@ -129,6 +160,7 @@ const services = [
     font-family: var(--font-mono);
     font-weight: 700;
     letter-spacing: 0.05em;
+    z-index: 1;
   }
   .service-card-body {
     padding: 20px 22px 22px;
@@ -162,6 +194,16 @@ const services = [
     letter-spacing: 0.04em;
     text-transform: uppercase;
   }
+  .service-card-more {
+    margin-top: 16px;
+    color: var(--color-primary);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .service-card-more span { display: inline-block; transition: transform var(--dur-base) var(--ease-standard); }
+  .service-card:hover .service-card-more span { transform: translateX(3px); }
   .service-card-link span { transition: transform var(--dur-base) var(--ease-standard); }
   .service-card:hover .service-card-link span { transform: translateX(3px); }
 

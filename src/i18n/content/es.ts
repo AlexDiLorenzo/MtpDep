@@ -43,10 +43,9 @@ export const es: LocalizedContent = {
   },
 
   home: {
-    title:
-      'Montpellier Dépannage · Grúa y asistencia en carretera 24 h · Montpellier, Hérault y A9',
+    title: 'Grúa 24 h en Montpellier y la A9 | Atención en español',
     description:
-      '¿Avería cerca de Montpellier o en la autopista A9? Servicio de grúa y asistencia en carretera 24 horas, atención en español. Coches, autocaravanas, camiones. Más de 30 años de experiencia y 8 bases en Hérault y Gard.',
+      '¿Avería cerca de Montpellier o en la A9? Grúa 24 horas en español para coches, autocaravanas y camiones. Ocho bases en Hérault y Gard.',
     heroPill: '24 horas al día · 7 días a la semana',
     heroTitle: '¿Avería en el sur de Francia?',
     heroTitleAccent: 'Grúa a cualquier hora.',
@@ -153,9 +152,9 @@ export const es: LocalizedContent = {
   },
 
   serviceIndex: {
-    title: 'Servicios · Grúa, rescate y transporte de vehículos — Montpellier Dépannage',
+    title: 'Servicios de grúa y asistencia | Montpellier',
     description:
-      'Grúa para turismos y camiones, rescate en la autopista A9, flota eléctrica para el centro histórico, transporte internacional de vehículos y talleres mecánicos en Montpellier. 24 horas.',
+      'Grúa para coches y camiones, asistencia en la A9, transporte internacional y talleres cerca de Montpellier. Urgencias disponibles 24 horas.',
     overline: 'Servicios',
     heading: 'Seis servicios, un solo teléfono.',
     lead:
@@ -440,9 +439,9 @@ export const es: LocalizedContent = {
   ],
 
   coverage: {
-    title: 'Zona de cobertura · Montpellier, Hérault, Gard y la A9 — Montpellier Dépannage',
+    title: 'Cobertura de grúa | Montpellier, Hérault, Gard y A9',
     description:
-      '8 bases y 15 localidades cubiertas 24 horas alrededor de Montpellier: Sète, Nimes, La Grande-Motte, Lodève, Uzès, Le Grau-du-Roi y más. Grúa y asistencia en Hérault, Gard y la autopista A9.',
+      'Ocho bases cubren Montpellier, Hérault, Gard y la autopista A9 las 24 horas, incluidas Sète, Nîmes, La Grande-Motte, Lodève y Uzès.',
     overline: 'Cobertura',
     heading: 'Hasta dónde llegamos.',
     lead: [

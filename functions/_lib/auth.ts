@@ -17,22 +17,26 @@ export function timingSafeEqual(a: string, b: string): boolean {
   return diff === 0;
 }
 
-/** Renvoie true si la requête fournit un token valide (query ?token=… ou cookie). */
+/** Renvoie true si la requête fournit un cookie httpOnly valide. */
 export function checkToken(
   request: Request,
   expected: string | undefined,
   cookieName: string
 ): { ok: boolean; queryToken: string | null } {
   if (!expected) return { ok: false, queryToken: null };
-  const url = new URL(request.url);
-  const queryToken = url.searchParams.get('token');
   const cookieToken = parseCookie(request.headers.get('cookie'))[cookieName];
-  const provided = queryToken || cookieToken;
+  const provided = cookieToken;
   if (!provided) return { ok: false, queryToken: null };
-  return { ok: timingSafeEqual(provided, expected), queryToken };
+  return { ok: timingSafeEqual(provided, expected), queryToken: null };
 }
 
-/** Header Set-Cookie httpOnly Secure SameSite=Lax 30j. */
+/** Header Set-Cookie httpOnly Secure SameSite=Strict 30j. */
 export function makeAuthCookie(name: string, value: string, maxAgeSec = 60 * 60 * 24 * 30): string {
-  return `${name}=${encodeURIComponent(value)}; Path=/; Max-Age=${maxAgeSec}; HttpOnly; Secure; SameSite=Lax`;
+  return `${name}=${encodeURIComponent(value)}; Path=/; Max-Age=${maxAgeSec}; HttpOnly; Secure; SameSite=Strict`;
+}
+
+/** Refuse les mutations déclenchées depuis un autre site. */
+export function isSameOrigin(request: Request): boolean {
+  const origin = request.headers.get('origin');
+  return !origin || origin === new URL(request.url).origin;
 }

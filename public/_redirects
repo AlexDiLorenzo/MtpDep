@@ -12,6 +12,7 @@
 /photos               /                                301
 /videos               /                                301
 /paiement-remorquage  /                                301
+/wp-content/uploads/2015/07/ldm.pdf /a-propos/         301
 
 # --- Familles WordPress (archives, medias, admin) ---
 /category/*           /        301

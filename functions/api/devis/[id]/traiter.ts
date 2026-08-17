@@ -4,6 +4,7 @@
 import type { Env, DevisRow } from '../../../_lib/env';
 import { verifyId } from '../../../_lib/crypto';
 import { htmlResponse, escapeHtml } from '../../../_lib/html';
+import { isSameOrigin } from '../../../_lib/auth';
 
 export const onRequestGet: PagesFunction<Env, 'id'> = async (ctx) => {
   const { params, request, env } = ctx;
@@ -41,6 +42,43 @@ export const onRequestGet: PagesFunction<Env, 'id'> = async (ctx) => {
     );
   }
 
+  return htmlResponse(
+    layout(
+      'Confirmer le traitement',
+      `<p>Confirmez que la demande de <strong>${escapeHtml(row.name ?? row.phone)}</strong> a bien été prise en charge.</p>
+       <form method="post">
+         <input type="hidden" name="t" value="${escapeHtml(token)}" />
+         <button type="submit">✓ Marquer comme traitée</button>
+       </form>
+       <p style="color:#5F5E5A;font-size:13px;">Cette confirmation évite qu’un scanner d’email ne traite la demande automatiquement.</p>`
+    )
+  );
+};
+
+// La mutation exige un POST explicite : un simple aperçu automatique de
+// l'email ne peut plus marquer un devis comme traité.
+export const onRequestPost: PagesFunction<Env, 'id'> = async (ctx) => {
+  const { params, request, env } = ctx;
+  if (!isSameOrigin(request)) {
+    return htmlResponse(layout('Action refusée', '<p>Origine de la requête invalide.</p>'), 403);
+  }
+  const id = params.id as string;
+  const form = await request.formData();
+  const token = String(form.get('t') || '');
+  if (!id || !token || !(await verifyId(id, token, env.DEVIS_SECRET))) {
+    return htmlResponse(layout('Lien invalide', '<p>Le lien est manquant, modifié ou expiré.</p>'), 403);
+  }
+
+  const row = await env.DB.prepare('SELECT * FROM devis WHERE id = ? LIMIT 1')
+    .bind(id)
+    .first<DevisRow>();
+  if (!row) {
+    return htmlResponse(layout('Demande introuvable', '<p>Cette demande n’existe plus.</p>'), 404);
+  }
+  if (row.status === 'treated') {
+    return htmlResponse(layout('Déjà traitée', '<p>Cette demande avait déjà été marquée comme traitée.</p>'));
+  }
+
   const treated_at = Date.now();
   await env.DB.prepare(
     `UPDATE devis SET status = 'treated', treated_at = ? WHERE id = ? AND status = 'open'`
@@ -74,6 +112,7 @@ function layout(title: string, body: string): string {
   h1 { font-family: 'Space Grotesk', sans-serif; font-size: 28px; margin: 0 0 18px; color: #2C6126; }
   p { line-height: 1.6; }
   code { background: #F1EFE8; padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+  button { border: 0; border-radius: 8px; background: #E4E13C; color: #1A190F; padding: 14px 20px; font: inherit; font-weight: 700; cursor: pointer; }
   .muted { font-size: 11px; color: #888780; margin-top: 24px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 700; }
 </style></head><body>
 <main><div class="card">

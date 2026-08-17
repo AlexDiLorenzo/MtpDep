@@ -58,6 +58,19 @@ const { titre, overline, alt = false } = Astro.props;
   }
   .cs-body :global(p) { margin: 0 0 14px; }
   .cs-body :global(p:last-child) { margin-bottom: 0; }
+  .cs-body :global(h3) {
+    color: var(--color-text);
+    font-family: var(--font-display);
+    font-size: 18px;
+    margin: 24px 0 8px;
+  }
+  .cs-body :global(ul) {
+    list-style: disc;
+    margin: 0 0 18px;
+    padding-left: 22px;
+  }
+  .cs-body :global(li) { margin-bottom: 6px; }
+  .cs-body :global(strong) { color: var(--color-text); }
   .cs-body :global(a) {
     color: var(--color-primary);
     font-weight: 600;

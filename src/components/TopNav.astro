@@ -14,6 +14,10 @@ interface Props {
 }
 
 const { routeKey } = Astro.props;
+const currentPath = Astro.url.pathname === '/' || Astro.url.pathname.endsWith('/')
+  ? Astro.url.pathname
+  : `${Astro.url.pathname}/`;
+const isCurrent = (href: string) => href === '/' ? currentPath === '/' : currentPath.startsWith(href);
 ---
 
 <nav class="topnav">
@@ -22,14 +26,14 @@ const { routeKey } = Astro.props;
       <LogoMark size={32} />
     </a>
 
-    <a href="/recrutement" class="topnav-recruit" aria-label="Montpellier Dépannage recrute">
+    <a href="/recrutement/" class="topnav-recruit" aria-label="Montpellier Dépannage recrute" aria-current={isCurrent('/recrutement/') ? 'page' : undefined}>
       <span class="topnav-recruit-dot" aria-hidden="true"></span>
       MDP recrute
     </a>
 
     <ul class="topnav-links">
       {nav.map((item) => (
-        <li><a href={item.href}>{item.label}</a></li>
+        <li><a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>{item.label}</a></li>
       ))}
     </ul>
 
@@ -40,7 +44,7 @@ const { routeKey } = Astro.props;
       </a>
     </div>
 
-    <button class="topnav-burger" aria-label="Menu" aria-controls="mobile-menu" aria-expanded="false" id="burger">
+    <button class="topnav-burger" aria-label="Ouvrir le menu" aria-controls="mobile-menu" aria-expanded="false" id="burger">
       <span></span><span></span><span></span>
     </button>
   </div>
@@ -48,9 +52,9 @@ const { routeKey } = Astro.props;
   <div class="topnav-mobile" id="mobile-menu" hidden>
     <ul>
       {nav.map((item) => (
-        <li><a href={item.href}>{item.label}</a></li>
+        <li><a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>{item.label}</a></li>
       ))}
-      <li><a href="/recrutement" class="mobile-recruit"><span class="topnav-recruit-dot" aria-hidden="true"></span> MDP recrute</a></li>
+      <li><a href="/recrutement/" class="mobile-recruit"><span class="topnav-recruit-dot" aria-hidden="true"></span> MDP recrute</a></li>
       <li><a href={site.phone.href} class="btn btn-primary mobile-phone-cta mono">☎ {site.phone.display}</a></li>
       {routeKey && (
         <li class="mobile-lang"><LanguageSwitcher current="fr" routeKey={routeKey} /></li>
@@ -141,6 +145,7 @@ const { routeKey } = Astro.props;
     transition: border-color var(--dur-fast) var(--ease-standard), color var(--dur-fast) var(--ease-standard);
   }
   .topnav-links a:hover { color: var(--color-primary); border-color: var(--color-primary); }
+  .topnav-links a[aria-current='page'] { color: var(--color-primary); border-color: var(--color-primary); font-weight: 700; }
 
   .topnav-cta { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
   .topnav-phone-cta {
@@ -230,6 +235,15 @@ const { routeKey } = Astro.props;
     const isOpen = !menu?.hidden;
     if (menu) menu.hidden = isOpen;
     burger.setAttribute('aria-expanded', String(!isOpen));
+    burger.setAttribute('aria-label', isOpen ? 'Ouvrir le menu' : 'Fermer le menu');
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape' || menu?.hidden) return;
+    if (menu) menu.hidden = true;
+    burger?.setAttribute('aria-expanded', 'false');
+    burger?.setAttribute('aria-label', 'Ouvrir le menu');
+    burger?.focus();
   });
 
   // Scrolled state → subtle shadow

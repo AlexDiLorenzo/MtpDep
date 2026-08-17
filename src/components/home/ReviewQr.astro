@@ -34,7 +34,7 @@ import { photos } from '../../config/site';
     <p class="qr-overlay-over">Montpellier&nbsp;Dépannage</p>
     <img
       class="qr-big"
-      src={photos.qrAvis}
+      data-src={photos.qrAvis}
       width="1044"
       height="1044"
       alt="QR code pour laisser un avis Google sur Montpellier Dépannage"
@@ -172,6 +172,8 @@ import { photos } from '../../config/site';
     }
 
     async function open() {
+      const qr = overlay!.querySelector('img[data-src]') as HTMLImageElement | null;
+      if (qr && !qr.src) qr.src = qr.dataset.src || '';
       overlay!.hidden = false;
       document.body.style.overflow = 'hidden';
       await acquireWakeLock();

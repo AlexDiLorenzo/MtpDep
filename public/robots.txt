@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /pilotage/
 
 Sitemap: https://www.montpellierdepannage.com/sitemap-index.xml

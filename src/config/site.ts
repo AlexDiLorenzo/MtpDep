@@ -26,6 +26,17 @@ export const site = {
 
   hours: '24/7',
   url: 'https://www.montpellierdepannage.com',
+
+  legal: {
+    companyName: 'MONTPELLIER DÉPANNAGE',
+    legalForm: 'SAS',
+    capital: '480 000 €',
+    siren: '382 482 404',
+    siret: '382 482 404 00078',
+    rcs: '382 482 404 RCS Montpellier',
+    vat: 'FR80 382 482 404',
+    publicationDirector: 'Norbert Di Lorenzo',
+  },
 } as const;
 
 // Navigation principale — pages multi-pages (architecture SEO).

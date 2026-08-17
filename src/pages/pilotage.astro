@@ -14,15 +14,13 @@ import { site } from '../config/site';
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Pilotage · {site.name}</title>
     <meta name="robots" content="noindex,nofollow" />
-    <link rel="icon" type="image/png" href="/img/logo-mdp.png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="icon" type="image/png" href="/img/favicon-32.png" />
   </head>
   <body>
     <div class="pil" data-state="loading">
       <header class="pil-header">
         <div class="pil-brand">
-          <img src="/img/logo-mdp.png" alt="" class="pil-logo" />
+          <img src="/img/logo-mdp.webp" alt="" width="600" height="333" class="pil-logo" />
           <div class="pil-title">
             <div class="pil-overline" id="pil-overline">Tableau de bord</div>
             <h1>Pilotage Montpellier&nbsp;Dépannage</h1>
@@ -205,7 +203,7 @@ import { site } from '../config/site';
     <!-- Login overlay (caché par défaut, affiché si 401) -->
     <div class="pil-login" id="pil-login" hidden>
       <form id="pil-login-form" autocomplete="off">
-        <img src="/img/logo-mdp.png" alt="" />
+        <img src="/img/logo-mdp.webp" alt="" width="600" height="333" />
         <h2>Accès pilotage</h2>
         <input type="password" name="token" id="pil-token" placeholder="Token d'accès" autofocus required />
         <button type="submit">Entrer</button>
@@ -695,37 +693,48 @@ import { site } from '../config/site';
           const gm = gg.month || {};
           const sites = gg.sites || [];
 
+          // Quand la synchro Google échoue, le back continue de servir le dernier
+          // cache (status 'stale'). Sans ce garde-fou l'écran afficherait des notes
+          // vieilles de plusieurs semaines comme si elles dataient du jour.
+          const ggStale = gg.status === 'stale';
+          const ggSince = gg.updated_at
+            ? new Date(gg.updated_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: '2-digit' })
+            : null;
+          const ggStaleSub = ggSince
+            ? ('figé au ' + ggSince + ' · synchro Google en échec')
+            : 'synchro Google en échec';
+
           // Note globale
-          const cardGl = setCardStatus('card-google-global', gl.status);
+          const cardGl = setCardStatus('card-google-global', ggStale ? 'gray' : gl.status);
           setBind(cardGl, 'big', gl.avg != null ? fmt1(gl.avg) : '—');
           setBind(cardGl, 'stars', gl.avg != null ? starString(gl.avg) : '');
-          setBind(cardGl, 'bigsub', gl.avg != null
+          setBind(cardGl, 'bigsub', ggStale ? ggStaleSub : gl.avg != null
             ? 'note moyenne du réseau'
             : 'en attente des données Google');
-          setBind(cardGl, 'status-label', gl.avg != null
+          setBind(cardGl, 'status-label', ggStale ? 'Non synchronisé' : gl.avg != null
             ? (gl.status === 'green' ? 'Excellente' : gl.status === 'orange' ? 'Correcte' : 'Fragile')
             : '—');
           setBind(cardGl, 'count', String(gl.count ?? 0));
           setBind(cardGl, 'establishments', String(sites.length || '—'));
 
           // Ce mois-ci
-          const cardGm = setCardStatus('card-google-month', gm.status);
+          const cardGm = setCardStatus('card-google-month', ggStale ? 'gray' : gm.status);
           setBind(cardGm, 'big', gm.avg != null ? fmt1(gm.avg) : '—');
           setBind(cardGm, 'stars', gm.avg != null ? starString(gm.avg) : '');
-          setBind(cardGm, 'bigsub', gm.count
+          setBind(cardGm, 'bigsub', ggStale ? ggStaleSub : gm.count
             ? ('note moyenne sur ' + gm.count + ' avis')
             : 'aucun avis reçu ce mois-ci');
           const oneStar = gm.one_star ?? 0;
-          setBind(cardGm, 'status-label', oneStar > 0
+          setBind(cardGm, 'status-label', ggStale ? 'Non synchronisé' : oneStar > 0
             ? (oneStar + ' avis 1 ★')
             : 'Aucun avis 1 ★');
           setBind(cardGm, 'monthcount', String(gm.count ?? 0));
           setBind(cardGm, 'onestar', String(oneStar));
           const osRow = cardGm.querySelector('[data-row="onestar"]');
-          if (osRow) osRow.classList.toggle('is-alert', oneStar > 0);
+          if (osRow) osRow.classList.toggle('is-alert', !ggStale && oneStar > 0);
 
           // Par établissement
-          renderSites(sites);
+          renderSites(sites, ggStale, ggStaleSub);
 
           // ── Connexion (état DepanTime) ──
           const dtOk = !json.depantime || json.depantime.status === 'ok';
@@ -735,7 +744,7 @@ import { site } from '../config/site';
           sourceEl.textContent = dtOk ? 'DepanTime · D1' : 'D1 seul (DepanTime hors-ligne)';
         }
 
-        function renderSites(sites) {
+        function renderSites(sites, stale, staleSub) {
           const host = document.querySelector('#card-google-sites [data-bind="sitelist"]');
           if (!host) return;
           if (!sites.length) {
@@ -756,6 +765,13 @@ import { site } from '../config/site';
               + '<span class="pil-site-count">' + (s.review_count || 0) + ' avis</span>'
               + '</div>';
           }).join('');
+          // Cache périmé : les notes affichées ne valent plus rien comme signal,
+          // la carte passe en gris et annonce sa date au lieu d'un statut réseau.
+          if (stale) {
+            setCardStatus('card-google-sites', 'gray');
+            setBind(document.getElementById('card-google-sites'), 'status-label', staleSub || 'Non synchronisé');
+            return;
+          }
           // Statut de la carte = le pire établissement.
           const worst = sites.some((s) => s.status === 'red') ? 'red'
             : sites.some((s) => s.status === 'orange') ? 'orange'
