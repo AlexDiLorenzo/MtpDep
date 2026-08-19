@@ -198,19 +198,16 @@ const jsonLd = [
   /* ====== Hero ====== */
   .lh-hero {
     position: relative;
-    min-height: 650px;
+    min-height: 580px;
     background-image:
-      radial-gradient(circle at 12% 8%, rgba(62,127,44,0.3), transparent 42%),
-      linear-gradient(90deg, rgba(18,50,17,0.9) 0%, rgba(26,25,15,0.5) 58%, rgba(26,25,15,0.28) 100%),
-      linear-gradient(180deg, rgba(26,25,15,0.18) 0%, rgba(18,31,16,0.9) 100%),
+      linear-gradient(180deg, rgba(26,25,15,0.72) 0%, rgba(26,25,15,0.82) 100%),
       var(--lh-hero-bg);
     background-size: cover;
     background-position: center;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    padding: 92px var(--pad-x-desktop) 34px;
-    overflow: hidden;
+    padding: 80px var(--pad-x-desktop) 0;
   }
   .lh-hero-content { max-width: var(--container-max); margin: 0 auto; width: 100%; }
   .lh-pill {
@@ -234,13 +231,13 @@ const jsonLd = [
   }
   .lh-title {
     font-family: var(--font-display);
-    font-size: clamp(50px, 5.4vw, 70px);
-    line-height: 1.01;
+    font-size: 52px;
+    line-height: 1.06;
     letter-spacing: var(--tr-display);
     font-weight: 700;
     color: #fff;
     margin: 0 0 18px;
-    max-width: 13ch;
+    max-width: 820px;
   }
   .lh-title-accent { color: var(--md-brand-yellow); }
   .lh-lead {
@@ -257,9 +254,9 @@ const jsonLd = [
     padding: 16px 26px;
     background: var(--md-brand-yellow);
     color: var(--md-brand-black);
-    border-radius: 15px;
+    border-radius: var(--radius-lg);
     text-decoration: none;
-    box-shadow: 0 12px 30px rgba(228,225,60,0.24);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.35);
     transition: transform var(--dur-base) var(--ease-standard);
   }
   .lh-phone:hover { transform: translateY(-2px); }
@@ -295,12 +292,6 @@ const jsonLd = [
     max-width: var(--container-max);
     margin: 44px auto 0;
     width: 100%;
-    padding: 8px;
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: var(--radius-card);
-    background: rgba(15,37,17,0.52);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
   }
   .lh-stats {
     list-style: none;
@@ -308,6 +299,7 @@ const jsonLd = [
     padding: 0;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid rgba(255,255,255,0.16);
   }
   .lh-stat { padding: 22px 20px; border-right: 1px solid rgba(255,255,255,0.12); }
   .lh-stat:last-child { border-right: none; }
@@ -327,7 +319,7 @@ const jsonLd = [
   .lh-stat-kicker { font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 2px; }
 
   /* ====== Sections ====== */
-  .lh-section { padding: 78px var(--pad-x-desktop); background: var(--color-bg); }
+  .lh-section { padding: 64px var(--pad-x-desktop); background: var(--color-bg); }
   .lh-section-alt { background: var(--color-bg-subtle); }
   .lh-inner { max-width: var(--container-max); margin: 0 auto; }
   .lh-overline {
@@ -386,10 +378,9 @@ const jsonLd = [
   }
   .lh-step {
     background: var(--color-bg);
-    border: 1px solid var(--color-border-soft);
-    border-radius: var(--radius-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
     padding: 24px;
-    box-shadow: var(--shadow-card);
   }
   .lh-step-num {
     display: inline-block;
@@ -422,22 +413,22 @@ const jsonLd = [
     padding: 0;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+    gap: 16px;
   }
   .lh-service {
     display: flex;
     flex-direction: column;
     height: 100%;
     background: var(--color-bg);
-    border: 1px solid var(--color-border-soft);
-    border-radius: var(--radius-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
     padding: 22px;
     text-decoration: none;
-    box-shadow: var(--shadow-card);
+    box-shadow: var(--shadow-xs);
     transition: transform var(--dur-base) var(--ease-standard),
                 box-shadow var(--dur-base) var(--ease-standard);
   }
-  .lh-service:hover { transform: translateY(-5px); box-shadow: var(--shadow-card-hover); }
+  .lh-service:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
   .lh-service-tag {
     align-self: flex-start;
     font-size: 10px;
@@ -445,7 +436,7 @@ const jsonLd = [
     background: var(--md-brand-yellow);
     color: var(--md-brand-black);
     padding: 4px 8px;
-    border-radius: var(--radius-pill);
+    border-radius: var(--radius-xs);
     margin-bottom: 12px;
   }
   .lh-service-title {
@@ -585,7 +576,7 @@ const jsonLd = [
 
   /* ====== Responsive ====== */
   @media (max-width: 1023px) {
-    .lh-hero { padding: 72px var(--pad-x-tablet) 28px; min-height: 560px; }
+    .lh-hero { padding: 64px var(--pad-x-tablet) 0; min-height: 520px; }
     .lh-title { font-size: 38px; }
     .lh-section { padding: 52px var(--pad-x-tablet); }
     .lh-cta { padding: 52px var(--pad-x-tablet); }
@@ -595,14 +586,14 @@ const jsonLd = [
     .lh-stat:nth-child(2) { border-right: none; }
   }
   @media (max-width: 639px) {
-    .lh-hero { padding: 62px var(--pad-x-mobile) 24px; }
-    .lh-title { font-size: 38px; }
+    .lh-hero { padding: 52px var(--pad-x-mobile) 0; }
+    .lh-title { font-size: 30px; }
     .lh-lead { font-size: 15px; }
-    .lh-section { padding: 54px var(--pad-x-mobile); }
+    .lh-section { padding: 44px var(--pad-x-mobile); }
     .lh-cta { padding: 44px var(--pad-x-mobile); }
     .lh-cta-title { font-size: 24px; }
     .lh-services, .lh-steps, .lh-points { grid-template-columns: 1fr; }
-    .lh-stats { grid-template-columns: repeat(2, 1fr); }
+    .lh-stats { grid-template-columns: 1fr; }
     .lh-stat { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.12); }
     .lh-phone-number { font-size: 21px; }
   }

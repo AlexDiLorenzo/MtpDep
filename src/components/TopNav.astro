@@ -23,7 +23,7 @@ const isCurrent = (href: string) => href === '/' ? currentPath === '/' : current
 <nav class="topnav">
   <div class="topnav-inner">
     <a href="/" class="topnav-brand" aria-label={`${site.name} · accueil`}>
-      <LogoMark size={44} />
+      <LogoMark size={32} />
     </a>
 
     <a href="/recrutement/" class="topnav-recruit" aria-label="Montpellier Dépannage recrute" aria-current={isCurrent('/recrutement/') ? 'page' : undefined}>
@@ -68,22 +68,18 @@ const isCurrent = (href: string) => href === '/' ? currentPath === '/' : current
     position: sticky;
     top: 0;
     z-index: 50;
-    background: rgba(255, 254, 250, 0.91);
-    border-bottom: 1px solid rgba(44, 97, 38, 0.1);
-    backdrop-filter: blur(18px) saturate(145%);
-    -webkit-backdrop-filter: blur(18px) saturate(145%);
-    transition: box-shadow var(--dur-slow) var(--ease-standard), background-color var(--dur-slow) var(--ease-standard);
+    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: box-shadow var(--dur-slow) var(--ease-standard);
   }
-  .topnav.scrolled {
-    background: rgba(255, 254, 250, 0.97);
-    box-shadow: 0 10px 35px rgba(18, 50, 17, 0.1);
-  }
+  .topnav.scrolled { box-shadow: var(--shadow-md); }
 
   .topnav-inner {
     max-width: var(--container-max);
     margin: 0 auto;
-    min-height: 76px;
-    padding: 10px var(--pad-x-desktop);
+    padding: 14px var(--pad-x-desktop);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -96,17 +92,14 @@ const isCurrent = (href: string) => href === '/' ? currentPath === '/' : current
     text-decoration: none;
     color: inherit;
     flex-shrink: 0;
-    filter: drop-shadow(0 4px 7px rgba(18, 50, 17, 0.13));
-    transition: transform var(--dur-base) var(--ease-standard);
   }
-  .topnav-brand:hover { transform: translateY(-1px) scale(1.02); }
 
   /* Pill "MDP recrute" — placée à gauche du nav, signal jaune */
   .topnav-recruit {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 14px;
+    padding: 7px 14px;
     border-radius: var(--radius-pill);
     background: var(--md-signal-300);
     color: var(--md-brand-black);
@@ -115,7 +108,7 @@ const isCurrent = (href: string) => href === '/' ? currentPath === '/' : current
     text-decoration: none;
     letter-spacing: 0.03em;
     border: 1px solid rgba(26,25,15,0.15);
-    box-shadow: 0 5px 16px rgba(160,157,30,0.2);
+    box-shadow: 0 2px 8px rgba(228,225,60,0.5);
     transition: transform var(--dur-base) var(--ease-standard),
                 box-shadow var(--dur-base) var(--ease-standard);
     flex-shrink: 0;
@@ -140,35 +133,28 @@ const isCurrent = (href: string) => href === '/' ? currentPath === '/' : current
   .topnav-links {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 28px;
   }
   .topnav-links a {
     font-size: 14px;
     color: var(--color-text);
     font-weight: 500;
     text-decoration: none;
-    padding: 9px 13px;
-    border-radius: var(--radius-pill);
-    transition: background-color var(--dur-fast) var(--ease-standard), color var(--dur-fast) var(--ease-standard);
+    padding: 4px 0;
+    border-bottom: 2px solid transparent;
+    transition: border-color var(--dur-fast) var(--ease-standard), color var(--dur-fast) var(--ease-standard);
   }
-  .topnav-links a:hover { color: var(--color-primary); background: rgba(44,97,38,0.07); }
-  .topnav-links a[aria-current='page'] {
-    color: var(--color-primary);
-    background: var(--color-primary-bg);
-    box-shadow: inset 0 0 0 1px rgba(44,97,38,0.08);
-    font-weight: 700;
-  }
+  .topnav-links a:hover { color: var(--color-primary); border-color: var(--color-primary); }
+  .topnav-links a[aria-current='page'] { color: var(--color-primary); border-color: var(--color-primary); font-weight: 700; }
 
   .topnav-cta { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
   .topnav-phone-cta {
-    padding: 11px 17px;
+    padding: 10px 16px;
     font-size: 14px;
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-md);
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: linear-gradient(135deg, var(--md-forest-600), var(--md-forest-700));
-    box-shadow: 0 8px 22px rgba(44,97,38,0.24);
   }
 
   /* Burger (mobile) */
@@ -176,9 +162,9 @@ const isCurrent = (href: string) => href === '/' ? currentPath === '/' : current
     display: none;
     width: 40px;
     height: 40px;
-    border: 1px solid rgba(44,97,38,0.16);
-    border-radius: var(--radius-xl);
-    background: var(--color-primary-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: transparent;
     padding: 0;
     flex-direction: column;
     justify-content: center;
@@ -190,20 +176,15 @@ const isCurrent = (href: string) => href === '/' ? currentPath === '/' : current
     height: 2px;
     background: var(--color-text);
     border-radius: 1px;
-    transition: transform var(--dur-base) var(--ease-standard), opacity var(--dur-base) var(--ease-standard);
   }
-  .topnav-burger[aria-expanded='true'] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
-  .topnav-burger[aria-expanded='true'] span:nth-child(2) { opacity: 0; }
-  .topnav-burger[aria-expanded='true'] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
 
   .topnav-mobile { display: none; }
   .topnav-mobile ul {
     display: flex;
     flex-direction: column;
     gap: 6px;
-    padding: 12px var(--pad-x-mobile) 22px;
-    border-top: 1px solid rgba(44,97,38,0.1);
-    box-shadow: 0 18px 35px rgba(18,50,17,0.1);
+    padding: 8px var(--pad-x-mobile) 20px;
+    border-top: 1px solid var(--color-border);
   }
   .topnav-mobile a {
     display: block;
@@ -228,7 +209,7 @@ const isCurrent = (href: string) => href === '/' ? currentPath === '/' : current
   .mobile-lang { display: flex; justify-content: center; padding-top: 10px; }
 
   @media (max-width: 1023px) {
-    .topnav-inner { padding: 9px var(--pad-x-tablet); gap: 16px; }
+    .topnav-inner { padding: 12px var(--pad-x-tablet); gap: 16px; }
     .topnav-links { gap: 18px; }
   }
 
@@ -237,7 +218,7 @@ const isCurrent = (href: string) => href === '/' ? currentPath === '/' : current
   }
 
   @media (max-width: 767px) {
-    .topnav-inner { min-height: 68px; padding: 8px var(--pad-x-mobile); }
+    .topnav-inner { padding: 12px var(--pad-x-mobile); }
     .topnav-cta { display: none; }
     .topnav-recruit { display: none; } /* visible uniquement dans le menu burger */
     .topnav-burger { display: flex; }

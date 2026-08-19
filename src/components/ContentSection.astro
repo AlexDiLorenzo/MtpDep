@@ -20,17 +20,15 @@ const { titre, overline, alt = false } = Astro.props;
 
 <style>
   .cs {
-    padding: 72px var(--pad-x-desktop);
+    padding: 56px var(--pad-x-desktop);
     background: var(--color-bg);
   }
   .cs--alt {
-    background:
-      radial-gradient(circle at 90% 0%, rgba(44,97,38,0.055), transparent 30%),
-      var(--color-bg-subtle);
-    border-top: 1px solid rgba(44,97,38,0.08);
-    border-bottom: 1px solid rgba(44,97,38,0.08);
+    background: var(--color-bg-subtle);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
   }
-  .cs-inner { max-width: 1040px; margin: 0 auto; }
+  .cs-inner { max-width: var(--container-max); margin: 0 auto; }
   .cs-overline {
     display: inline-block;
     font-size: 11px;
@@ -45,18 +43,18 @@ const { titre, overline, alt = false } = Astro.props;
   }
   .cs-h2 {
     font-family: var(--font-display);
-    font-size: 32px;
+    font-size: 28px;
     line-height: 1.14;
     letter-spacing: var(--tr-display);
     font-weight: 700;
     color: var(--color-text);
-    margin: 0 0 24px;
+    margin: 0 0 20px;
   }
   .cs-body {
     font-size: 15px;
     line-height: 1.65;
     color: var(--color-text-muted);
-    max-width: 780px;
+    max-width: 720px;
   }
   .cs-body :global(p) { margin: 0 0 14px; }
   .cs-body :global(p:last-child) { margin-bottom: 0; }
@@ -79,10 +77,10 @@ const { titre, overline, alt = false } = Astro.props;
   }
 
   @media (max-width: 1023px) {
-    .cs { padding: 56px var(--pad-x-tablet); }
+    .cs { padding: 44px var(--pad-x-tablet); }
     .cs-h2 { font-size: 25px; }
   }
   @media (max-width: 639px) {
-    .cs { padding: 44px var(--pad-x-mobile); }
+    .cs { padding: 36px var(--pad-x-mobile); }
   }
 </style>

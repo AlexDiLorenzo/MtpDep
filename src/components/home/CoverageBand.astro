@@ -52,14 +52,12 @@ import { zones } from '../../data/zones';
 
 <style>
   .coverage {
-    padding: var(--section-space) var(--pad-x-desktop);
+    padding: 96px var(--pad-x-desktop);
     background:
-      radial-gradient(circle at 10% 0%, rgba(228,225,60,0.12), transparent 34%),
-      radial-gradient(circle at 92% 95%, rgba(100,161,66,0.22), transparent 38%),
-      linear-gradient(145deg, #102F17 0%, #1D4A23 58%, #17391C 100%);
-    color: #fff;
-    position: relative;
-    overflow: hidden;
+      radial-gradient(ellipse at 50% 0%, rgba(44,97,38,0.06) 0%, transparent 60%),
+      var(--color-bg);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
   }
   .coverage-inner {
     max-width: var(--container-max);
@@ -78,9 +76,8 @@ import { zones } from '../../data/zones';
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--md-brand-yellow);
-    background: rgba(228,225,60,0.1);
-    border: 1px solid rgba(228,225,60,0.19);
+    color: var(--color-primary);
+    background: var(--color-primary-bg);
     padding: 6px 12px;
     border-radius: var(--radius-pill);
     margin-bottom: 16px;
@@ -91,14 +88,14 @@ import { zones } from '../../data/zones';
     line-height: 1.08;
     letter-spacing: var(--tr-display);
     font-weight: 700;
-    color: #fff;
+    color: var(--color-text);
     margin: 0 0 16px;
   }
-  .coverage-title-accent { color: var(--md-brand-yellow); }
+  .coverage-title-accent { color: var(--color-primary); }
   .coverage-lead {
     font-size: 17px;
     line-height: 1.65;
-    color: rgba(255,255,255,0.73);
+    color: var(--color-text-muted);
     margin: 0;
   }
 
@@ -110,10 +107,10 @@ import { zones } from '../../data/zones';
     width: 100%;
     background:
       radial-gradient(circle at 50% 0%, #F6F5EB 0%, #ECEAD8 100%);
-    border: 1px solid rgba(255,255,255,0.55);
-    border-radius: var(--radius-panel);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-2xl);
     overflow: hidden;
-    box-shadow: 0 34px 90px rgba(0,0,0,0.28);
+    box-shadow: var(--shadow-sm);
     aspect-ratio: 770 / 565;
   }
 
@@ -189,7 +186,7 @@ import { zones } from '../../data/zones';
   .coverage-hint {
     margin: 0;
     font-size: 12px;
-    color: rgba(255,255,255,0.64);
+    color: var(--color-text-muted);
   }
   .coverage-actions {
     margin-top: 20px;
@@ -204,15 +201,14 @@ import { zones } from '../../data/zones';
     align-items: center;
     gap: 8px;
     padding: 11px 16px;
-    border: 1px solid var(--md-brand-yellow);
-    border-radius: var(--radius-xl);
-    color: var(--md-brand-black);
-    background: var(--md-brand-yellow);
+    border: 1px solid var(--color-primary);
+    border-radius: var(--radius-lg);
+    color: var(--color-primary);
     font-size: 13px;
     font-weight: 700;
     text-decoration: none;
   }
-  .coverage-all:hover { background: #F0ED47; transform: translateY(-2px); }
+  .coverage-all:hover { background: var(--color-primary-bg); }
 
   /* ---------- Responsive ---------- */
   @media (max-width: 1023px) {
@@ -222,10 +218,7 @@ import { zones } from '../../data/zones';
   @media (max-width: 639px) {
     .coverage { padding: 64px var(--pad-x-mobile); }
     .coverage-title { font-size: 28px; }
-    .coverage-head { margin-bottom: 34px; }
-    .coverage-map-wrap { border-radius: 20px; }
     .coverage-badge { font-size: 10px; padding: 6px 10px; top: 12px; left: 12px; }
-    .coverage-legend { display: none; }
-    .coverage-hint { text-align: center; }
+    .coverage-legend { bottom: 10px; right: 10px; gap: 10px; padding: 6px 10px; font-size: 10px; }
   }
 </style>

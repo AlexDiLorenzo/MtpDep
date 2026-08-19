@@ -40,32 +40,13 @@ html, body {
   text-rendering: optimizeLegibility;
 }
 
-html {
-  scroll-behavior: smooth;
-  overflow-x: clip;
-  background: var(--color-bg);
-}
-
-body {
-  min-width: 320px;
-  overflow-x: clip;
-}
-
-main { isolation: isolate; }
-
-::selection {
-  color: var(--md-brand-black);
-  background: rgba(228, 225, 60, 0.72);
-}
+html { scroll-behavior: smooth; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 }
 
-h1, h2, h3, h4, h5, h6 {
-  margin: 0;
-  text-wrap: balance;
-}
+h1, h2, h3, h4, h5, h6 { margin: 0; }
 p { margin: 0; }
 
 img, svg { display: block; max-width: 100%; }
@@ -77,8 +58,6 @@ a {
   text-decoration: none;
   transition: color var(--dur-fast) var(--ease-standard);
 }
-
-a, button { -webkit-tap-highlight-color: rgba(44, 97, 38, 0.14); }
 
 ul { list-style: none; padding: 0; margin: 0; }
 
@@ -164,12 +143,6 @@ ul { list-style: none; padding: 0; margin: 0; }
   background: rgba(255,255,255,0.08);
   border-color: rgba(255,255,255,0.6);
 }
-
-@media (hover: hover) {
-  .btn:hover { transform: translateY(-2px); }
-}
-
-.btn:active { transform: translateY(0); }
 
 /* ---- Apparition au scroll ----
    Hidden state appliqué UNIQUEMENT si JS actif (classe .js-reveal ajoutée
