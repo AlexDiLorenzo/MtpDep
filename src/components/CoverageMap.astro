@@ -66,7 +66,7 @@ const markers = agences.map((a) => {
       href={`/agences/${m.slug}/`}
       class:list={['cmap-marker', { 'is-main': m.principal }]}
       style={`--i:${i};`}
-      aria-label={`${m.societe} — voir la page agence`}
+      aria-label={`${m.name} — voir l’agence`}
     >
       <title>{m.societe}</title>
 
