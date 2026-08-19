@@ -25,6 +25,11 @@ import { site } from '../../config/site';
         vous rappelle. Pour une panne en cours, appelez directement le
         <a href={site.phone.href} class="mono" data-call-source="devis-section">{site.phone.display}</a>.
       </p>
+      <ul class="devis-promises" aria-label="Nos engagements pour votre demande">
+        <li><span aria-hidden="true">✓</span> Rappel par un dépanneur</li>
+        <li><span aria-hidden="true">✓</span> Demande sans engagement</li>
+        <li><span aria-hidden="true">✓</span> Données confidentielles</li>
+      </ul>
     </div>
 
     <div class="devis-panel" id="devis">
@@ -193,8 +198,8 @@ import { site } from '../../config/site';
 <style>
   /* ---------- Section ---------- */
   .devis {
-    padding: 88px var(--pad-x-desktop);
-    background: var(--color-bg);
+    padding: var(--section-space) var(--pad-x-desktop);
+    background: linear-gradient(135deg, #EEF4E8 0%, #FAFAF5 58%, #F6F3D8 100%);
     position: relative;
     overflow: hidden;
   }
@@ -203,16 +208,24 @@ import { site } from '../../config/site';
     position: absolute;
     inset: 0;
     background:
-      radial-gradient(ellipse at 12% 10%, rgba(44,97,38,0.05) 0%, transparent 55%),
-      radial-gradient(ellipse at 88% 90%, rgba(228,225,60,0.08) 0%, transparent 55%);
+      radial-gradient(ellipse at 8% 5%, rgba(44,97,38,0.11) 0%, transparent 48%),
+      radial-gradient(ellipse at 92% 92%, rgba(228,225,60,0.15) 0%, transparent 48%);
     pointer-events: none;
   }
   .devis-inner {
-    max-width: 860px;
+    max-width: var(--container-max);
     margin: 0 auto;
     position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 0.82fr) minmax(540px, 1.18fr);
+    gap: clamp(48px, 7vw, 88px);
+    align-items: start;
   }
-  .devis-intro { margin-bottom: 32px; }
+  .devis-intro {
+    position: sticky;
+    top: 116px;
+    padding-top: 18px;
+  }
   .devis-section-overline {
     display: inline-block;
     font-size: 11px;
@@ -227,7 +240,7 @@ import { site } from '../../config/site';
   }
   .devis-section-title {
     font-family: var(--font-display);
-    font-size: 36px;
+    font-size: clamp(38px, 4vw, 50px);
     line-height: 1.1;
     letter-spacing: var(--tr-display);
     font-weight: 700;
@@ -240,7 +253,7 @@ import { site } from '../../config/site';
     line-height: 1.65;
     color: var(--color-text-muted);
     margin: 0;
-    max-width: 680px;
+    max-width: 560px;
   }
   .devis-section-lead a {
     color: var(--color-primary);
@@ -248,15 +261,48 @@ import { site } from '../../config/site';
     text-decoration: none;
   }
   .devis-section-lead a:hover { text-decoration: underline; }
+  .devis-promises {
+    margin: 30px 0 0;
+    display: grid;
+    gap: 12px;
+  }
+  .devis-promises li {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    color: var(--color-text);
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .devis-promises span {
+    display: inline-grid;
+    place-items: center;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    color: #fff;
+    background: var(--color-primary);
+    font-size: 12px;
+    box-shadow: 0 5px 14px rgba(44,97,38,0.2);
+  }
 
   /* ---------- Panneau ---------- */
   .devis-panel {
     background: var(--color-bg);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-2xl);
-    padding: 36px 36px 32px;
-    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(44,97,38,0.14);
+    border-radius: var(--radius-panel);
+    padding: 42px 40px 36px;
+    box-shadow: var(--shadow-panel);
     scroll-margin-top: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .devis-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 5px;
+    background: linear-gradient(90deg, var(--color-primary), var(--md-brand-yellow));
   }
   .devis-head {
     margin-bottom: 24px;
@@ -333,13 +379,14 @@ import { site } from '../../config/site';
   .devis-field input[type='email'],
   .devis-field textarea {
     width: 100%;
-    padding: 11px 13px;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
+    min-height: 47px;
+    padding: 12px 14px;
+    border: 1px solid #D7D8CF;
+    border-radius: var(--radius-xl);
     font-family: var(--font-sans);
     font-size: 14px;
     color: var(--color-text);
-    background: var(--color-bg);
+    background: #FBFCF9;
     transition: border-color var(--dur-base) var(--ease-standard),
                 box-shadow var(--dur-base) var(--ease-standard);
   }
@@ -375,7 +422,7 @@ import { site } from '../../config/site';
     text-align: center;
     padding: 11px 12px;
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-xl);
     font-size: 13px;
     font-weight: 700;
     color: var(--color-text);
@@ -489,14 +536,16 @@ import { site } from '../../config/site';
 
   @media (max-width: 1023px) {
     .devis { padding: 72px var(--pad-x-tablet); }
-    .devis-section-title { font-size: 30px; }
+    .devis-inner { grid-template-columns: 1fr; gap: 38px; max-width: 820px; }
+    .devis-intro { position: static; padding-top: 0; }
+    .devis-section-title { font-size: 38px; }
     .devis-panel { padding: 28px 24px; }
   }
   @media (max-width: 639px) {
-    .devis { padding: 56px var(--pad-x-mobile); }
-    .devis-section-title { font-size: 25px; }
+    .devis { padding: 68px var(--pad-x-mobile); }
+    .devis-section-title { font-size: 31px; }
     .devis-section-lead { font-size: 15px; }
-    .devis-panel { padding: 24px 20px; }
+    .devis-panel { padding: 28px 20px 24px; border-radius: 20px; }
     .devis-grid { grid-template-columns: 1fr; }
     .devis-title { font-size: 20px; }
     .devis-submit-row { flex-direction: column; align-items: stretch; }

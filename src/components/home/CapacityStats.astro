@@ -141,10 +141,14 @@ const fmtTarget = (n: number) =>
 
 <style>
   .cap {
-    padding: 96px var(--pad-x-desktop);
-    background: var(--color-bg-subtle);
-    border-top: 1px solid var(--color-border);
-    border-bottom: 1px solid var(--color-border);
+    padding: var(--section-space) var(--pad-x-desktop);
+    background:
+      linear-gradient(rgba(44,97,38,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(44,97,38,0.035) 1px, transparent 1px),
+      var(--color-bg-subtle);
+    background-size: 44px 44px;
+    border-top: 1px solid rgba(44,97,38,0.08);
+    border-bottom: 1px solid rgba(44,97,38,0.08);
   }
   .cap-inner {
     max-width: var(--container-max);
@@ -153,8 +157,8 @@ const fmtTarget = (n: number) =>
 
   /* ---------- Head ---------- */
   .cap-head {
-    max-width: 720px;
-    margin-bottom: 56px;
+    max-width: 790px;
+    margin-bottom: 50px;
   }
   .cap-overline {
     display: inline-block;
@@ -170,7 +174,7 @@ const fmtTarget = (n: number) =>
   }
   .cap-title {
     font-family: var(--font-display);
-    font-size: 44px;
+    font-size: clamp(38px, 4.2vw, 50px);
     line-height: 1.08;
     letter-spacing: var(--tr-display);
     font-weight: 700;
@@ -192,14 +196,14 @@ const fmtTarget = (n: number) =>
     padding: 0;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
+    gap: 20px;
   }
   .cap-kpi {
-    background: var(--color-bg);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-xl);
-    padding: 26px 24px;
-    box-shadow: var(--shadow-xs);
+    background: rgba(255,255,255,0.9);
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-card);
+    padding: 28px 25px;
+    box-shadow: var(--shadow-card);
     position: relative;
     overflow: hidden;
     transition: transform var(--dur-base) var(--ease-standard),
@@ -210,17 +214,17 @@ const fmtTarget = (n: number) =>
     position: absolute;
     top: 0; left: 0;
     width: 100%;
-    height: 3px;
+    height: 4px;
     background: linear-gradient(90deg, var(--color-primary) 0%, var(--md-signal-300) 100%);
     opacity: 0.85;
   }
   .cap-kpi:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-md);
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-card-hover);
   }
   .cap-kpi-value {
     font-family: var(--font-display);
-    font-size: 44px;
+    font-size: 46px;
     font-weight: 700;
     letter-spacing: -0.02em;
     color: var(--color-text);
@@ -252,11 +256,12 @@ const fmtTarget = (n: number) =>
   /* ---------- Photo ---------- */
   .cap-photo {
     position: relative;
-    border-radius: var(--radius-2xl);
+    border-radius: var(--radius-panel);
     overflow: hidden;
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-panel);
     isolation: isolate;
-    min-height: 280px;
+    min-height: 360px;
+    border: 1px solid rgba(255,255,255,0.65);
   }
   .cap-photo-img {
     position: absolute;
@@ -271,7 +276,7 @@ const fmtTarget = (n: number) =>
     position: absolute;
     inset: 0;
     background: linear-gradient(180deg, rgba(26,25,15,0) 30%, rgba(26,25,15,0.85) 100%);
-    padding: 28px 32px;
+    padding: 32px 36px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -313,13 +318,17 @@ const fmtTarget = (n: number) =>
     .cap { padding: 80px var(--pad-x-tablet); }
     .cap-title { font-size: 36px; }
     .cap-kpis { grid-template-columns: repeat(2, 1fr); }
-    .cap-photo { min-height: 240px; }
+    .cap-photo { min-height: 300px; }
   }
   @media (max-width: 639px) {
     .cap { padding: 64px var(--pad-x-mobile); }
-    .cap-title { font-size: 28px; }
+    .cap-title { font-size: 30px; }
+    .cap-head { margin-bottom: 36px; }
+    .cap-kpis { gap: 12px; margin-bottom: 42px; }
     .cap-kpi-value { font-size: 36px; }
-    .cap-kpi { padding: 22px 20px; }
+    .cap-kpi { padding: 22px 18px; border-radius: 18px; }
+    .cap-kpi-kicker { font-size: 11px; }
+    .cap-photo { min-height: 290px; border-radius: 20px; }
     .cap-photo-overlay { padding: 20px; }
     .cap-photo-stats { gap: 24px; }
     .cap-photo-stat-value { font-size: 22px; }

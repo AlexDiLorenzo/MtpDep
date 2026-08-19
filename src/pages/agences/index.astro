@@ -152,8 +152,10 @@ const jsonLd = [
 <style>
   /* ====== En-tête ====== */
   .ax-head {
-    padding: 64px var(--pad-x-desktop) 40px;
-    background: var(--color-bg);
+    padding: 76px var(--pad-x-desktop) 60px;
+    background:
+      radial-gradient(circle at 84% 0%, rgba(228,225,60,0.15), transparent 34%),
+      linear-gradient(135deg, #102F17, #1E4B24);
   }
   .ax-head-inner { max-width: var(--container-max); margin: 0 auto; }
   .ax-overline {
@@ -162,43 +164,45 @@ const jsonLd = [
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--color-primary);
-    background: var(--color-primary-bg);
+    color: var(--md-brand-yellow);
+    background: rgba(228,225,60,0.1);
+    border: 1px solid rgba(228,225,60,0.18);
     padding: 6px 12px;
     border-radius: var(--radius-pill);
     margin-bottom: 16px;
   }
   .ax-title {
     font-family: var(--font-display);
-    font-size: 44px;
+    font-size: clamp(42px, 5vw, 58px);
     line-height: 1.08;
     letter-spacing: var(--tr-display);
     font-weight: 700;
-    color: var(--color-text);
+    color: #fff;
     margin: 0 0 16px;
     max-width: 760px;
   }
   .ax-lead {
     font-size: 16px;
     line-height: 1.6;
-    color: var(--color-text-muted);
+    color: rgba(255,255,255,0.74);
     margin: 0;
     max-width: 680px;
   }
 
   /* ====== Carte ====== */
   .ax-map-section {
-    padding: 0 var(--pad-x-desktop) 16px;
+    padding: 0 var(--pad-x-desktop) 80px;
+    background: linear-gradient(180deg, #1E4B24 0%, #17391C 100%);
   }
   .ax-map-wrap {
     position: relative;
     max-width: 1000px;
     margin: 0 auto;
     background: radial-gradient(circle at 50% 0%, #F6F5EB 0%, #ECEAD8 100%);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-2xl);
+    border: 1px solid rgba(255,255,255,0.5);
+    border-radius: var(--radius-panel);
     overflow: hidden;
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 32px 80px rgba(0,0,0,0.28);
     aspect-ratio: 770 / 565;
   }
   .ax-map-badge {
@@ -225,14 +229,14 @@ const jsonLd = [
   .ax-map-hint {
     text-align: center;
     font-size: 12px;
-    color: var(--color-text-muted);
+    color: rgba(255,255,255,0.65);
     margin: 16px 0 0;
   }
 
   /* ====== Liste ====== */
   .ax-list-section {
-    padding: 56px var(--pad-x-desktop) 72px;
-    background: var(--color-bg);
+    padding: 84px var(--pad-x-desktop) 72px;
+    background: var(--color-bg-subtle);
   }
   .ax-list-inner { max-width: var(--container-max); margin: 0 auto; }
   .ax-grid {
@@ -241,25 +245,25 @@ const jsonLd = [
     padding: 0;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
+    gap: 20px;
   }
   .ax-card {
     display: flex;
     flex-direction: column;
     height: 100%;
-    background: var(--color-bg);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-xl);
-    padding: 24px 22px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-card);
+    padding: 27px 25px;
     text-decoration: none;
-    box-shadow: var(--shadow-xs);
+    box-shadow: var(--shadow-card);
     transition: transform var(--dur-base) var(--ease-standard),
                 box-shadow var(--dur-base) var(--ease-standard),
                 border-color var(--dur-base) var(--ease-standard);
   }
   .ax-card:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-md);
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-card-hover);
     border-color: var(--md-forest-200);
   }
   .ax-card-flag {
@@ -271,12 +275,12 @@ const jsonLd = [
     color: var(--color-primary);
     background: var(--color-primary-bg);
     padding: 4px 8px;
-    border-radius: var(--radius-xs);
+    border-radius: var(--radius-pill);
     margin-bottom: 10px;
   }
   .ax-card-name {
     font-family: var(--font-display);
-    font-size: 17px;
+    font-size: 20px;
     font-weight: 700;
     color: var(--color-text);
     margin: 0 0 8px;
@@ -322,8 +326,8 @@ const jsonLd = [
 
   /* ====== Zones d'intervention ====== */
   .ax-zones-section {
-    padding: 8px var(--pad-x-desktop) 72px;
-    background: var(--color-bg);
+    padding: 18px var(--pad-x-desktop) 84px;
+    background: var(--color-bg-subtle);
   }
   .ax-zones-inner { max-width: var(--container-max); margin: 0 auto; }
   .ax-zones-title {
@@ -349,9 +353,10 @@ const jsonLd = [
   }
   .ax-zones-group {
     background: var(--color-bg-subtle);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-xl);
-    padding: 20px 22px;
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-card);
+    padding: 22px 24px;
+    box-shadow: var(--shadow-xs);
   }
   .ax-zones-group-title {
     font-size: 13px;
@@ -428,20 +433,21 @@ const jsonLd = [
 
   /* ====== Responsive ====== */
   @media (max-width: 1023px) {
-    .ax-head { padding: 48px var(--pad-x-tablet) 32px; }
+    .ax-head { padding: 58px var(--pad-x-tablet) 48px; }
     .ax-title { font-size: 34px; }
-    .ax-map-section { padding: 0 var(--pad-x-tablet) 16px; }
-    .ax-list-section { padding: 48px var(--pad-x-tablet) 56px; }
+    .ax-map-section { padding: 0 var(--pad-x-tablet) 64px; }
+    .ax-list-section { padding: 68px var(--pad-x-tablet) 56px; }
     .ax-cta { padding: 48px var(--pad-x-tablet); }
     .ax-grid { grid-template-columns: repeat(2, 1fr); }
     .ax-zones-section { padding: 8px var(--pad-x-tablet) 56px; }
     .ax-zones-groups { grid-template-columns: repeat(2, 1fr); }
   }
   @media (max-width: 639px) {
-    .ax-head { padding: 40px var(--pad-x-mobile) 28px; }
-    .ax-title { font-size: 28px; }
-    .ax-map-section { padding: 0 var(--pad-x-mobile) 16px; }
-    .ax-list-section { padding: 40px var(--pad-x-mobile) 48px; }
+    .ax-head { padding: 48px var(--pad-x-mobile) 40px; }
+    .ax-title { font-size: 34px; }
+    .ax-map-section { padding: 0 var(--pad-x-mobile) 54px; }
+    .ax-map-wrap { border-radius: 20px; }
+    .ax-list-section { padding: 58px var(--pad-x-mobile) 48px; }
     .ax-cta { padding: 40px var(--pad-x-mobile); }
     .ax-grid { grid-template-columns: 1fr; }
     .ax-zones-section { padding: 8px var(--pad-x-mobile) 48px; }

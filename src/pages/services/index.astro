@@ -4,7 +4,6 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import TopNav from '../../components/TopNav.astro';
 import Footer from '../../components/Footer.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
-import { photos } from '../../config/site';
 import { services } from '../../data/services';
 import { organizationSchema, breadcrumbSchema } from '../../lib/schema';
 
@@ -24,6 +23,15 @@ const jsonLd = [
     { name: 'Services', url: '/services/' },
   ]),
 ];
+
+const cardImages: Record<string, string> = {
+  porscheCayman: '/img/porsche-cayman-card.webp',
+  plRecuperation: '/img/pl-recuperation-card.webp',
+  interventionA9: '/img/intervention-a9-card.webp',
+  transportInternational: '/img/transport-international-card.webp',
+  flotteElectrique: '/img/flotte-electrique-card.webp',
+  peyrou: '/img/peyrou-vertical-card.webp',
+};
 ---
 
 <BaseLayout title={pageTitle} description={pageDescription} jsonLd={jsonLd} routeKey="services">
@@ -48,7 +56,7 @@ const jsonLd = [
           {services.map((s) => (
             <li>
               <a href={`/services/${s.slug}/`} class="sx-card">
-                <div class="sx-card-img" style={`--sx-img: url('${photos[s.photo]}');`}>
+                <div class="sx-card-img" style={`--sx-img: url('${cardImages[s.photo]}');`}>
                   <span class="sx-card-tag mono">{s.tag}</span>
                 </div>
                 <div class="sx-card-body">
@@ -81,8 +89,10 @@ const jsonLd = [
 
 <style>
   .sx-head {
-    padding: 64px var(--pad-x-desktop) 40px;
-    background: var(--color-bg);
+    padding: 76px var(--pad-x-desktop) 66px;
+    background:
+      radial-gradient(circle at 84% 0%, rgba(228,225,60,0.16), transparent 34%),
+      linear-gradient(135deg, #102F17, #1E4B24);
   }
   .sx-head-inner { max-width: var(--container-max); margin: 0 auto; }
   .sx-overline {
@@ -91,33 +101,34 @@ const jsonLd = [
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--color-primary);
-    background: var(--color-primary-bg);
+    color: var(--md-brand-yellow);
+    background: rgba(228,225,60,0.1);
+    border: 1px solid rgba(228,225,60,0.18);
     padding: 6px 12px;
     border-radius: var(--radius-pill);
     margin-bottom: 16px;
   }
   .sx-title {
     font-family: var(--font-display);
-    font-size: 44px;
+    font-size: clamp(42px, 5vw, 58px);
     line-height: 1.08;
     letter-spacing: var(--tr-display);
     font-weight: 700;
-    color: var(--color-text);
+    color: #fff;
     margin: 0 0 16px;
     max-width: 760px;
   }
   .sx-lead {
     font-size: 16px;
     line-height: 1.6;
-    color: var(--color-text-muted);
+    color: rgba(255,255,255,0.74);
     margin: 0;
     max-width: 640px;
   }
 
   .sx-grid-section {
-    padding: 24px var(--pad-x-desktop) 72px;
-    background: var(--color-bg);
+    padding: 76px var(--pad-x-desktop) 88px;
+    background: var(--color-bg-subtle);
   }
   .sx-grid-inner { max-width: var(--container-max); margin: 0 auto; }
   .sx-grid {
@@ -126,24 +137,24 @@ const jsonLd = [
     padding: 0;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
+    gap: 22px;
   }
   .sx-card {
     display: flex;
     flex-direction: column;
     height: 100%;
-    background: var(--color-bg);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-xl);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-card);
     overflow: hidden;
     text-decoration: none;
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-card);
     transition: transform var(--dur-base) var(--ease-standard),
                 box-shadow var(--dur-base) var(--ease-standard);
   }
-  .sx-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .sx-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-card-hover); }
   .sx-card-img {
-    height: 168px;
+    height: 210px;
     background-image: linear-gradient(180deg, rgba(26,25,15,0) 40%, rgba(26,25,15,0.7) 100%), var(--sx-img);
     background-size: cover;
     background-position: center;
@@ -156,25 +167,27 @@ const jsonLd = [
     padding: 4px 8px;
     background: var(--md-brand-yellow);
     color: var(--md-brand-black);
-    border-radius: var(--radius-xs);
+    border-radius: var(--radius-pill);
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.05em;
   }
   .sx-card-body {
-    padding: 20px 22px 22px;
+    padding: 24px;
     display: flex;
     flex-direction: column;
     flex: 1;
   }
   .sx-card-title {
-    font-size: 17px;
+    font-family: var(--font-display);
+    font-size: 20px;
+    line-height: 1.22;
     font-weight: 700;
     color: var(--color-text);
     margin: 0 0 8px;
   }
   .sx-card-desc {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--color-text-muted);
     margin: 0 0 16px;
     line-height: 1.55;
@@ -222,16 +235,17 @@ const jsonLd = [
   @media (max-width: 1023px) {
     .sx-head { padding: 48px var(--pad-x-tablet) 32px; }
     .sx-title { font-size: 34px; }
-    .sx-grid-section { padding: 24px var(--pad-x-tablet) 56px; }
+    .sx-grid-section { padding: 62px var(--pad-x-tablet) 72px; }
     .sx-cta { padding: 48px var(--pad-x-tablet); }
     .sx-grid { grid-template-columns: repeat(2, 1fr); }
   }
   @media (max-width: 639px) {
-    .sx-head { padding: 40px var(--pad-x-mobile) 28px; }
-    .sx-title { font-size: 28px; }
-    .sx-grid-section { padding: 20px var(--pad-x-mobile) 48px; }
+    .sx-head { padding: 48px var(--pad-x-mobile) 42px; }
+    .sx-title { font-size: 34px; }
+    .sx-grid-section { padding: 54px var(--pad-x-mobile) 62px; }
     .sx-cta { padding: 40px var(--pad-x-mobile); }
     .sx-grid { grid-template-columns: 1fr; }
+    .sx-card-img { height: 190px; }
   }
 
   @media (prefers-reduced-motion: reduce) {

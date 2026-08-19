@@ -27,7 +27,7 @@ const links = [
 <nav class="lnav">
   <div class="lnav-inner">
     <a href={pathFor('home', locale)!} class="lnav-brand" aria-label={`${site.name} — ${ui.navHome}`}>
-      <LogoMark size={32} />
+      <LogoMark size={44} />
     </a>
 
     <ul class="lnav-links">
@@ -50,26 +50,28 @@ const links = [
     position: sticky;
     top: 0;
     z-index: 50;
-    background: var(--color-bg);
-    border-bottom: 1px solid var(--color-border);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: rgba(255,254,250,0.93);
+    border-bottom: 1px solid rgba(44,97,38,0.1);
+    backdrop-filter: blur(18px) saturate(145%);
+    -webkit-backdrop-filter: blur(18px) saturate(145%);
+    box-shadow: 0 6px 24px rgba(18,50,17,0.06);
   }
   .lnav-inner {
     max-width: var(--container-max);
     margin: 0 auto;
-    padding: 14px var(--pad-x-desktop);
+    min-height: 76px;
+    padding: 10px var(--pad-x-desktop);
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 20px;
   }
-  .lnav-brand { display: flex; align-items: center; flex-shrink: 0; }
+  .lnav-brand { display: flex; align-items: center; flex-shrink: 0; filter: drop-shadow(0 4px 7px rgba(18,50,17,0.13)); }
 
   .lnav-links {
     display: flex;
     align-items: center;
-    gap: 26px;
+    gap: 4px;
     list-style: none;
     margin: 0;
     padding: 0;
@@ -79,12 +81,11 @@ const links = [
     font-weight: 500;
     color: var(--color-text);
     text-decoration: none;
-    padding: 4px 0;
-    border-bottom: 2px solid transparent;
-    transition: color var(--dur-fast) var(--ease-standard),
-                border-color var(--dur-fast) var(--ease-standard);
+    padding: 9px 13px;
+    border-radius: var(--radius-pill);
+    transition: color var(--dur-fast) var(--ease-standard), background-color var(--dur-fast) var(--ease-standard);
   }
-  .lnav-links a:hover { color: var(--color-primary); border-color: var(--color-primary); }
+  .lnav-links a:hover { color: var(--color-primary); background: var(--color-primary-bg); }
 
   .lnav-cta { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
   .lnav-phone {
@@ -94,10 +95,11 @@ const links = [
     padding: 10px 16px;
     background: var(--md-brand-green);
     color: #fff;
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-xl);
     font-size: 14px;
     font-weight: 700;
     text-decoration: none;
+    box-shadow: 0 8px 22px rgba(44,97,38,0.22);
   }
   .lnav-phone:hover { background: var(--md-forest-700, #234f1e); }
 

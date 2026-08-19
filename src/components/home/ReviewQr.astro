@@ -55,15 +55,16 @@ import { photos } from '../../config/site';
     gap: 7px;
     padding: 9px 14px;
     border-radius: var(--radius-pill);
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(15, 37, 17, 0.48);
     border: 1px solid rgba(255, 255, 255, 0.28);
     color: #fff;
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.03em;
     cursor: pointer;
-    -webkit-backdrop-filter: blur(4px);
-    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.14);
     transition: background-color var(--dur-base) var(--ease-standard),
                 transform var(--dur-base) var(--ease-standard);
   }
@@ -138,7 +139,15 @@ import { photos } from '../../config/site';
     .qr-shortcut { right: var(--pad-x-tablet); }
   }
   @media (max-width: 767px) {
-    .qr-shortcut { right: var(--pad-x-mobile); top: 12px; }
+    .qr-shortcut {
+      right: var(--pad-x-mobile);
+      top: 14px;
+      width: 42px;
+      height: 42px;
+      padding: 0;
+      justify-content: center;
+    }
+    .qr-shortcut-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
   }
 
   @media (prefers-reduced-motion: reduce) {
